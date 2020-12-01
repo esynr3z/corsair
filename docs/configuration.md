@@ -27,6 +27,7 @@ Options for "auto_increment_mode":
 | :- | :- |
 | "none" | No address auto increment. If no address is provided, error will be generated.  |
 | "data_width" | Enable auto increment with value based on "data_width" of "interface_generic" group |
+| "custom" | Enable auto increment based on "auto_increment_value" |
 
 Options for "alignment_mode":
 
@@ -34,6 +35,7 @@ Options for "alignment_mode":
 | :- | :- |
 | "none" | No check of address alignment  |
 | "data_width" | Enable check of address alignment based on "data_width" of "interface_generic" group |
+| "custom" | Enable check of address alignment based on "alignment_value" |
 
 ## register_reset
 

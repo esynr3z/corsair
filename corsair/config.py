@@ -12,210 +12,230 @@ class Parameter():
     """Generic parameter.
 
     Attributes:
-      name: Name of the parameter.
-      value: Value of the parameter.
-      allowlist: List with values allowed for the parameter.
-      min: Parameter value must be equal or greater than that number.
-      max: Parameter value must be less than that number.
+        name: Name of the parameter.
+        value: Value of the parameter.
+        checker: Lambda function to perform value checking.
 
     """
-    def __init__(self, name, value=None, allowlist=None, min=None, max=None):
+    def __init__(self, name, value=None, checker=lambda val: True):
         """Initialize parameter.
 
         Args:
-          name: String with the parameter's name.
-          value: Optional; Value of the parameter.
-          allowlist: Optional;
-            List with values allowed for the parameter.
-            Should not be mixed with min, max arguments.
-          min: Optional;
-            Parameter value must be equal or greater than that number.
-            Should not be mixed allowlist argument.
-            Use it with max argument to create a range.
-          max: Optional;
-            Parameter value must be less than that number.
-            Should not be mixed allowlist argument.
-            Use it with min argument to create a range.
+            name: String with the parameter's name.
+            value (optional): Value of the parameter.
+            checker (optional):
+                Lambda function to perform value checking.
+                Returns True if value check is OK, and False otherwise.
 
         Raises:
-          ValueError: An error occured if value does not match allowlist or
-            specified range (with min, max, min and max)
+            ValueError: An error occured if value does not match checker rules.
 
         """
         self.name = name
         self._value = value
-        self.allowlist = allowlist
-        self.min = min
-        self.max = max
+        self.checker = checker
         if value is not None:
             self._check()
 
+    def __repr__(self):
+        """Returns string representation of an object."""
+        return 'Parameter(%s, %s)' % (repr(self.name), repr(self.value))
+
     def __str__(self):
-        """Returns parameter's string"""
-        return '%s: %s' % (self.name, self._value)
+        """Returns 'informal' string representation of an object."""
+        return self._str()
+
+    def _str(self, indent=''):
+        """Returns indented parameter's string with name and value."""
+        return indent + '%s: %s' % (self.name, self._value)
 
     @property
     def value(self):
-        """Get current value"""
+        """Current value of the parameter.
+
+        Raises:
+            ValueError: An error occured if value fails the check after set.
+        """
         return self._value
 
     @value.setter
     def value(self, new_value):
-        """Set current value
-
-        Raises:
-          ValueError: An error occured if value does not match allowlist or
-            specified range (with min, max, min and max)
-        """
         self._value = new_value
         self._check()
 
     def _check(self):
-        """Check parameter value correctness
+        """Check parameter value correctness.
 
         Raises:
-          ValueError: An error occured if value does not match allowlist or
-            specified range (with min, max, min and max)
+            ValueError: An error occured if value does not match checker rules.
         """
-        if self.allowlist is not None:
-            if self._value not in self.allowlist:
-                raise ValueError('%s parameter has no option %s in %s!' % (self.name,
-                                                                           self._value,
-                                                                           self.allowlist))
-        elif (self.min is not None) and (self.max is not None):
-            if self._value < self.min or self._value >= self.max:
-                raise ValueError("%s value %d doesn't match the range [%d;%d)!" % (self.name,
-                                                                                   self._value,
-                                                                                   self.min,
-                                                                                   self.max))
-        elif self.min is not None:
-            if self._value < self.min:
-                raise ValueError("%s value %d is less than minimum value %d!" % (self.name,
-                                                                                 self._value,
-                                                                                 self.min))
-        elif self.max is not None:
-            if self._value >= self.max:
-                raise ValueError("%s value %d is greater than or equal maximum value %d!" % (self.name,
-                                                                                             self._value,
-                                                                                             self.max))
+        if self.checker(self.value) is False:
+            raise ValueError('"%s" parameter with "%s" value failed the check!' % (self.name,
+                                                                                   self.value))
 
 
 class ParameterGroup():
-    """Group of parameters.
+    """Group of parameters or other groups.
 
     Attributes:
-      name: Name of the group.
-
-    Use [] syntax for accessing parameter's values.
-    par_a_value = par_group['par_a_name']
+        name: Name of the group.
     """
-    def __init__(self, name, params=[]):
-        """Initialize parameter group.
-
-        Args:
-          params: Optional; List of the parameters to be stored inside the group.
-        """
+    def __init__(self, name):
+        """Initialize parameter group."""
         self.name = name
         self._params = {}
-        for p in params:
-            self.add_param(p)
+
+    def __repr__(self):
+        """Returns string representation of an object."""
+        return 'ParameterGroup(%s)' % repr(self.name)
 
     def __str__(self):
-        """Returns string representing group members and their values"""
-        params = ['  ' + str(self._params[name]) for name in self._params.keys()]
-        params_str = '\n'.join(params) if params else '  empty'
-        return '%s:\n' % self.name + params_str
+        """Returns 'informal' string representation of an object."""
+        return self._str()
 
     def __getitem__(self, key):
-        """To access parameter's value by it's name.
+        """Get parameter or group by name.
 
         Raises:
-          KeyError: An error occured if parameter does not exists.
+            KeyError: An error occured if parameter or group does not exists.
         """
         try:
-            return self._params[key].value
+            return self._params[key]
         except KeyError:
-            raise KeyError("Parameter with a name '%s' doesn't exist in a '%s' group!" % (key, self.name))
+            raise KeyError("Parameter/Group with a name '%s' doesn't exist!" % key)
 
-    def add_param(self, param):
-        """Add parameter to the group"""
-        self._params[param.name] = param
-
-
-class Configuration():
-    """ Collection of global parameters.
-
-    Use [] syntax for accessing parameter's values.
-    par_a_value = config['par_a_name']
-    par_b_value = config['group_a_name']['par_b_name']
-    """
-    def __init__(self, params=[]):
-        """Initialize parameter group.
-
-        Args:
-          params: Optional; List of the parameters to be stored inside the configuration.
-            Note that this list is applied only after all built-in parameters will be created.
-        """
-        self._params = {}
-        self._init_builtin_params()
-        for p in params:
-            self.add_param(p)
-
-    def _init_builtin_params(self):
-        """Initalize all built-in params"""
-
-        # parameter read_filler
-        self.add_param(Parameter(name='read_filler', value=0x0))
-
-        # group address_calculation
-        address_calculation_params = [
-            Parameter(name='auto_increment_mode', value='none', allowlist=['none', 'data_width']),
-            Parameter(name='auto_increment_value', value=4, min=1),
-            Parameter(name='alignment_mode', value='data_width', allowlist=['none', 'data_width']),
-            Parameter(name='alignment_value', value=4, min=1)
-        ]
-        self.add_param(ParameterGroup('address_calculation', address_calculation_params))
-
-        # parameter register_reset
-        self.add_param(Parameter(name='register_reset', value='sync_pos', allowlist=['sync_pos',
-                                                                                     'sync_neg',
-                                                                                     'async_pos',
-                                                                                     'async_neg',
-                                                                                     'init_only']))
-
-        # group interface_generic
-        interface_generic_params = [
-            Parameter(name='type', value='lb', allowlist=['amm', 'apb', 'axil', 'lb']),
-            Parameter(name='data_width', value='32'),
-            Parameter(name='address_width', value='32'),
-        ]
-        self.add_param(ParameterGroup('interface_generic', interface_generic_params))
-
-        # group interface_specific
-        self.add_param(ParameterGroup('interface_specific'))
-
-    def __str__(self):
-        """Returns string representing all parameters and their values"""
-        param_str = [str(self._params[name]) for name in self._params.keys()]
-        return '\n'.join(param_str)
-
-    def __getitem__(self, key):
-        """To access parameter's value by it's name.
+    def __setitem__(self, key, value):
+        """Set parameter or group by name.
 
         Raises:
-          KeyError: An error occured if parameter or group does not exists.
+            KeyError: An error occured if parameter or group does not exists.
         """
-        if isinstance(self._params[key], Parameter):
-            try:
-                return self._params[key].value
-            except KeyError:
-                raise KeyError("Parameter with a name '%s' doesn't exist in the configuration!" % key)
-        else:
-            try:
-                return self._params[key]
-            except KeyError:
-                raise KeyError("Parameter group with a name '%s' doesn't exist in the configuration!" % key)
+        try:
+            self._params[key] = value
+        except KeyError:
+            raise KeyError("Parameter/Group with a name '%s' doesn't exist!" % key)
 
-    def add_param(self, param):
-        """Add parameter or group of parameters"""
-        self._params[param.name] = param
+    def _str(self, indent=''):
+        """Returns indented string with group members and their values"""
+        new_indent = indent + '  '
+        params = [self[name]._str(new_indent) for name in self.names]
+        params_str = '\n'.join(params) if params else new_indent + 'empty'
+        return indent + '%s:\n' % self.name + params_str
+
+    @property
+    def names(self):
+        """Return all parameters names"""
+        return self._params.keys()
+
+    @property
+    def params(self):
+        """Returns list with parameters objects."""
+        return [param for param in self._params.items()]
+
+    def add_params(self, new_params):
+        """Add/replace parameters by name from input list."""
+        # hack to handle single elements
+        if type(new_params) is not list:
+            new_params = [new_params]
+        # add params to dict one by one
+        for p in new_params:
+            self[p.name] = p
+
+    @property
+    def values(self):
+        """Dictionary with values of the parameters/groups.
+
+        Getter:
+            Returns dictionary with pairs {name:value} of all parameter/groups of the current group.
+
+        Setter:
+            Sets only parameters/groups specified in the input dictionary,
+            but if parameter/group does not exist, it will create it.
+        """
+        values = {}
+        for name in self.names:
+            if isinstance(self[name], ParameterGroup):
+                values[name] = self[name].values
+            else:
+                values[name] = self[name].value
+        return values
+
+    @values.setter
+    def values(self, new_values):
+        for name in new_values.keys():
+            try:
+                # if parameter/group exists
+                if isinstance(self[name], ParameterGroup):
+                    self[name].values = new_values[name]
+                else:
+                    self[name].value = new_values[name]
+            except KeyError:
+                # else if parameter/group does not exists
+                if isinstance(new_values[name], dict):
+                    self.add_params(ParameterGroup(name=name))
+                    self[name].values = new_values[name]
+                else:
+                    self.add_params(Parameter(name=name, value=new_values[name]))
+
+
+class Configuration(ParameterGroup):
+    """Collection of global parameters."""
+    def __init__(self):
+        """Initialize configuration."""
+        super().__init__('configuration')
+        self._init_default_params()
+
+    def __repr__(self):
+        """Returns string representation of an object."""
+        return 'Configuration()'
+
+    def _init_default_params(self):
+        """Initalize all default params"""
+
+        # parameter read_filler
+        self.add_params(Parameter(name='read_filler', value=0x0))
+
+        # group address_calculation
+        self.add_params(ParameterGroup('address_calculation'))
+
+        self['address_calculation'].add_params([
+            Parameter(name='auto_increment_mode', value='none', checker=lambda val: val in ['none', 'data_width', 'custom']),
+            Parameter(name='auto_increment_value', value=4, checker=lambda val: val >= 1),
+            Parameter(name='alignment_mode', value='data_width', checker=lambda val: val in ['none', 'data_width', 'custom']),
+            Parameter(name='alignment_value', value=4, checker=lambda val: val >= 1)
+        ])
+
+        # parameter register_reset
+        reg_rst_allowlist = ['sync_pos', 'sync_neg', 'async_pos', 'async_neg', 'init_only']
+        self.add_params(Parameter(name='register_reset', value='sync_pos',
+                                  checker=lambda val: val in reg_rst_allowlist))
+
+        # group interface_generic
+        self.add_params(ParameterGroup('interface_generic'))
+
+        ifgen_type_allowed = ['amm', 'apb', 'axil', 'lb']
+        self['interface_generic'].add_params(
+            Parameter(name='type', value='lb', checker=lambda val: val in ifgen_type_allowed)
+        )
+
+        ifgen_data_width_allowed = {
+            'amm': [8, 16, 32, 64, 128, 256, 512, 1024],
+            'apb': [8, 16, 32],
+            'axil': [32, 64],
+            'lb': [8, 16, 32, 64, 128, 256, 512, 1024]
+        }
+        ifgen_addr_width_allowed = {
+            'amm': range(1, 64),
+            'apb': range(1, 32),
+            'axil': [32, 64],
+            'lb': range(1, 64)
+        }
+        self['interface_generic'].add_params([
+            Parameter(name='data_width', value=32,
+                      checker=lambda val: val in ifgen_data_width_allowed[self['interface_generic']['type'].value]),
+            Parameter(name='address_width', value=32,
+                      checker=lambda val: val in ifgen_addr_width_allowed[self['interface_generic']['type'].value])
+        ])
+
+        # group interface_specific
+        self.add_params(ParameterGroup('interface_specific'))
