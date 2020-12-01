@@ -199,9 +199,11 @@ class Configuration(ParameterGroup):
         self.add_params(ParameterGroup('address_calculation'))
 
         self['address_calculation'].add_params([
-            Parameter(name='auto_increment_mode', value='none', checker=lambda val: val in ['none', 'data_width', 'custom']),
+            Parameter(name='auto_increment_mode', value='none',
+                      checker=lambda val: val in ['none', 'data_width', 'custom']),
             Parameter(name='auto_increment_value', value=4, checker=lambda val: val >= 1),
-            Parameter(name='alignment_mode', value='data_width', checker=lambda val: val in ['none', 'data_width', 'custom']),
+            Parameter(name='alignment_mode', value='data_width',
+                      checker=lambda val: val in ['none', 'data_width', 'custom']),
             Parameter(name='alignment_value', value=4, checker=lambda val: val >= 1)
         ])
 
