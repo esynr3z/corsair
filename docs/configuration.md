@@ -1,16 +1,28 @@
-# Configuration options
+# Configuration
 
-Collection of global parameters. These parameters can be used in special section of a CSR description file.
+Collection of global parameters. These parameters can be stored in a special section of a CSR description file to control the whole generation process.
 
-Any of groups/parameters with default values can be skipped.
+## Working with parameters
 
-## read_filler
+TODO.
+
+## Working with parameters groups
+
+TODO.
+
+## Working with configuration
+
+TODO.
+
+## Default parameters
+
+### read_filler
 
 Value to be returned if read of empty address or WO register is performed.
 
 **Default value**: "0x0".
 
-## address_calculation
+### address_calculation
 
 Group of address calculation related parameters.
 
@@ -37,7 +49,7 @@ Options for "alignment_mode":
 | "data_width" | Enable check of address alignment based on "data_width" of "interface_generic" group |
 | "custom" | Enable check of address alignment based on "alignment_value" |
 
-## register_reset
+### register_reset
 
 Type of a reset being used.
 
@@ -53,7 +65,7 @@ Choice of:
 
 **Default value**: "sync_pos".
 
-## interface_generic
+### interface_generic
 
 Group of generic interface related parameters.
 
@@ -83,6 +95,6 @@ Allowed combinations of the parameters:
 | "axil" | 32, 64 | 32, 64|
 | "lb" | 8, 16, ... (any power of 2) | 1 - 64 |
 
-## interface_specific
+### interface_specific
 
 Group of interface type specific parameters. This block is unque for every interface type.

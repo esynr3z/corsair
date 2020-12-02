@@ -3,8 +3,7 @@
 
 """Configuration module.
 
-More information about configuration options used in Configuration class
-can be found in docs/configuration.md.
+More information about configuration options can be found in docs/configuration.md.
 """
 
 from . import utils
