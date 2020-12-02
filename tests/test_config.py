@@ -103,6 +103,16 @@ class TestParameterGroup:
         print(pg)
         assert pg[p2_name].value == p2_val
 
+    def test_add_twice(self):
+        """Test of adding a parameter to a group twice"""
+        p1_name = 'param_a'
+        p1_val = 42
+        p1 = Parameter(p1_name, p1_val)
+        pg = ParameterGroup('group_a')
+        pg.add_params(p1)
+        with pytest.raises(KeyError):
+            pg.add_params(p1)
+
 
 class TestConfiguration:
     """Class 'Configuration' testing"""

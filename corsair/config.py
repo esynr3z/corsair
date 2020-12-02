@@ -108,15 +108,9 @@ class ParameterGroup():
             raise KeyError("Parameter/Group with a name '%s' doesn't exist!" % key)
 
     def __setitem__(self, key, value):
-        """Set parameter or group by name.
-
-        Raises:
-            KeyError: An error occured if parameter or group does not exists.
-        """
-        try:
-            self._params[key] = value
-        except KeyError:
-            raise KeyError("Parameter/Group with a name '%s' doesn't exist!" % key)
+        """Set parameter or group by name"""
+        raise KeyError("Not able to set '%s' item directly in '%s' group!"
+                       " Try use add_params() method." % (key, self.name))
 
     def _str(self, indent=''):
         """Returns indented string with group members and their values"""
@@ -136,13 +130,16 @@ class ParameterGroup():
         return [param for param in self._params.items()]
 
     def add_params(self, new_params):
-        """Add/replace parameters by name from input list."""
+        """Add parameters."""
         # hack to handle single elements
         if type(new_params) is not list:
             new_params = [new_params]
+
         # add params to dict one by one
         for p in new_params:
-            self[p.name] = p
+            if p.name in self._params:
+                raise KeyError("Item with name '%s' is already present in '%s' group!" % (p.name, self.name))
+            self._params[p.name] = p
 
     @property
     def values(self):
