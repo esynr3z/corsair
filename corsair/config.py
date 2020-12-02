@@ -7,6 +7,8 @@ More information about configuration options used in Configuration class
 can be found in docs/configuration.md.
 """
 
+from . import utils
+
 
 class Parameter():
     """Generic parameter.
@@ -31,11 +33,11 @@ class Parameter():
             ValueError: An error occured if value does not match checker rules.
 
         """
+        self._value = None
+
         self.name = name
-        self._value = value
         self.checker = checker
-        if value is not None:
-            self._check()
+        self.value = value
 
     def __repr__(self):
         """Returns string representation of an object."""
@@ -60,7 +62,9 @@ class Parameter():
 
     @value.setter
     def value(self, new_value):
-        self._value = new_value
+        # store all 0x-like hexademical strings as integers if possible
+        self._value = utils.try_hex_to_dec(new_value)
+        # run checker for the new value
         self._check()
 
     def _check(self):
