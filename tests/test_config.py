@@ -33,27 +33,27 @@ class TestParameter:
     def test_allowlist(self):
         """Test of a parameter allowlist check"""
         with pytest.raises(ValueError):
-            p = Parameter("param_a", 'aaa', checker=lambda val: val in ['bbb', 'ccc'])
+            Parameter("param_a", 'aaa', checker=lambda val: val in ['bbb', 'ccc'])
 
     def test_min(self):
         """Test of a parameter min check"""
         with pytest.raises(ValueError):
-            p = Parameter("param_a", 5, checker=lambda val: val >= 0xF)
+            Parameter("param_a", 5, checker=lambda val: val >= 0xF)
 
     def test_max(self):
         """Test of a parameter max check"""
         with pytest.raises(ValueError):
-            p = Parameter("param_a", 32, checker=lambda val: val < 32)
+            Parameter("param_a", 32, checker=lambda val: val < 32)
 
     def test_range_less(self):
         """Test of a parameter range check: if value is less"""
         with pytest.raises(ValueError):
-            p = Parameter("param_a", 5, checker=lambda val: 100 <= val < 200)
+            Parameter("param_a", 5, checker=lambda val: 100 <= val < 200)
 
     def test_range_greater(self):
         """Test of a parameter range check: if value is greater"""
         with pytest.raises(ValueError):
-            p = Parameter("param_a", 300, checker=lambda val: 100 <= val < 200)
+            Parameter("param_a", 300, checker=lambda val: 100 <= val < 200)
 
 
 class TestParameterGroup:
