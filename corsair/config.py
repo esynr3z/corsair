@@ -3,7 +3,7 @@
 
 """Configuration module.
 
-More information about configuration options can be found in docs/configuration.md.
+More information about configuration options can be found in docs/config.md.
 """
 
 from . import utils
@@ -82,6 +82,9 @@ class ParameterGroup():
 
     Attributes:
         name: Name of the group.
+        names: List with all the objects (parameters/groups) names
+        params: List with all the objects
+        values: Dictionary with the values of the parameters/groups.
     """
     def __init__(self, name):
         """Initialize parameter group."""
