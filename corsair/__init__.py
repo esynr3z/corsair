@@ -8,3 +8,4 @@ It generates HDL code, documentation and other artifacts from CSR map descriptio
 __version__ = "0.0.0"
 
 from . import config
+from . import regmap

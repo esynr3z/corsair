@@ -28,3 +28,17 @@ def tree_hex_to_dec(tree):
             tree_hex_to_dec(val)
         else:
             tree[idx] = try_hex_to_dec(val)
+
+
+def is_non_neg_int(val, err_msg=""):
+    if isinstance(val, int) and val >= 0:
+        return True
+    else:
+        raise ValueError("Value of '%s' must be a non-negative integer." % val if not err_msg else err_msg)
+
+
+def is_pos_int(val, err_msg=""):
+    if isinstance(val, int) and val > 0:
+        return True
+    else:
+        raise ValueError("Value of '%s' must be a positive integer." % val if not err_msg else err_msg)
