@@ -7,6 +7,7 @@ More information about register map can be found in docs/regmap.md.
 """
 
 from . import utils
+from .config import Configuration
 
 
 class BitField():
@@ -185,7 +186,7 @@ class Register():
         bfields: List with bit fields.
         names: List with bit fields names
     """
-    def __init__(self, name='', description='', address=0):
+    def __init__(self, name='', description='', address=None):
         self._name = name
         self._description = description
         self.address = utils.try_hex_to_dec(address)
@@ -276,6 +277,127 @@ class Register():
 
 
 class RegisterMap():
-    """ CSR map """
-    def __init__(self):
-        pass
+    """CSR map.
+
+        name: Name of a map.
+        names: List with all registers names.
+        regs: List with register objects.
+    """
+    def __init__(self, name='register_map', config=Configuration()):
+        self.name = name
+        self.config = config
+        self._regs = []
+
+    def __repr__(self):
+        """Returns string representation of an object."""
+        return 'RegisterMap(%s, %s)' % (repr(self.name), repr(self.config))
+
+    def __str__(self):
+        """Returns 'informal' string representation of an object."""
+        return self._str()
+
+    def _str(self, indent=''):
+        inner_indent = indent + '  '
+        regs = [reg._str(inner_indent) for reg in self.regs]
+        regs_str = '\n'.join(regs) if regs else inner_indent + 'empty'
+        return indent + '%s:\n' % (self.name) + regs_str
+
+    def __len__(self):
+        """Number of registers."""
+        return len(self._regs)
+
+    def __iter__(self):
+        """Registers iterator."""
+        return iter(self._regs)
+
+    def __getitem__(self, key):
+        """Get register by name or index.
+
+        Raises:
+            KeyError: An error occured if register does not exists.
+        """
+        try:
+            if isinstance(key, str):
+                return next(reg for reg in self if reg.name == key)
+            else:
+                return self._regs[key]
+        except (StopIteration, TypeError, KeyError, IndexError):
+            raise KeyError("There is no register with a name/index '%s'!" % (key))
+
+    def __setitem__(self, key, value):
+        """Set register by key"""
+        raise KeyError("Not able to set '%s' register directly!"
+                       " Try use add_regs() method." % (key))
+
+    @property
+    def names(self):
+        """Return all register names."""
+        return [reg.name for reg in self]
+
+    def _addr_apply(self, reg):
+        """Apply auto-calculated address for a register with no address."""
+        # some error checks
+        if len(self) == 0:
+            raise ValueError("Register '%s' with no address is not allowed"
+                             " to be the first register in a map!" % (reg.name))
+        if self.config['address_calculation']['auto_increment_mode'] == 'none':
+            raise ValueError("Register '%s' with no address is not allowed"
+                             " when address auto increment is disabled!" % (reg.name))
+
+        prev_addr = self.regs[-1].address
+
+        if self.config['address_calculation']['auto_increment_mode'] == 'data_width':
+            addr_step = self.config['interface_generic']['data_width'] // 8
+        else:
+            addr_step = self.config['address_calculation']['auto_increment_value']
+
+        reg.address = prev_addr + addr_step
+
+    def _addr_check(self, reg):
+        """Check address alignment."""
+        if self.config['address_calculation']['alignment_mode'] == 'data_width':
+            align_val = self.config['interface_generic']['data_width'] // 8
+        elif self.config['address_calculation']['alignment_mode'] == 'custom':
+            align_val = self.config['address_calculation']['alignment_value']
+        else:
+            align_val = 1
+
+        if (reg.address % align_val) != 0:
+            raise ValueError("Register '%s' with address '%d' is not %d bytes alligned!" %
+                             (reg.name, reg.address, align_val))
+
+    @property
+    def regs(self):
+        """Returns list with registers."""
+        return self._regs
+
+    def add_regs(self, new_regs):
+        """Add register."""
+        # hack to handle single elements
+        new_regs = utils.listify(new_regs)
+
+        # add registers to list one by one
+        for reg in new_regs:
+            # check existance
+            if reg.name in self.names:
+                raise KeyError("Register with name '%s' is already present!" % (reg.name))
+            # aplly calculated address if register address is empty
+            if reg.address is None:
+                self._addr_apply(reg)
+            # check address alignment
+            self._addr_check(reg)
+            # check address conflicts
+            addresses = [reg.address for reg in self]
+            if reg.address in addresses:
+                conflict_reg = self[addresses.index(reg.address)].name
+                raise KeyError("Register '%s' with address '%d'"
+                               " conflicts with register '%s' with the same address!" %
+                               (reg.name, reg.address, conflict_reg))
+            # if we here - all is ok and register can be added
+            try:
+                # find position to insert register and not to break ascending order of addresses
+                reg_idx = next(i for i, r in enumerate(self._regs) if r.address > reg.address)
+                self._regs.insert(reg_idx, reg)
+            except StopIteration:
+                # when registers list is empty or all addresses are less than the current one
+                self._regs.append(reg)

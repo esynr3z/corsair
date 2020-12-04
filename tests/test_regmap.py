@@ -206,3 +206,23 @@ class TestRegister:
         reg.add_bfields(bf)
         with pytest.raises(KeyError):
             reg[3]
+
+
+class TestRegisterMap:
+    """Class 'RegisterMap' testing."""
+    def test_create(self):
+        """Test of a register map creation."""
+        name = 'reg_a'
+        description = 'Register A'
+        address = 0x4
+        reg = Register(name, description, address)
+        reg.add_bfields([
+            BitField('bf_a', 'Bit field A'),
+            BitField('bf_b', 'Bit field B')
+        ])
+        rmap = RegisterMap()
+        rmap.add_regs(reg)
+
+        print(repr(rmap))
+        print(rmap)
+        assert rmap['reg_a'].address == reg.address
