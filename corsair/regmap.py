@@ -3,7 +3,7 @@
 
 """Register map.
 
-More information about configuration options can be found in docs/regmap.md.
+More information about register map can be found in docs/regmap.md.
 """
 
 from . import utils
@@ -69,7 +69,7 @@ class BitField():
 
     @property
     def width(self):
-        """Bit width of the field. Only non-negative integers are allowed."""
+        """Bit width of the field. Only positive integers are allowed."""
         return self._width
 
     @width.setter
@@ -121,7 +121,7 @@ class BitField():
             self._access_flags = value
         else:
             raise ValueError("Access flags attribute has to be 'bool', "
-                             "but provided '%s' for '%s' field!" % (type(value), self.name))
+                             "but '%s' provided for '%s' field!" % (type(value), self.name))
 
     @property
     def modifiers(self):
