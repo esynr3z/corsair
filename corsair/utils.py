@@ -42,3 +42,11 @@ def is_pos_int(val, err_msg=""):
         return True
     else:
         raise ValueError("Value of '%s' must be a positive integer." % val if not err_msg else err_msg)
+
+
+def listify(obj):
+    """Make lists from single objects. No changes are made for the argument of the 'list' type."""
+    if type(obj) is not list:
+        return [obj]
+    else:
+        return obj

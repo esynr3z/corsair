@@ -135,8 +135,7 @@ class ParameterGroup():
     def add_params(self, new_params):
         """Add parameters."""
         # hack to handle single elements
-        if type(new_params) is not list:
-            new_params = [new_params]
+        new_params = utils.listify(new_params)
 
         # add params to dict one by one
         for p in new_params:
