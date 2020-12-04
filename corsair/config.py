@@ -182,10 +182,14 @@ class ParameterGroup():
 
 
 class Configuration(ParameterGroup):
-    """Collection of global parameters."""
-    def __init__(self):
+    """Collection of global parameters.
+
+    Attributes:
+        name: Configuration name.
+    """
+    def __init__(self, name='configuration'):
         """Initialize configuration."""
-        super().__init__('configuration')
+        super().__init__(name)
         self._init_default_params()
 
     def __repr__(self):
