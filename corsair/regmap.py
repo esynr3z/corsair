@@ -182,14 +182,14 @@ class Register():
         name: Name of a register.
         description: Description of a register.
         address: Address of a register
-        bit_fields: List with bit fields.
+        bfields: List with bit fields.
         names: List with bit fields names
     """
     def __init__(self, name='', description='', address=0):
         self._name = name
         self._description = description
         self.address = utils.try_hex_to_dec(address)
-        self._bit_fields = []
+        self._bfields = []
 
     def __repr__(self):
         """Returns string representation of an object."""
@@ -201,17 +201,17 @@ class Register():
 
     def _str(self, indent=''):
         inner_indent = indent + '  '
-        bit_fields = [bf._str(inner_indent) for bf in self.bit_fields]
-        bit_fields_str = '\n'.join(bit_fields) if bit_fields else inner_indent + 'empty'
-        return indent + '%s: %s\n' % (self.name, self.description) + bit_fields_str
+        bfields = [bf._str(inner_indent) for bf in self.bfields]
+        bfields_str = '\n'.join(bfields) if bfields else inner_indent + 'empty'
+        return indent + '%s: %s\n' % (self.name, self.description) + bfields_str
 
     def __len__(self):
         """Number of register's bit fields."""
-        return len(self._bit_fields)
+        return len(self._bfields)
 
     def __iter__(self):
         """Bit fields iterator."""
-        return iter(self._bit_fields)
+        return iter(self._bfields)
 
     def __getitem__(self, key):
         """Get bit field by name or index.
@@ -223,14 +223,14 @@ class Register():
             if isinstance(key, str):
                 return next(bf for bf in self if bf.name == key)
             else:
-                return self._bit_fields[key]
+                return self._bfields[key]
         except (StopIteration, TypeError, KeyError, IndexError):
             raise KeyError("There is no bit field with a name/index '%s' in '%s' register!" % (key, self.name))
 
     def __setitem__(self, key, value):
         """Set bit field by key"""
         raise KeyError("Not able to set '%s' bit field directly in '%s' register!"
-                       " Try use add_bit_fields() method." % (key, self.name))
+                       " Try use add_bfields() method." % (key, self.name))
 
     @property
     def name(self):
@@ -259,21 +259,20 @@ class Register():
             return self._description
 
     @property
-    def bit_fields(self):
+    def bfields(self):
         """Returns list with bit fields."""
-        return self._bit_fields
+        return self._bfields
 
-    def add_bit_fields(self, new_bit_fields):
+    def add_bfields(self, new_bfields):
         """Add bit fields."""
         # hack to handle single elements
-        if type(new_bit_fields) is not list:
-            new_bit_fields = [new_bit_fields]
+        new_bfields = utils.listify(new_bfields)
 
         # add bit fields to list one by one
-        for bf in new_bit_fields:
-            if bf.name in [bf.name for bf in self]:
+        for bf in new_bfields:
+            if bf.name in self.names:
                 raise KeyError("Bit field with name '%s' is already present in '%s' register!" % (bf.name, self.name))
-            self._bit_fields.append(bf)
+            self._bfields.append(bf)
 
 
 class RegisterMap():

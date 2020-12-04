@@ -145,13 +145,13 @@ class TestRegister:
         name = 'reg_a'
         description = 'Register A'
         address = 0x4
-        bit_fields = [BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')]
+        bfields = [BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')]
         reg = Register(name, description, address)
-        reg.add_bit_fields(bit_fields)
+        reg.add_bfields(bfields)
         print(repr(reg))
         print(reg)
-        assert (name, description, address, bit_fields) == \
-               (reg.name, reg.description, reg.address, reg.bit_fields)
+        assert (name, description, address, bfields) == \
+               (reg.name, reg.description, reg.address, reg.bfields)
 
     def test_name_error_no_fields(self):
         """Test of a register creation with no name and no fields."""
@@ -162,14 +162,14 @@ class TestRegister:
     def test_name_error_with_fields(self):
         """Test of a register creation with no name and several fields."""
         reg = Register()
-        reg.add_bit_fields([BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')])
+        reg.add_bfields([BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')])
         with pytest.raises(ValueError):
             reg.name
 
     def test_name_of_field(self):
         """Test of a register with name and description of the field."""
         reg = Register()
-        reg.add_bit_fields(BitField('CNT', 'Counter'))
+        reg.add_bfields(BitField('CNT', 'Counter'))
         print(reg.name, reg.description)
         print(reg[0].name, reg.description)
         print(reg[0].name, reg[0].description)
@@ -180,14 +180,14 @@ class TestRegister:
         """Test of adding field to a register."""
         reg = Register('REGA', 'Register A')
         bf = BitField('bf_a', 'Bit field A')
-        reg.add_bit_fields(bf)
+        reg.add_bfields(bf)
         assert bf == reg['bf_a'] and bf == reg[0]
 
     def test_add_fields(self):
         """Test of adding several fields to a register"""
         reg = Register('REGA', 'Register A')
         bf = [BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')]
-        reg.add_bit_fields(bf)
+        reg.add_bfields(bf)
         assert bf[0] == reg['bf_a'] and bf[0] == reg[0] and \
                bf[1] == reg['bf_b'] and bf[1] == reg[1]
 
@@ -195,7 +195,7 @@ class TestRegister:
         """Test of trying to get bit field with wrong name."""
         reg = Register('REGA', 'Register A')
         bf = [BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')]
-        reg.add_bit_fields(bf)
+        reg.add_bfields(bf)
         with pytest.raises(KeyError):
             reg['bf_c']
 
@@ -203,6 +203,6 @@ class TestRegister:
         """Test of trying to get bit field with wrong index."""
         reg = Register('REGA', 'Register A')
         bf = [BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')]
-        reg.add_bit_fields(bf)
+        reg.add_bfields(bf)
         with pytest.raises(KeyError):
             reg[3]
