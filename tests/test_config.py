@@ -10,6 +10,7 @@ from corsair.config import (
     ParameterGroup,
     Configuration
 )
+import copy
 
 
 class TestParameter:
@@ -22,6 +23,19 @@ class TestParameter:
         print(p)
         print(repr(p))
         assert p.name == p_name and p.value == p_val
+
+    def test_eq(self):
+        """Test of equality comparision of parameters."""
+        p1 = Parameter('par_a', 42)
+        p2 = copy.deepcopy(p1)
+        assert p1 == p2
+
+    def test_ne(self):
+        """Test of non equality comparision of parameters."""
+        p1 = Parameter('par_a', 42)
+        p2 = copy.deepcopy(p1)
+        p2.checker = lambda val: val != 777
+        assert p1 != p2
 
     def test_modify(self):
         """Test of a parameter creation"""
@@ -77,6 +91,27 @@ class TestParameterGroup:
         pg.add_params(params)
         print(pg)
         assert pg.name == pg_name and pg[p2_name].value == p2_val
+
+    def test_eq(self):
+        """Test of equality comparision of parameters groups."""
+        pg1 = ParameterGroup('group_a')
+        pg1.add_params([
+            Parameter('p1', 42),
+            Parameter('p2', '0x42'),
+        ])
+        pg2 = copy.deepcopy(pg1)
+        assert pg1 == pg2
+
+    def test_ne(self):
+        """Test of non equality comparision of parameters groups."""
+        pg1 = ParameterGroup('group_a')
+        pg1.add_params([
+            Parameter('p1', 42),
+            Parameter('p2', '0x42'),
+        ])
+        pg2 = copy.deepcopy(pg1)
+        pg2['p2'].value = 'lol'
+        assert pg1 != pg2
 
     def test_add_single_param(self):
         """Test of adding a parameter to a group"""

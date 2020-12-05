@@ -10,6 +10,7 @@ from corsair.regmap import (
     Register,
     RegisterMap
 )
+import copy
 
 
 class TestBitField:
@@ -29,6 +30,19 @@ class TestBitField:
         print(bf)
         assert (name, description, initial, width, lsb, access, access_flags, modifiers) == \
                (bf.name, bf.description, bf.initial, bf.width, bf.lsb, bf.access, bf.access_flags, bf.modifiers)
+
+    def test_eq(self):
+        """Test of equality comparision of bit fields."""
+        bf1 = BitField('bf_a', initial=2)
+        bf2 = copy.deepcopy(bf1)
+        assert bf1 == bf2
+
+    def test_ne(self):
+        """Test of non equality comparision of bit fields."""
+        bf1 = BitField('bf_a', initial=2)
+        bf2 = copy.deepcopy(bf1)
+        bf2 .initial = 3
+        assert bf1 != bf2
 
     def test_initial_access(self):
         """Test of accessing to 'initial' attribute of a bit field."""
@@ -153,6 +167,21 @@ class TestRegister:
         assert (name, description, address, bfields) == \
                (reg.name, reg.description, reg.address, reg.bfields)
 
+    def test_eq(self):
+        """Test of equality comparision of registes."""
+        reg1 = Register()
+        reg1.add_bfields([BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')])
+        reg2 = copy.deepcopy(reg1)
+        assert reg1 == reg2
+
+    def test_ne(self):
+        """Test of non equality comparision of registers."""
+        reg1 = Register()
+        reg1.add_bfields([BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')])
+        reg2 = copy.deepcopy(reg1)
+        reg2['bf_a'].access = 'wo'
+        assert reg1 != reg2
+
     def test_name_error_no_fields(self):
         """Test of a register creation with no name and no fields."""
         reg = Register()
@@ -225,4 +254,29 @@ class TestRegisterMap:
 
         print(repr(rmap))
         print(rmap)
-        assert rmap['reg_a'].address == reg.address
+        assert rmap['reg_a'] == reg
+
+    def test_eq(self):
+        """Test of equality comparision of register maps."""
+        reg = Register('reg_a', 'Register A', 0x4)
+        reg.add_bfields([
+            BitField('bf_a', 'Bit field A'),
+            BitField('bf_b', 'Bit field B')
+        ])
+        rmap1 = RegisterMap()
+        rmap1.add_regs(reg)
+        rmap2 = copy.deepcopy(rmap1)
+        assert rmap1 == rmap2
+
+    def test_ne(self):
+        """Test of non equality comparision of register maps."""
+        reg = Register('reg_a', 'Register A', 0x4)
+        reg.add_bfields([
+            BitField('bf_a', 'Bit field A'),
+            BitField('bf_b', 'Bit field B')
+        ])
+        rmap1 = RegisterMap()
+        rmap1.add_regs(reg)
+        rmap2 = copy.deepcopy(rmap1)
+        rmap2['reg_a']['bf_b'].initial = 1
+        assert rmap1 != rmap2

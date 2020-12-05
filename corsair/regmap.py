@@ -35,6 +35,20 @@ class BitField():
         self.access_flags = access_flags
         self.modifiers = modifiers
 
+    def __eq__(self, other):
+        """Check if objects are equal."""
+        if self.__class__ != other.__class__:
+            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
+        else:
+            return self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        """Check if objects are non equal."""
+        if self.__class__ != other.__class__:
+            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
+        else:
+            return not self.__eq__(other)
+
     def __repr__(self):
         """Returns string representation of an object."""
         return 'BitField(%s)' % repr(self.name)
@@ -192,6 +206,20 @@ class Register():
         self.address = utils.try_hex_to_dec(address)
         self._bfields = []
 
+    def __eq__(self, other):
+        """Check if objects are equal."""
+        if self.__class__ != other.__class__:
+            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
+        else:
+            return self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        """Check if objects are non equal."""
+        if self.__class__ != other.__class__:
+            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
+        else:
+            return not self.__eq__(other)
+
     def __repr__(self):
         """Returns string representation of an object."""
         return 'Register(%s, %s, %s)' % (repr(self.name), repr(self.description), repr(self.address))
@@ -287,6 +315,20 @@ class RegisterMap():
         self.name = name
         self.config = config
         self._regs = []
+
+    def __eq__(self, other):
+        """Check if objects are equal."""
+        if self.__class__ != other.__class__:
+            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
+        else:
+            return self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        """Check if objects are non equal."""
+        if self.__class__ != other.__class__:
+            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
+        else:
+            return not self.__eq__(other)
 
     def __repr__(self):
         """Returns string representation of an object."""

@@ -38,6 +38,20 @@ class Parameter():
         self.checker = checker
         self.value = value
 
+    def __eq__(self, other):
+        """Check if objects are equal."""
+        if self.__class__ != other.__class__:
+            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
+        else:
+            return self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        """Check if objects are non equal."""
+        if self.__class__ != other.__class__:
+            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
+        else:
+            return not self.__eq__(other)
+
     def __repr__(self):
         """Returns string representation of an object."""
         return 'Parameter(%s, %s)' % (repr(self.name), repr(self.value))
@@ -90,6 +104,20 @@ class ParameterGroup():
         """Initialize parameter group."""
         self.name = name
         self._params = {}
+
+    def __eq__(self, other):
+        """Check if objects are equal."""
+        if self.__class__ != other.__class__:
+            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
+        else:
+            return self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        """Check if objects are non equal."""
+        if self.__class__ != other.__class__:
+            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
+        else:
+            return not self.__eq__(other)
 
     def __repr__(self):
         """Returns string representation of an object."""
