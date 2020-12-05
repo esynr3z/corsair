@@ -355,10 +355,10 @@ class RegisterMap():
 
     def _addr_check(self, reg):
         """Check address alignment."""
-        if self.config['address_calculation']['alignment_mode'] == 'data_width':
-            align_val = self.config['interface_generic']['data_width'] // 8
-        elif self.config['address_calculation']['alignment_mode'] == 'custom':
-            align_val = self.config['address_calculation']['alignment_value']
+        if self.config['address_calculation']['alignment_mode'].value == 'data_width':
+            align_val = self.config['interface_generic']['data_width'].value // 8
+        elif self.config['address_calculation']['alignment_mode'].value == 'custom':
+            align_val = self.config['address_calculation']['alignment_value'].value
         else:
             align_val = 1
 
