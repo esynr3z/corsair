@@ -382,16 +382,16 @@ class RegisterMap():
         if len(self) == 0:
             raise ValueError("Register '%s' with no address is not allowed"
                              " to be the first register in a map!" % (reg.name))
-        if self.config['address_calculation']['auto_increment_mode'] == 'none':
+        if self.config['address_calculation']['auto_increment_mode'].value == 'none':
             raise ValueError("Register '%s' with no address is not allowed"
                              " when address auto increment is disabled!" % (reg.name))
 
         prev_addr = self.regs[-1].address
 
-        if self.config['address_calculation']['auto_increment_mode'] == 'data_width':
-            addr_step = self.config['interface_generic']['data_width'] // 8
+        if self.config['address_calculation']['auto_increment_mode'].value == 'data_width':
+            addr_step = self.config['interface_generic']['data_width'].value // 8
         else:
-            addr_step = self.config['address_calculation']['auto_increment_value']
+            addr_step = self.config['address_calculation']['auto_increment_value'].value
 
         reg.address = prev_addr + addr_step
 
@@ -422,7 +422,7 @@ class RegisterMap():
         for reg in new_regs:
             # check existance
             if reg.name in self.names:
-                raise KeyError("Register with name '%s' is already present!" % (reg.name))
+                raise ValueError("Register with name '%s' is already present!" % (reg.name))
             # aplly calculated address if register address is empty
             if reg.address is None:
                 self._addr_apply(reg)
@@ -432,9 +432,9 @@ class RegisterMap():
             addresses = [reg.address for reg in self]
             if reg.address in addresses:
                 conflict_reg = self[addresses.index(reg.address)].name
-                raise KeyError("Register '%s' with address '%d'"
-                               " conflicts with register '%s' with the same address!" %
-                               (reg.name, reg.address, conflict_reg))
+                raise ValueError("Register '%s' with address '%d'"
+                                 " conflicts with register '%s' with the same address!" %
+                                 (reg.name, reg.address, conflict_reg))
             # if we here - all is ok and register can be added
             try:
                 # find position to insert register and not to break ascending order of addresses

@@ -280,3 +280,45 @@ class TestRegisterMap:
         rmap2 = copy.deepcopy(rmap1)
         rmap2['reg_a']['bf_b'].initial = 1
         assert rmap1 != rmap2
+
+    def test_add_regs(self):
+        """Test of adding several registers to a map"""
+        reg_a = Register('reg_a', 'Register A', 0x8)
+        reg_b = Register('reg_b', 'Register B', 0xC)
+        rmap = RegisterMap()
+        rmap.add_regs([reg_a, reg_b])
+        assert rmap[0] == reg_a and rmap['reg_a'] == reg_a and \
+               rmap[1] == reg_b and rmap['reg_b'] == reg_b
+
+    def test_reg_name_conflict(self):
+        """Test of adding register with a name that already present in a map."""
+        rmap = RegisterMap()
+        rmap.add_regs(Register('reg_a', 'Register A', 0x8))
+        with pytest.raises(ValueError):
+            rmap.add_regs(Register('reg_a', 'Register A copypaste', 0x8))
+
+    def test_reg_no_addr_first(self):
+        """Test of adding first register with no address to a map"""
+        rmap = RegisterMap()
+        with pytest.raises(ValueError):
+            rmap.add_regs(Register('reg_a', 'Register A'))
+
+    def test_reg_no_addr_no_incr(self):
+        """Test of adding register with no address to a map when address auto increment is deisabled."""
+        rmap = RegisterMap()
+        rmap.add_regs(Register('reg_a', 'Register A', 0x0))
+        with pytest.raises(ValueError):
+            rmap.add_regs(Register('reg_b', 'Register B'))
+
+    def test_reg_addr_align_error(self):
+        """Test of adding register with address not aligned to a proper value (0x4 default)."""
+        rmap = RegisterMap()
+        with pytest.raises(ValueError):
+            rmap.add_regs(Register('reg_a', 'Register A', 0x2))
+
+    def test_reg_addr_conflict(self):
+        """Test of adding register with an address that already present in a map."""
+        rmap = RegisterMap()
+        rmap.add_regs(Register('reg_a', 'Register A', 0x0))
+        with pytest.raises(ValueError):
+            rmap.add_regs(Register('reg_b', 'Register B', 0x0))
