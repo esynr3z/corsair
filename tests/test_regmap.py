@@ -188,6 +188,11 @@ class TestRegister:
         reg2['bf_a'].access = 'wo'
         assert reg1 != reg2
 
+    def test_addr_error(self):
+        """Test of a register creation with non-correct address."""
+        with pytest.raises(ValueError):
+            Register('reg_a', 'Register A', 'f0')
+
     def test_name_error_no_fields(self):
         """Test of a register creation with no name and no fields."""
         reg = Register()

@@ -207,10 +207,11 @@ class Register():
         names: List with bit fields names
     """
     def __init__(self, name='', description='', address=None):
-        self._name = name
-        self._description = description
-        self.address = utils.try_hex_to_dec(address)
         self._bfields = []
+
+        self.name = name
+        self.description = description
+        self.address = address
 
     def __eq__(self, other):
         """Check if objects are equal."""
@@ -280,6 +281,25 @@ class Register():
         else:
             return self._name
 
+    @name.setter
+    def name(self, value):
+        self._name = value
+
+    @property
+    def address(self):
+        """Register address. Only non-negative integers are allowed."""
+        return self._address
+
+    @address.setter
+    def address(self, value):
+        value = utils.try_hex_to_dec(value)
+        err_msg = ("Address value '%s' for '%s' is wrong!"
+                   " Only non-negative integers are allowed." % (value, self._name))
+        if value is None:
+            self._address = None
+        elif utils.is_non_neg_int(value, err_msg):
+            self._address = value
+
     @property
     def names(self):
         """Return all bit field names"""
@@ -292,6 +312,10 @@ class Register():
             return self[0].description
         else:
             return self._description
+
+    @description.setter
+    def description(self, value):
+        self._description = value
 
     @property
     def bfields(self):
