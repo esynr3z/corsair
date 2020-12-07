@@ -62,7 +62,7 @@ class BitField():
         """Returns indented string with the bit field information."""
         inner_indent = indent + '  '
         bf_str = indent + '%s: %s\n' % (self.name, self.description)
-        bf_str += inner_indent + 'initial = %s\n' % self.initial
+        bf_str += inner_indent + 'initial = %s\n' % utils.try_int_to_str(self.initial)
         bf_str += inner_indent + 'width = %s\n' % self.width
         bf_str += inner_indent + 'lsb = %s\n' % self.lsb
         bf_str += inner_indent + 'access = %s\n' % self.access
@@ -239,7 +239,7 @@ class Register():
         inner_indent = indent + '  '
         bfields = [bf._str(inner_indent) for bf in self.bfields]
         bfields_str = '\n'.join(bfields) if bfields else inner_indent + 'empty'
-        return indent + '%s: %s\n' % (self.name, self.description) + bfields_str
+        return indent + '(0x%x) %s: %s\n' % (self.address, self.name, self.description) + bfields_str
 
     def __len__(self):
         """Number of register's bit fields."""

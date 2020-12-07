@@ -62,7 +62,7 @@ class Parameter():
 
     def _str(self, indent=''):
         """Returns indented parameter's string with name and value."""
-        return indent + '%s: %s' % (self.name, self._value)
+        return indent + '%s: %s' % (self.name, utils.try_int_to_str(self._value))
 
     @property
     def value(self):

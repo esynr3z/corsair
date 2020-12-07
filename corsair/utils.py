@@ -50,3 +50,14 @@ def listify(obj):
         return [obj]
     else:
         return obj
+
+
+def try_int_to_str(val, max_dec=1024):
+    """Make string from int. Hexademical representaion will be used if input value greater that 'max_dec'."""
+    if isinstance(val, int):
+        if val > max_dec:
+            return "0x%x" % val
+        else:
+            return "%d" % val
+    else:
+        return val
