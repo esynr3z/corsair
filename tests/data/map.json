@@ -1,0 +1,203 @@
+{
+    "configuration": {
+
+        "register_reset": "sync_pos",
+
+        "read_filler": "0xDEADBEEF",
+
+        "address_calculation": {
+            "auto_increment": "none",
+            "alignment": "data_width"
+        },
+
+        "interface_generic": {
+            "type": "lb",
+            "data_width": 32,
+            "address_width": 12
+        },
+
+        "interface_specific":{
+        }
+
+    },
+
+    "register_map" : [
+        {
+            "address": "0x000",
+            "bit_fields": [
+                {
+                    "name": "LEN",
+                    "description": "Length of pulse",
+                    "initial": "0x0",
+                    "width": 32,
+                    "lsb": 0,
+                    "access":"rw"
+                }
+            ]
+        },
+        {
+            "address": "0x004",
+            "bit_fields": [
+                {
+                    "name": "CNT",
+                    "description": "Counter value",
+                    "initial": "0x0",
+                    "width": 16,
+                    "lsb": 0,
+                    "access": "rw",
+                    "access_flags": true,
+                    "modifiers": [
+                        "external_update"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "START",
+            "description": "Start processes",
+            "address": "0x008",
+            "bit_fields": [
+                {
+                    "name": "STA",
+                    "description": "Start process A",
+                    "width": 1,
+                    "lsb": 0,
+                    "access": "wo",
+                    "modifiers": [
+                        "self_clear"
+                    ]
+                },
+                {
+                    "name": "STB",
+                    "description": "Start process B",
+                    "width": 1,
+                    "lsb": 8,
+                    "access": "wo",
+                    "modifiers": [
+                        "self_clear"
+                    ]
+                },
+                {
+                    "name": "STC",
+                    "description": "Start process C",
+                    "width": 1,
+                    "lsb": 16,
+                    "access": "wo",
+                    "modifiers": [
+                        "self_clear"
+                    ]
+                },
+                {
+                    "name": "KEY",
+                    "description": "Secret key to start process",
+                    "width": 8,
+                    "lsb": 24,
+                    "access": "wo"
+                }
+            ]
+        },
+        {
+            "name": "STAT",
+            "description": "Status",
+            "address": "0x010",
+            "bit_fields": [
+                {
+                    "name": "DIR",
+                    "description": "Current direction",
+                    "width": 1,
+                    "lsb": 0,
+                    "access": "ro"
+                },
+                {
+                    "name": "STATE",
+                    "description": "Current state",
+                    "width": 3,
+                    "lsb": 3,
+                    "access": "ro",
+                    "modifiers": [
+                        "external_update"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "CTL",
+            "description": "Control",
+            "address": "0x020",
+            "bit_fields": [
+                {
+                    "name": "ENA",
+                    "description": "Enable A",
+                    "width": 1,
+                    "lsb": 1,
+                    "access": "rw"
+                },
+                {
+                    "name": "INITB",
+                    "description": "Initial value for B",
+                    "width": 8,
+                    "lsb": 8,
+                    "access": "rw"
+                }
+            ]
+        },
+        {
+            "name": "FLAG",
+            "description": "Flags",
+            "address": "0x024",
+            "bit_fields": [
+                {
+                    "name": "EVA",
+                    "description": "Event A",
+                    "width": 1,
+                    "lsb": 0,
+                    "access": "rw",
+                    "modifiers": [
+                        "external_update",
+                        "write1_to_clear"
+                    ]
+                },
+                {
+                    "name": "EVB",
+                    "description": "Event B",
+                    "width": 1,
+                    "lsb": 2,
+                    "access": "ro",
+                    "modifiers": [
+                        "external_update",
+                        "read_to_clear"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "VERSION",
+            "description": "Current version",
+            "address": "0x040",
+            "bit_fields": [
+                {
+                    "name": "MINOR",
+                    "description": "Minor version",
+                    "initial": "0x23",
+                    "width": 8,
+                    "lsb": 0,
+                    "access": "ro",
+                    "modifiers": [
+                        "read_const"
+                    ]
+                },
+                {
+                    "name": "MAJOR",
+                    "description": "Major version",
+                    "initial": "0x02",
+                    "width": 8,
+                    "lsb": 16,
+                    "access": "ro",
+                    "modifiers": [
+                        "read_const"
+                    ]
+                }
+            ]
+        }
+    ]
+}
