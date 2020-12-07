@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Configuration module tests.
+"""Register map module tests.
 """
 
 import pytest
