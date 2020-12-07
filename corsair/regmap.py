@@ -23,6 +23,7 @@ class BitField():
         access: Bit field access mode.
         access_flags: Enable access flags generation.
         modifiers: List of access modifiers.
+        bits: List with all bits positions used by a bit field.
     """
     def __init__(self, name, description='', initial=0, width=1,
                  lsb=0, access='rw', access_flags=False, modifiers=[]):
@@ -91,7 +92,7 @@ class BitField():
     def width(self, value):
         value = utils.try_hex_to_dec(value)
         err_msg = ("Width value '%s' for '%s' is wrong!"
-                   "Only positive integers are allowed." % (value, self.name))
+                   " Only positive integers are allowed." % (value, self.name))
         if utils.is_pos_int(value, err_msg):
             self._width = value
 
@@ -104,7 +105,7 @@ class BitField():
     def lsb(self, value):
         value = utils.try_hex_to_dec(value)
         err_msg = ("LSB value '%s' for '%s' is wrong!"
-                   "Only non-negative integers are allowed." % (value, self.name))
+                   " Only non-negative integers are allowed." % (value, self.name))
         if utils.is_non_neg_int(value, err_msg):
             self._lsb = value
 
@@ -189,6 +190,11 @@ class BitField():
             raise ValueError("Unknown access modifiers combination '%s' for '%s' field!" % (value, self.name))
 
         self._modifiers = value
+
+    @property
+    def bits(self):
+        """Returns list with all bits positions used by a bit field"""
+        return list(range(self.lsb, self.msb + 1))
 
 
 class Register():

@@ -152,6 +152,11 @@ class TestBitField:
         with pytest.raises(ValueError):
             bf.modifiers = 'self_clear'
 
+    def test_bits(self):
+        """Test of adding a field with position that  overlaps with other field in a register."""
+        bf = BitField('bf_a', lsb=5, width=4)
+        assert bf.bits == [5, 6, 7, 8]
+
 
 class TestRegister:
     """Class 'Register' testing."""
