@@ -10,6 +10,7 @@ from corsair.regmap import (
     Register,
     RegisterMap
 )
+from corsair.config import Configuration
 import copy
 
 
@@ -310,11 +311,33 @@ class TestRegisterMap:
         with pytest.raises(ValueError):
             rmap.add_regs(Register('reg_b', 'Register B'))
 
-    def test_reg_addr_align_error(self):
-        """Test of adding register with address not aligned to a proper value (0x4 default)."""
-        rmap = RegisterMap()
+    def test_reg_addr_align_data_width(self):
+        """Test of adding register with address not aligned to a proper value (based on a data width)."""
+        config = Configuration()
+        config['address_calculation']['alignment_mode'].value = 'data_width'
+        config['interface_generic']['data_width'].value = 32
+        rmap = RegisterMap(config=config)
         with pytest.raises(ValueError):
             rmap.add_regs(Register('reg_a', 'Register A', 0x2))
+
+    def test_reg_addr_align_custom(self):
+        """Test of adding register with address not aligned to a proper value (based on a custom value)."""
+        config = Configuration()
+        config['address_calculation']['alignment_mode'].value = 'custom'
+        config['address_calculation']['alignment_value'].value = 128
+        rmap = RegisterMap(config=config)
+        with pytest.raises(ValueError):
+            rmap.add_regs(Register('reg_a', 'Register A', 0x4))
+
+    def test_reg_addr_align_none(self):
+        """Test of adding register with address not aligned to a proper value (based on a custom value)."""
+        config = Configuration()
+        config['address_calculation']['alignment_mode'].value = 'none'
+        config['interface_generic']['data_width'].value = 32
+        config['address_calculation']['alignment_value'].value = 128
+        rmap = RegisterMap(config=config)
+        # no exception
+        rmap.add_regs(Register('reg_a', 'Register A', 0x2))
 
     def test_reg_addr_conflict(self):
         """Test of adding register with an address that already present in a map."""
@@ -322,3 +345,57 @@ class TestRegisterMap:
         rmap.add_regs(Register('reg_a', 'Register A', 0x0))
         with pytest.raises(ValueError):
             rmap.add_regs(Register('reg_b', 'Register B', 0x0))
+
+    def test_reg_addr_string(self):
+        """Test of adding registers with addresses represented as hexadenical string."""
+        rmap = RegisterMap()
+        rmap.add_regs([
+            Register('reg_a', 'Register A', '0x04'),
+            Register('reg_b', 'Register B', '0x08'),
+            Register('reg_c', 'Register C', '0x0C'),
+        ])
+        assert rmap['reg_a'].address == 0x04 and \
+               rmap['reg_b'].address == 0x08 and \
+               rmap['reg_c'].address == 0x0C
+
+    def test_reg_addr_order(self):
+        """Test of adding registers and check that they are presented in ascending order in a map."""
+        rmap = RegisterMap()
+        rmap.add_regs(Register('reg_a', 'Register A', 0x0))
+        rmap.add_regs(Register('reg_b', 'Register B', 0x10))
+        rmap.add_regs(Register('reg_c', 'Register C', 0x4))
+        rmap.add_regs(Register('reg_d', 'Register D', 0x14))
+        assert rmap.names == ['reg_a', 'reg_c', 'reg_b', 'reg_d']
+
+    def test_reg_addr_auto_incr_data_width(self):
+        """Test of auto increment of a register's address based on interface data width."""
+        config = Configuration()
+        config['address_calculation']['auto_increment_mode'].value = 'data_width'
+        config['interface_generic']['data_width'].value = 64
+        rmap = RegisterMap(config=config)
+        rmap.add_regs(Register('reg_a', 'Register A', 0x0))
+        rmap.add_regs(Register('reg_b', 'Register B'))
+        assert rmap['reg_b'].address == 0x8
+
+    def test_reg_addr_auto_incr_custom(self):
+        """Test of auto increment of a register's address."""
+        config = Configuration()
+        config['address_calculation']['alignment_mode'].value = 'none'
+        config['address_calculation']['auto_increment_mode'].value = 'custom'
+        config['address_calculation']['auto_increment_value'].value = 0x2
+        rmap = RegisterMap(config=config)
+        rmap.add_regs(Register('reg_a', 'Register A', 0x0))
+        rmap.add_regs(Register('reg_b', 'Register B'))
+        assert rmap['reg_b'].address == 0x2
+
+    def test_reg_addr_auto_incr_align(self):
+        """Test of alignment check of an auto incremented register's address."""
+        config = Configuration()
+        config['address_calculation']['alignment_mode'].value = 'custom'
+        config['address_calculation']['alignment_value'].value = 0x4
+        config['address_calculation']['auto_increment_mode'].value = 'custom'
+        config['address_calculation']['auto_increment_value'].value = 0x2
+        rmap = RegisterMap(config=config)
+        rmap.add_regs(Register('reg_a', 'Register A', 0x0))
+        with pytest.raises(ValueError):
+            rmap.add_regs(Register('reg_b', 'Register B'))
