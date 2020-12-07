@@ -329,9 +329,23 @@ class Register():
 
         # add bit fields to list one by one
         for bf in new_bfields:
+            # check existance
             if bf.name in self.names:
-                raise KeyError("Bit field with name '%s' is already present in '%s' register!" % (bf.name, self.name))
-            self._bfields.append(bf)
+                raise ValueError("Bit field with name '%s' is already present in '%s' register!" % (bf.name, self.name))
+            # check fields overlapping
+            overlaps = [set(bf.bits).intersection(set(old_bf.bits)) for old_bf in self._bfields]
+            overlaps_names = [self.names[i] for i, ovl in enumerate(overlaps) if ovl]
+            if self.bfields and overlaps_names:
+                raise ValueError("Position of a bit field '%s'"
+                                 " conflicts with other bit field(s): %s!" % (bf.name, repr(overlaps_names)))
+            # if we here - all is ok and bit field can be added
+            try:
+                # find position to insert bit field and not to break ascending order of bit field msb positions
+                bf_idx = next(i for i, old_bf in enumerate(self._bfields) if old_bf.msb > bf.msb)
+                self._bfields.insert(bf_idx, bf)
+            except StopIteration:
+                # when bit field list is empty or all bit field msb positions are less than the current one
+                self._bfields.append(bf)
 
 
 class RegisterMap():

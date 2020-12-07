@@ -165,7 +165,11 @@ class TestRegister:
         name = 'reg_a'
         description = 'Register A'
         address = 0x4
-        bfields = [BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')]
+        bfields = [
+            BitField('bf_a', 'Bit field A', lsb=0),
+            BitField('bf_b', 'Bit field B', lsb=1),
+            BitField('bf_c', 'Bit field C', lsb=2)
+        ]
         reg = Register(name, description, address)
         reg.add_bfields(bfields)
         print(repr(reg))
@@ -176,14 +180,20 @@ class TestRegister:
     def test_eq(self):
         """Test of equality comparision of registes."""
         reg1 = Register()
-        reg1.add_bfields([BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')])
+        reg1.add_bfields([
+            BitField('bf_a', 'Bit field A', lsb=0),
+            BitField('bf_b', 'Bit field B', lsb=1)
+        ])
         reg2 = copy.deepcopy(reg1)
         assert reg1 == reg2
 
     def test_ne(self):
         """Test of non equality comparision of registers."""
         reg1 = Register()
-        reg1.add_bfields([BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')])
+        reg1.add_bfields([
+            BitField('bf_a', 'Bit field A', lsb=0),
+            BitField('bf_b', 'Bit field B', lsb=1)
+        ])
         reg2 = copy.deepcopy(reg1)
         reg2['bf_a'].access = 'wo'
         assert reg1 != reg2
@@ -202,7 +212,10 @@ class TestRegister:
     def test_name_error_with_fields(self):
         """Test of a register creation with no name and several fields."""
         reg = Register()
-        reg.add_bfields([BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')])
+        reg.add_bfields([
+            BitField('bf_a', 'Bit field A', lsb=0),
+            BitField('bf_b', 'Bit field B', lsb=1)
+        ])
         with pytest.raises(ValueError):
             reg.name
 
@@ -226,7 +239,10 @@ class TestRegister:
     def test_add_fields(self):
         """Test of adding several fields to a register"""
         reg = Register('REGA', 'Register A')
-        bf = [BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')]
+        bf = [
+            BitField('bf_a', 'Bit field A', lsb=0),
+            BitField('bf_b', 'Bit field B', lsb=1)
+        ]
         reg.add_bfields(bf)
         assert bf[0] == reg['bf_a'] and bf[0] == reg[0] and \
                bf[1] == reg['bf_b'] and bf[1] == reg[1]
@@ -234,7 +250,10 @@ class TestRegister:
     def test_get_field_key_error(self):
         """Test of trying to get bit field with wrong name."""
         reg = Register('REGA', 'Register A')
-        bf = [BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')]
+        bf = [
+            BitField('bf_a', 'Bit field A', lsb=0),
+            BitField('bf_b', 'Bit field B', lsb=1)
+        ]
         reg.add_bfields(bf)
         with pytest.raises(KeyError):
             reg['bf_c']
@@ -242,10 +261,37 @@ class TestRegister:
     def test_get_field_index_error(self):
         """Test of trying to get bit field with wrong index."""
         reg = Register('REGA', 'Register A')
-        bf = [BitField('bf_a', 'Bit field A'), BitField('bf_b', 'Bit field B')]
+        bf = [
+            BitField('bf_a', 'Bit field A', lsb=0),
+            BitField('bf_b', 'Bit field B', lsb=1)
+        ]
         reg.add_bfields(bf)
         with pytest.raises(KeyError):
             reg[3]
+
+    def test_field_name_conflict(self):
+        """Test of adding a field with a name that already present in a register."""
+        reg = Register('REGA', 'Register A')
+        reg.add_bfields(BitField('bf_a', 'Bit field A', lsb=0))
+        with pytest.raises(ValueError):
+            reg.add_bfields(BitField('bf_a', 'Bit field A', lsb=0))
+
+    def test_field_position_conflict(self):
+        """Test of adding a field with position that  overlaps with other field in a register."""
+        reg = Register('REGA', 'Register A')
+        reg.add_bfields(BitField('bf_a', 'Bit field A', lsb=0, width=8))
+        reg.add_bfields(BitField('bf_b', 'Bit field B', lsb=8, width=8))
+        with pytest.raises(ValueError):
+            reg.add_bfields(BitField('bf_c', 'Bit field C', lsb=4, width=10))
+
+    def test_field_order(self):
+        """Test of adding fields and check that they are presented in ascending order in a register."""
+        reg = Register('REGA', 'Register A')
+        reg.add_bfields(BitField('bf_a', 'Bit field A', lsb=0, width=3))
+        reg.add_bfields(BitField('bf_b', 'Bit field B', lsb=16, width=1))
+        reg.add_bfields(BitField('bf_c', 'Bit field C', lsb=5, width=6))
+        reg.add_bfields(BitField('bf_d', 'Bit field D', lsb=18, width=12))
+        assert reg.names == ['bf_a', 'bf_c', 'bf_b', 'bf_d']
 
 
 class TestRegisterMap:
@@ -257,8 +303,8 @@ class TestRegisterMap:
         address = 0x4
         reg = Register(name, description, address)
         reg.add_bfields([
-            BitField('bf_a', 'Bit field A'),
-            BitField('bf_b', 'Bit field B')
+            BitField('bf_a', 'Bit field A', lsb=0),
+            BitField('bf_b', 'Bit field B', lsb=1)
         ])
         rmap = RegisterMap()
         rmap.add_regs(reg)
@@ -271,8 +317,8 @@ class TestRegisterMap:
         """Test of equality comparision of register maps."""
         reg = Register('reg_a', 'Register A', 0x4)
         reg.add_bfields([
-            BitField('bf_a', 'Bit field A'),
-            BitField('bf_b', 'Bit field B')
+            BitField('bf_a', 'Bit field A', lsb=0),
+            BitField('bf_b', 'Bit field B', lsb=1)
         ])
         rmap1 = RegisterMap()
         rmap1.add_regs(reg)
@@ -283,8 +329,8 @@ class TestRegisterMap:
         """Test of non equality comparision of register maps."""
         reg = Register('reg_a', 'Register A', 0x4)
         reg.add_bfields([
-            BitField('bf_a', 'Bit field A'),
-            BitField('bf_b', 'Bit field B')
+            BitField('bf_a', 'Bit field A', lsb=0),
+            BitField('bf_b', 'Bit field B', lsb=1)
         ])
         rmap1 = RegisterMap()
         rmap1.add_regs(reg)
