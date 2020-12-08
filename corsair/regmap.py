@@ -41,7 +41,7 @@ class BitField():
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
-            return self.__dict__ == other.__dict__
+            return self.as_dict() == other.as_dict()
 
     def __ne__(self, other):
         """Check if objects are non equal."""
@@ -231,7 +231,7 @@ class Register():
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
-            return self.__dict__ == other.__dict__
+            return self.as_dict() == other.as_dict()
 
     def __ne__(self, other):
         """Check if objects are non equal."""
@@ -387,7 +387,7 @@ class RegisterMap():
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
-            return self.__dict__ == other.__dict__
+            return self.as_dict() == other.as_dict()
 
     def __ne__(self, other):
         """Check if objects are non equal."""

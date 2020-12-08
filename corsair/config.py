@@ -43,7 +43,10 @@ class Parameter():
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
-            return self.__dict__ == other.__dict__
+            return (
+                self.as_dict() == other.as_dict() and
+                self.checker == other.checker
+            )
 
     def __ne__(self, other):
         """Check if objects are non equal."""
@@ -114,7 +117,7 @@ class ParameterGroup():
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
-            return self.__dict__ == other.__dict__
+            return self.as_dict() == other.as_dict()
 
     def __ne__(self, other):
         """Check if objects are non equal."""

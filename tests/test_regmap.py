@@ -179,7 +179,7 @@ class TestRegister:
 
     def test_eq(self):
         """Test of equality comparision of registes."""
-        reg1 = Register()
+        reg1 = Register('reg_a')
         reg1.add_bfields([
             BitField('bf_a', 'Bit field A', lsb=0),
             BitField('bf_b', 'Bit field B', lsb=1)
@@ -189,7 +189,7 @@ class TestRegister:
 
     def test_ne(self):
         """Test of non equality comparision of registers."""
-        reg1 = Register()
+        reg1 = Register('reg_a')
         reg1.add_bfields([
             BitField('bf_a', 'Bit field A', lsb=0),
             BitField('bf_b', 'Bit field B', lsb=1)
