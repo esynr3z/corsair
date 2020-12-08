@@ -64,6 +64,10 @@ class Parameter():
         """Returns indented parameter's string with name and value."""
         return indent + '%s: %s' % (self.name, utils.try_int_to_str(self._value))
 
+    def as_dict(self):
+        """Returns dictionary with parameters's key attributes."""
+        return {'name': self.name, 'value': self.value}
+
     @property
     def value(self):
         """Current value of the parameter.
@@ -149,6 +153,10 @@ class ParameterGroup():
         params = [self[name].as_str(new_indent) for name in self.names]
         params_str = '\n'.join(params) if params else new_indent + 'empty'
         return indent + '%s:\n' % self.name + params_str
+
+    def as_dict(self):
+        """Returns dictionary with group's key attributes."""
+        return self.values
 
     @property
     def names(self):

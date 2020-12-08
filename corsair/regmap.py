@@ -70,6 +70,19 @@ class BitField():
         bf_str += inner_indent + 'modifiers = %s' % self.modifiers
         return bf_str
 
+    def as_dict(self):
+        """Returns dictionary with bit field's key attributes."""
+        return {
+            'name': self.name,
+            'description': self.description,
+            'initial': self.initial,
+            'width': self.width,
+            'lsb': self.lsb,
+            'access': self.access,
+            'access_flags': self.access_flags,
+            'modifiers': self.modifiers
+        }
+
     @property
     def initial(self):
         """Initial value for the field. Only non-negative integers are allowed."""
@@ -241,6 +254,15 @@ class Register():
         bfields_str = '\n'.join(bfields) if bfields else inner_indent + 'empty'
         return indent + '(0x%x) %s: %s\n' % (self.address, self.name, self.description) + bfields_str
 
+    def as_dict(self):
+        """Returns dictionary with register's key attributes."""
+        return {
+            'name': self.name,
+            'description': self.description,
+            'address': self.address,
+            'bit_fields': [bf.as_dict() for bf in self.bfields]
+        }
+
     def __len__(self):
         """Number of register's bit fields."""
         return len(self._bfields)
@@ -387,6 +409,10 @@ class RegisterMap():
         regs = [reg.as_str(inner_indent) for reg in self.regs]
         regs_str = '\n'.join(regs) if regs else inner_indent + 'empty'
         return indent + '%s:\n' % (self.name) + regs_str
+
+    def as_dict(self):
+        """Returns register map as a dictionary."""
+        return {reg.name: reg.as_dict() for reg in self.regs}
 
     def __len__(self):
         """Number of registers."""
