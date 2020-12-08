@@ -20,7 +20,7 @@ class JSONReader():
         Returns:
             RegisterMap object.
         """
-        with open(path) as json_file:
+        with open(path, 'r') as json_file:
             json_data = json.load(json_file)
 
             # Read configuration
