@@ -5,7 +5,7 @@
 It generates HDL code, documentation and other artifacts from CSR map description file.
 """
 
-__version__ = "0.0.0"
+from .__version__ import __version__
 
 from . import config
 from . import regmap
