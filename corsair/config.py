@@ -58,9 +58,9 @@ class Parameter():
 
     def __str__(self):
         """Returns 'informal' string representation of an object."""
-        return self._str()
+        return self.as_str()
 
-    def _str(self, indent=''):
+    def as_str(self, indent=''):
         """Returns indented parameter's string with name and value."""
         return indent + '%s: %s' % (self.name, utils.try_int_to_str(self._value))
 
@@ -125,7 +125,7 @@ class ParameterGroup():
 
     def __str__(self):
         """Returns 'informal' string representation of an object."""
-        return self._str()
+        return self.as_str()
 
     def __getitem__(self, key):
         """Get parameter or group by name.
@@ -143,10 +143,10 @@ class ParameterGroup():
         raise KeyError("Not able to set '%s' item directly in '%s' group!"
                        " Try use add_params() method." % (key, self.name))
 
-    def _str(self, indent=''):
+    def as_str(self, indent=''):
         """Returns indented string with group members and their values"""
         new_indent = indent + '  '
-        params = [self[name]._str(new_indent) for name in self.names]
+        params = [self[name].as_str(new_indent) for name in self.names]
         params_str = '\n'.join(params) if params else new_indent + 'empty'
         return indent + '%s:\n' % self.name + params_str
 

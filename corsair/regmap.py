@@ -56,9 +56,9 @@ class BitField():
 
     def __str__(self):
         """Returns 'informal' string representation of an object."""
-        return self._str()
+        return self.as_str()
 
-    def _str(self, indent=''):
+    def as_str(self, indent=''):
         """Returns indented string with the bit field information."""
         inner_indent = indent + '  '
         bf_str = indent + '%s: %s\n' % (self.name, self.description)
@@ -233,11 +233,11 @@ class Register():
 
     def __str__(self):
         """Returns 'informal' string representation of an object."""
-        return self._str()
+        return self.as_str()
 
-    def _str(self, indent=''):
+    def as_str(self, indent=''):
         inner_indent = indent + '  '
-        bfields = [bf._str(inner_indent) for bf in self.bfields]
+        bfields = [bf.as_str(inner_indent) for bf in self.bfields]
         bfields_str = '\n'.join(bfields) if bfields else inner_indent + 'empty'
         return indent + '(0x%x) %s: %s\n' % (self.address, self.name, self.description) + bfields_str
 
@@ -380,11 +380,11 @@ class RegisterMap():
 
     def __str__(self):
         """Returns 'informal' string representation of an object."""
-        return self._str()
+        return self.as_str()
 
-    def _str(self, indent=''):
+    def as_str(self, indent=''):
         inner_indent = indent + '  '
-        regs = [reg._str(inner_indent) for reg in self.regs]
+        regs = [reg.as_str(inner_indent) for reg in self.regs]
         regs_str = '\n'.join(regs) if regs else inner_indent + 'empty'
         return indent + '%s:\n' % (self.name) + regs_str
 
