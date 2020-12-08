@@ -216,7 +216,7 @@ class Register():
         name: Name of a register.
         description: Description of a register.
         address: Address of a register
-        bfields: List with bit fields.
+        bfields: List with bit fields objects.
         names: List with bit fields names
     """
     def __init__(self, name='', description='', address=None):
@@ -341,7 +341,7 @@ class Register():
 
     @property
     def bfields(self):
-        """Returns list with bit fields."""
+        """Returns list with bit field objects."""
         return self._bfields
 
     def add_bfields(self, new_bfields):
@@ -480,7 +480,7 @@ class RegisterMap():
 
     @property
     def regs(self):
-        """Returns list with registers."""
+        """Returns list with register objects."""
         return self._regs
 
     def add_regs(self, new_regs):
