@@ -5,12 +5,8 @@
 """
 
 import pytest
-from corsair.regmap import (
-    BitField,
-    Register,
-    RegisterMap
-)
-from corsair.config import Configuration
+from corsair import BitField, Register, RegisterMap
+from corsair import Configuration
 import copy
 
 

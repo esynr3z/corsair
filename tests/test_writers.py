@@ -5,8 +5,8 @@
 """
 
 import pytest
-from corsair.readers import JSONReader, YAMLReader
-from corsair.writers import JSONWriter, YAMLWriter
+from corsair import JSONReader, YAMLReader
+from corsair import JSONWriter, YAMLWriter
 
 
 class TestJSONWriter:

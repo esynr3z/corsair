@@ -7,7 +7,24 @@ It generates HDL code, documentation and other artifacts from CSR map descriptio
 
 from .__version__ import __version__
 
-from . import config
-from . import regmap
-from . import readers
-from . import writers
+from .config import (
+    Parameter,
+    ParameterGroup,
+    Configuration
+)
+
+from .regmap import (
+    BitField,
+    Register,
+    RegisterMap
+)
+
+from .readers import (
+    JSONReader,
+    YAMLReader
+)
+
+from .writers import (
+    JSONWriter,
+    YAMLWriter
+)

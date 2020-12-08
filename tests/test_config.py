@@ -5,11 +5,7 @@
 """
 
 import pytest
-from corsair.config import (
-    Parameter,
-    ParameterGroup,
-    Configuration
-)
+from corsair import Parameter, ParameterGroup, Configuration
 import copy
 
 
