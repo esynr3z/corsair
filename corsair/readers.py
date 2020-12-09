@@ -21,14 +21,20 @@ class JSONReader():
         Returns:
             RegisterMap object.
         """
+        print("Read '%s' CSR map file with JSONReader:" % path)
         with open(path, 'r') as json_file:
+            print("  Open file ... ", end='')
             json_data = json.load(json_file)
+            print("OK")
 
             # Read configuration
+            print("  Read configuration ... ", end='')
             config = Configuration()
             config.values = json_data['configuration']
+            print("OK")
 
             # Read register map
+            print("  Read register map ... ", end='')
             rmap = RegisterMap(config=config)
             for json_reg in json_data['register_map']:
                 json_reg_filtered = {k: v for k, v in json_reg.items() if k in ['name', 'description', 'address']}
@@ -36,6 +42,7 @@ class JSONReader():
                 for json_bf in json_reg['bit_fields']:
                     reg.add_bfields(BitField(**json_bf))
                 rmap.add_regs(reg)
+            print("OK")
 
             return rmap
 
@@ -51,14 +58,20 @@ class YAMLReader():
         Returns:
             RegisterMap object.
         """
+        print("Read '%s' CSR map file with YAMLReader:" % path)
         with open(path, 'r') as yaml_file:
+            print("  Open file ... ", end='')
             yaml_data = yaml.safe_load(yaml_file)
+            print("OK")
 
             # Read configuration
+            print("  Read configuration ... ", end='')
             config = Configuration()
             config.values = yaml_data['configuration']
+            print("OK")
 
             # Read register map
+            print("  Read register map ... ", end='')
             rmap = RegisterMap(config=config)
             for yaml_reg in yaml_data['register_map']:
                 yaml_reg_filtered = {k: v for k, v in yaml_reg.items() if k in ['name', 'description', 'address']}
@@ -66,5 +79,6 @@ class YAMLReader():
                 for yaml_bf in yaml_reg['bit_fields']:
                     reg.add_bfields(BitField(**yaml_bf))
                 rmap.add_regs(reg)
+            print("OK")
 
             return rmap
