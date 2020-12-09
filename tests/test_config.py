@@ -18,7 +18,8 @@ class TestParameter:
         p = Parameter(p_name, p_val)
         print(p)
         print(repr(p))
-        assert p.name == p_name and p.value == p_val
+        assert p.name == p_name
+        assert p.value == p_val
 
     def test_eq(self):
         """Test of equality comparision of parameters."""
@@ -86,7 +87,8 @@ class TestParameterGroup:
         pg = ParameterGroup(pg_name)
         pg.add_params(params)
         print(pg)
-        assert pg.name == pg_name and pg[p2_name].value == p2_val
+        assert pg.name == pg_name
+        assert pg[p2_name].value == p2_val
 
     def test_eq(self):
         """Test of equality comparision of parameters groups."""
@@ -164,7 +166,8 @@ class TestConfiguration:
         config = Configuration()
         config.add_params([pg, p3])
         print(config)
-        assert config[pg_name][p1_name].value == p1_val and config[p3_name].value == p3_val
+        assert config[pg_name][p1_name].value == p1_val
+        assert config[p3_name].value == p3_val
 
     def test_add_single_param(self):
         """Test of adding a parameter to the configuration"""
@@ -231,10 +234,10 @@ class TestConfiguration:
         }
         config.values = new_values
         print(config)
-        assert new_values['read_filler'] == config['read_filler'].value and \
-               new_values['address_calculation']['auto_increment_mode'] == \
-               config['address_calculation']['auto_increment_mode'].value and \
-               new_values['group_a'] == config['group_a'].values
+        assert new_values['read_filler'] == config['read_filler'].value
+        assert (new_values['address_calculation']['auto_increment_mode'] ==
+                config['address_calculation']['auto_increment_mode'].value)
+        assert new_values['group_a'] == config['group_a'].values
 
     def test_address_calculation_checker(self):
         config = Configuration()

@@ -22,9 +22,9 @@ class TestJSONReader:
         rmap = reader(input_file)
         print(rmap.config)
         print(rmap)
-        assert rmap.config['read_filler'].value == 0xDEADBEEF and \
-               rmap['LEN'].address == 0x0 and \
-               rmap['START']['STB'].access == 'wo'
+        assert rmap.config['read_filler'].value == 0xDEADBEEF
+        assert rmap['LEN'].address == 0x0
+        assert rmap['START']['STB'].access == 'wo'
 
 
 class TestYAMLReader:
@@ -41,6 +41,6 @@ class TestYAMLReader:
         rmap = reader(input_file)
         print(rmap.config)
         print(rmap)
-        assert rmap.config['read_filler'].value == 0xDEADBEEF and \
-               rmap['LEN'].address == 0x0 and \
-               rmap['START']['STB'].access == 'wo'
+        assert rmap.config['read_filler'].value == 0xDEADBEEF
+        assert rmap['LEN'].address == 0x0
+        assert rmap['START']['STB'].access == 'wo'

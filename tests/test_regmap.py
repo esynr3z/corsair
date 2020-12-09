@@ -25,8 +25,8 @@ class TestBitField:
         bf = BitField(name)
         print(repr(bf))
         print(bf)
-        assert (name, description, initial, width, lsb, access, access_flags, modifiers) == \
-               (bf.name, bf.description, bf.initial, bf.width, bf.lsb, bf.access, bf.access_flags, bf.modifiers)
+        assert ((name, description, initial, width, lsb, access, access_flags, modifiers) ==
+                (bf.name, bf.description, bf.initial, bf.width, bf.lsb, bf.access, bf.access_flags, bf.modifiers))
 
     def test_eq(self):
         """Test of equality comparision of bit fields."""
@@ -170,8 +170,8 @@ class TestRegister:
         reg.add_bfields(bfields)
         print(repr(reg))
         print(reg)
-        assert (name, description, address, bfields) == \
-               (reg.name, reg.description, reg.address, reg.bfields)
+        assert ((name, description, address, bfields) ==
+                (reg.name, reg.description, reg.address, reg.bfields))
 
     def test_eq(self):
         """Test of equality comparision of registes."""
@@ -222,15 +222,16 @@ class TestRegister:
         print(reg.name, reg.description)
         print(reg[0].name, reg.description)
         print(reg[0].name, reg[0].description)
-        assert reg.name == reg[0].name and \
-               reg.description == reg[0].description
+        assert reg.name == reg[0].name
+        assert reg.description == reg[0].description
 
     def test_add_field(self):
         """Test of adding field to a register."""
         reg = Register('REGA', 'Register A')
         bf = BitField('bf_a', 'Bit field A')
         reg.add_bfields(bf)
-        assert bf == reg['bf_a'] and bf == reg[0]
+        assert bf == reg['bf_a']
+        assert bf == reg[0]
 
     def test_add_fields(self):
         """Test of adding several fields to a register"""
@@ -240,8 +241,10 @@ class TestRegister:
             BitField('bf_b', 'Bit field B', lsb=1)
         ]
         reg.add_bfields(bf)
-        assert bf[0] == reg['bf_a'] and bf[0] == reg[0] and \
-               bf[1] == reg['bf_b'] and bf[1] == reg[1]
+        assert bf[0] == reg['bf_a']
+        assert bf[0] == reg[0]
+        assert bf[1] == reg['bf_b']
+        assert bf[1] == reg[1]
 
     def test_get_field_key_error(self):
         """Test of trying to get bit field with wrong name."""
@@ -340,8 +343,10 @@ class TestRegisterMap:
         reg_b = Register('reg_b', 'Register B', 0xC)
         rmap = RegisterMap()
         rmap.add_regs([reg_a, reg_b])
-        assert rmap[0] == reg_a and rmap['reg_a'] == reg_a and \
-               rmap[1] == reg_b and rmap['reg_b'] == reg_b
+        assert rmap[0] == reg_a
+        assert rmap['reg_a'] == reg_a
+        assert rmap[1] == reg_b
+        assert rmap['reg_b'] == reg_b
 
     def test_reg_name_conflict(self):
         """Test of adding register with a name that already present in a map."""
@@ -406,9 +411,9 @@ class TestRegisterMap:
             Register('reg_b', 'Register B', '0x08'),
             Register('reg_c', 'Register C', '0x0C'),
         ])
-        assert rmap['reg_a'].address == 0x04 and \
-               rmap['reg_b'].address == 0x08 and \
-               rmap['reg_c'].address == 0x0C
+        assert rmap['reg_a'].address == 0x04
+        assert rmap['reg_b'].address == 0x08
+        assert rmap['reg_c'].address == 0x0C
 
     def test_reg_addr_order(self):
         """Test of adding registers and check that they are presented in ascending order in a map."""
