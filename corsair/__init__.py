@@ -5,7 +5,11 @@
 It generates HDL code, documentation and other artifacts from CSR map description file.
 """
 
-from .__version__ import __version__
+from .__version__ import (
+    __title__,
+    __description__,
+    __version__
+)
 
 from .config import (
     Parameter,
