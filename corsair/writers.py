@@ -6,7 +6,6 @@
 
 import json
 import yaml
-import copy
 
 
 class JSONWriter():
