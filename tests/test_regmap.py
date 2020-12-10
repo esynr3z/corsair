@@ -456,3 +456,13 @@ class TestRegisterMap:
         rmap.add_regs(Register('reg_a', 'Register A', 0x0))
         with pytest.raises(ValueError):
             rmap.add_regs(Register('reg_b', 'Register B'))
+
+    def test_bf_datawidth_conflict(self):
+        """Wait exception when bf.msb value exceeds data width."""
+        reg = Register('reg_a', 'Register A', 0x4)
+        reg.add_bfields([
+            BitField('bf_a', 'Bit field A', lsb=0, width=35),
+        ])
+        rmap = RegisterMap()
+        with pytest.raises(ValueError):
+            rmap.add_regs(reg)

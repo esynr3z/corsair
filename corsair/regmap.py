@@ -493,6 +493,12 @@ class RegisterMap():
             # check existance
             if reg.name in self.names:
                 raise ValueError("Register with name '%s' is already present!" % (reg.name))
+            # check bit field conflicts with data width
+            for bf in reg:
+                if bf.msb >= self.config['interface_generic']['data_width'].value:
+                    raise ValueError("Register '%s' has field '%s' (msb=%d) "
+                                     "that exceeds interface data width %d!" %
+                                     (reg.name, bf.name, bf.msb, self.config['interface_generic']['data_width'].value))
             # aplly calculated address if register address is empty
             if reg.address is None:
                 self._addr_apply(reg)
