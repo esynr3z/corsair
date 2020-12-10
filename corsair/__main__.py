@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Run CorSaiR from command line with arguments.
+"""Run Corsair from command line with arguments.
 """
 
 import sys
