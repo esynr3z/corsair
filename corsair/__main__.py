@@ -145,7 +145,7 @@ def main():
         rmap = args.reader()
 
     # create all output artifacts
-    if (args.writers):
+    if args.writers:
         for writer in args.writers:
             writer(rmap)
 
