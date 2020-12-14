@@ -5,6 +5,15 @@ You just need to create and fill single CSR map description file once and then g
 
 It is as easy as:
 
+* Create CSR map description file or generate a template with Corsair:
+
+```sh
+corsair -t ip_csr.json
+```
+
+* Make changes to ```ip_csr.json```
+* Generate output artifacts:
+
 ```sh
 corsair -i ip_csr.json -o ip_regmap.v ip_regmap.md ip_regmap.h
 ```

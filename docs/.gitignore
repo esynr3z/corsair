@@ -1,8 +1,1 @@
-*
-!Makefile
-!conf.py
-!index.rst
-!configuration.rst
-!contributing.rst
-!register-map.rst
-!make.bat
+_build

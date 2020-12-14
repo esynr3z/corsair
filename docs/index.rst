@@ -1,11 +1,6 @@
 Welcome to Corsair's documentation!
 ===================================
 
-Introducion
-===========
-
-blabla
-
 Contents
 ========
 
@@ -14,6 +9,11 @@ Contents
 .. toctree::
    :maxdepth: 2
    :caption: Basics
+
+   introduction.rst
+   workflow.rst
+   csr-map.rst
+   local-bus.rst
 
 .. toctree::
    :maxdepth: 2
