@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """Register map.
-
-More information about register map can be found in docs/regmap.md.
 """
 
 from . import utils

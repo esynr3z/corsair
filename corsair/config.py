@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 """Configuration module.
-
-More information about configuration options can be found in docs/config.md.
 """
 
 from . import utils

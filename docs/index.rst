@@ -17,6 +17,15 @@ Contents
 
 .. toctree::
    :maxdepth: 2
+   :caption: API
+
+   config-api.rst
+   regmap-api.rst
+   readers-api.rst
+   writers-api.rst
+
+.. toctree::
+   :maxdepth: 2
    :caption: Additional materials
 
    contributing.rst

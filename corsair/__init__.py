@@ -32,3 +32,16 @@ from .writers import (
     JSONWriter,
     YAMLWriter
 )
+
+__all__ = [
+    'Parameter',
+    'ParameterGroup',
+    'Configuration',
+    'BitField',
+    'Register',
+    'RegisterMap',
+    'JSONReader',
+    'YAMLReader',
+    'JSONWriter',
+    'YAMLWriter'
+]

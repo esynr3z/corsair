@@ -49,4 +49,13 @@ Custom workflow
 
 Corsair can be imported to your module to enable creation of a custom workflow.
 
-TODO
+::
+
+    import corsair
+
+More information can be found in the API section:
+
+* :ref:`Configuration <config-api>`
+* :ref:`Register map <regmap-api>`
+* :ref:`Readers <readers-api>`
+* :ref:`Writers <writers-api>`
