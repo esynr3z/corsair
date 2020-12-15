@@ -19,14 +19,14 @@ class Parameter():
 
     Attributes:
         name: Name of the parameter.
-        checker: Lambda function to perform value validation.
+        validator: Lambda function to perform value validation.
             Returns True if value check is OK, and False otherwise.
     """
-    def __init__(self, name, value=None, checker=lambda val: True):
+    def __init__(self, name, value=None, validator=lambda val: True):
         self._value = None
 
         self.name = name
-        self.checker = checker
+        self.validator = validator
         self.value = value
 
     def __eq__(self, other):
@@ -35,7 +35,7 @@ class Parameter():
         else:
             return (
                 self.as_dict() == other.as_dict() and
-                self.checker == other.checker
+                self.validator == other.validator
             )
 
     def __ne__(self, other):
@@ -77,12 +77,12 @@ class Parameter():
     def value(self, new_value):
         # store all 0x-like hexademical strings as integers if possible
         self._value = utils.try_hex_to_dec(new_value)
-        # run checker for the new value
-        self._check()
+        # run validator for the new value
+        self._validate()
 
-    def _check(self):
+    def _validate(self):
         """Check parameter value correctness."""
-        if self.checker(self.value) is False:
+        if self.validator(self.value) is False:
             raise ValueError('"%s" parameter with "%s" value failed the check!' % (self.name,
                                                                                    self.value))
 
@@ -250,24 +250,24 @@ class Configuration(ParameterGroup):
 
         self['address_calculation'].add_params([
             Parameter(name='auto_increment_mode', value='none',
-                      checker=lambda val: val in ['none', 'data_width', 'custom']),
-            Parameter(name='auto_increment_value', value=4, checker=lambda val: val >= 1),
+                      validator=lambda val: val in ['none', 'data_width', 'custom']),
+            Parameter(name='auto_increment_value', value=4, validator=lambda val: val >= 1),
             Parameter(name='alignment_mode', value='data_width',
-                      checker=lambda val: val in ['none', 'data_width', 'custom']),
-            Parameter(name='alignment_value', value=4, checker=lambda val: val >= 1)
+                      validator=lambda val: val in ['none', 'data_width', 'custom']),
+            Parameter(name='alignment_value', value=4, validator=lambda val: val >= 1)
         ])
 
         # parameter register_reset
         reg_rst_allowlist = ['sync_pos', 'sync_neg', 'async_pos', 'async_neg', 'init_only']
         self.add_params(Parameter(name='register_reset', value='sync_pos',
-                                  checker=lambda val: val in reg_rst_allowlist))
+                                  validator=lambda val: val in reg_rst_allowlist))
 
         # group interface_generic
         self.add_params(ParameterGroup('interface_generic'))
 
         ifgen_type_allowed = ['amm', 'apb', 'axil', 'lb']
         self['interface_generic'].add_params(
-            Parameter(name='type', value='lb', checker=lambda val: val in ifgen_type_allowed)
+            Parameter(name='type', value='lb', validator=lambda val: val in ifgen_type_allowed)
         )
 
         ifgen_data_width_allowed = {
@@ -284,9 +284,9 @@ class Configuration(ParameterGroup):
         }
         self['interface_generic'].add_params([
             Parameter(name='data_width', value=32,
-                      checker=lambda val: val in ifgen_data_width_allowed[self['interface_generic']['type'].value]),
+                      validator=lambda val: val in ifgen_data_width_allowed[self['interface_generic']['type'].value]),
             Parameter(name='address_width', value=32,
-                      checker=lambda val: val in ifgen_addr_width_allowed[self['interface_generic']['type'].value])
+                      validator=lambda val: val in ifgen_addr_width_allowed[self['interface_generic']['type'].value])
         ])
 
         # group interface_specific

@@ -31,7 +31,7 @@ class TestParameter:
         """Test of non equality comparision of parameters."""
         p1 = Parameter('par_a', 42)
         p2 = copy.deepcopy(p1)
-        p2.checker = lambda val: val != 777
+        p2.validator = lambda val: val != 777
         assert p1 != p2
 
     def test_modify(self):
@@ -44,27 +44,27 @@ class TestParameter:
     def test_allowlist(self):
         """Test of a parameter allowlist check"""
         with pytest.raises(ValueError):
-            Parameter("param_a", 'aaa', checker=lambda val: val in ['bbb', 'ccc'])
+            Parameter("param_a", 'aaa', validator=lambda val: val in ['bbb', 'ccc'])
 
     def test_min(self):
         """Test of a parameter min check"""
         with pytest.raises(ValueError):
-            Parameter("param_a", 5, checker=lambda val: val >= 0xF)
+            Parameter("param_a", 5, validator=lambda val: val >= 0xF)
 
     def test_max(self):
         """Test of a parameter max check"""
         with pytest.raises(ValueError):
-            Parameter("param_a", 32, checker=lambda val: val < 32)
+            Parameter("param_a", 32, validator=lambda val: val < 32)
 
     def test_range_less(self):
         """Test of a parameter range check: if value is less"""
         with pytest.raises(ValueError):
-            Parameter("param_a", 5, checker=lambda val: 100 <= val < 200)
+            Parameter("param_a", 5, validator=lambda val: 100 <= val < 200)
 
     def test_range_greater(self):
         """Test of a parameter range check: if value is greater"""
         with pytest.raises(ValueError):
-            Parameter("param_a", 300, checker=lambda val: 100 <= val < 200)
+            Parameter("param_a", 300, validator=lambda val: 100 <= val < 200)
 
 
 class TestParameterGroup:
@@ -239,7 +239,7 @@ class TestConfiguration:
                 config['address_calculation']['auto_increment_mode'].value)
         assert new_values['group_a'] == config['group_a'].values
 
-    def test_address_calculation_checker(self):
+    def test_address_calculation_validator(self):
         config = Configuration()
         # no exception here
         print(config['address_calculation']['auto_increment_mode'])
@@ -249,7 +249,7 @@ class TestConfiguration:
         with pytest.raises(ValueError):
             config['address_calculation']['auto_increment_mode'].value = 'lalala'
 
-    def test_interface_generic_checker(self):
+    def test_interface_generic_validator(self):
         config = Configuration()
         # no exception here
         print(config['interface_generic']['type'])
