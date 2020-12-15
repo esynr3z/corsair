@@ -11,17 +11,22 @@ from .config import Configuration
 class BitField():
     """Bit field.
 
+    Examples:
+
+        Create a bit field:
+
+        >>> print(BitField('bf_a', 'bf_a description', lsb=0, width=8))
+        bf_a: bf_a description
+          initial = 0
+          width = 8
+          lsb = 0
+          access = rw
+          access_flags = False
+          modifiers = []
+
     Attributes:
         name: Name of the bit field.
         description: Description of the bit field.
-        initial: Initial (reset) value for the field
-        width: Bit width of the field
-        lsb: Position of less significant bit (LSB) of the field.
-        msb: Position of most significant bit (LSB) of the field.
-        access: Bit field access mode.
-        access_flags: Enable access flags generation.
-        modifiers: List of access modifiers.
-        bits: List with all bits positions used by a bit field.
     """
     def __init__(self, name, description='', initial=0, width=1,
                  lsb=0, access='rw', access_flags=False, modifiers=[]):
@@ -35,25 +40,21 @@ class BitField():
         self.modifiers = modifiers
 
     def __eq__(self, other):
-        """Check if objects are equal."""
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
             return self.as_dict() == other.as_dict()
 
     def __ne__(self, other):
-        """Check if objects are non equal."""
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
             return not self.__eq__(other)
 
     def __repr__(self):
-        """Returns string representation of an object."""
         return 'BitField(%s)' % repr(self.name)
 
     def __str__(self):
-        """Returns 'informal' string representation of an object."""
         return self.as_str()
 
     def as_str(self, indent=''):
@@ -209,13 +210,56 @@ class BitField():
 
 
 class Register():
-    """Control and status register."
+    """Control and status register.
 
-        name: Name of a register.
-        description: Description of a register.
-        address: Address of a register
-        bfields: List with bit fields objects.
-        names: List with bit fields names
+    Examples:
+
+        Create a register:
+
+        >>> reg = Register('reg_a', 'Register A description', address=8)
+        >>> reg.add_bfields([
+        ...     BitField('bf_a', 'Bit field A', lsb=0),
+        ...     BitField('bf_b', 'Bit field B', lsb=1)
+        ... ])
+        >>> print(reg)
+        (0x8) reg_a: Register A description
+          bf_a: Bit field A
+            initial = 0
+            width = 1
+            lsb = 0
+            access = rw
+            access_flags = False
+            modifiers = []
+          bf_b: Bit field B
+            initial = 0
+            width = 1
+            lsb = 1
+            access = rw
+            access_flags = False
+            modifiers = []
+
+        Access bit field via name or index:
+
+        >>> reg = Register('reg_a', 'Register A description', address=8)
+        >>> reg.add_bfields([
+        ...     BitField('bf_a', 'Bit field A', lsb=0),
+        ...     BitField('bf_b', 'Bit field B', lsb=1)
+        ... ])
+        >>> print(reg['bf_b'].name, reg[1].name)
+        bf_b bf_b
+
+        Iterate through bit fields:
+
+        >>> reg = Register('reg_a', 'Register A description', address=8)
+        >>> reg.add_bfields([
+        ...     BitField('bf_a', 'Bit field A', lsb=0),
+        ...     BitField('bf_b', 'Bit field B', lsb=1)
+        ... ])
+        >>> for bf in reg:
+        ...     print(bf.name)
+        ...
+        bf_a
+        bf_b
     """
     def __init__(self, name='', description='', address=None):
         self._bfields = []
@@ -225,28 +269,25 @@ class Register():
         self.address = address
 
     def __eq__(self, other):
-        """Check if objects are equal."""
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
             return self.as_dict() == other.as_dict()
 
     def __ne__(self, other):
-        """Check if objects are non equal."""
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
             return not self.__eq__(other)
 
     def __repr__(self):
-        """Returns string representation of an object."""
         return 'Register(%s, %s, %s)' % (repr(self.name), repr(self.description), repr(self.address))
 
     def __str__(self):
-        """Returns 'informal' string representation of an object."""
         return self.as_str()
 
     def as_str(self, indent=''):
+        """Returns indented string with the register information."""
         inner_indent = indent + '  '
         bfields = [bf.as_str(inner_indent) for bf in self.bfields]
         bfields_str = '\n'.join(bfields) if bfields else inner_indent + 'empty'
@@ -343,7 +384,10 @@ class Register():
         return self._bfields
 
     def add_bfields(self, new_bfields):
-        """Add bit fields."""
+        """Add bit field or list of bit feilds.
+
+        Bit fields are automatically sorted and stored in the ascending order of msb attributes.
+        """
         # hack to handle single elements
         new_bfields = utils.listify(new_bfields)
 
@@ -371,9 +415,47 @@ class Register():
 class RegisterMap():
     """CSR map.
 
+    Examples:
+
+        Create a register map:
+
+        >>> rmap = RegisterMap()
+        >>> rmap.add_regs([
+        ...     Register('reg_a', 'Register A', address=0),
+        ...     Register('reg_b', 'Register B', address=4)
+        ... ])
+        >>> print(rmap)
+        register_map:
+          (0x0) reg_a: Register A
+            empty
+          (0x4) reg_b: Register B
+            empty
+
+        Access register via name or index:
+
+        >>> rmap = RegisterMap()
+        >>> rmap.add_regs([
+        ...     Register('reg_a', 'Register A', address=0),
+        ...     Register('reg_b', 'Register B', address=4)
+        ... ])
+        >>> print(rmap['reg_a'].name, rmap[0].name)
+        reg_a reg_a
+
+        Iterate through registers:
+
+        >>> rmap = RegisterMap()
+        >>> rmap.add_regs([
+        ...     Register('reg_a', 'Register A', address=0),
+        ...     Register('reg_b', 'Register B', address=4)
+        ... ])
+        >>> for reg in rmap:
+        ...     print(reg.name)
+        ...
+        reg_a
+        reg_b
+
+    Attributes:
         name: Name of a map.
-        names: List with all registers names.
-        regs: List with register objects.
     """
     def __init__(self, name='register_map', config=Configuration()):
         self.name = name
@@ -381,28 +463,25 @@ class RegisterMap():
         self._regs = []
 
     def __eq__(self, other):
-        """Check if objects are equal."""
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
             return self.as_dict() == other.as_dict()
 
     def __ne__(self, other):
-        """Check if objects are non equal."""
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
             return not self.__eq__(other)
 
     def __repr__(self):
-        """Returns string representation of an object."""
         return 'RegisterMap(%s, %s)' % (repr(self.name), repr(self.config))
 
     def __str__(self):
-        """Returns 'informal' string representation of an object."""
         return self.as_str()
 
     def as_str(self, indent=''):
+        """Returns indented string with the register map information."""
         inner_indent = indent + '  '
         regs = [reg.as_str(inner_indent) for reg in self.regs]
         regs_str = '\n'.join(regs) if regs else inner_indent + 'empty'
@@ -482,7 +561,10 @@ class RegisterMap():
         return self._regs
 
     def add_regs(self, new_regs):
-        """Add register."""
+        """Add register or list of registers.
+
+        Register are automatically sorted and stored in the ascending order of addresses.
+        """
         # hack to handle single elements
         new_regs = utils.listify(new_regs)
 
