@@ -55,8 +55,8 @@ Install Sphinx and extensions:
 
     python3 -m pip install -U sphinx sphinx_rtd_theme m2r2
 
-Run from ``docs`` folder to build the documentation:
+Run from ``docs`` folder to build the documentation and test docstrings:
 
 ::
 
-    make clean && make html
+    make clean html doctest

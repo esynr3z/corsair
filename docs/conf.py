@@ -31,10 +31,15 @@ extensions = [
     'm2r2',
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
-    'sphinx.ext.viewcode'
+    'sphinx.ext.viewcode',
+    'sphinx.ext.doctest',
 ]
 
 source_suffix = ['.rst', '.md']
+
+doctest_global_setup = '''
+from corsair import *
+'''
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
