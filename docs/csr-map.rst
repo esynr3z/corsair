@@ -11,6 +11,8 @@ CSR map description file consists of two parts: configuration and register map. 
 
 Schematic representation of the structure is below (``{}`` is for a dictionary, ``[]`` - for an array). Description files in JSON or YAML formats follow in particular that structure with almost no changes.
 
+* name
+* version
 * configuration: {}
     * parameter_a
     * parameter_group_b {}
