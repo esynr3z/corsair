@@ -30,10 +30,10 @@ Use -h/--help key to get all options available.
     $ python3 -m corsair -h
     usage: corsair [-h] [-v] [-i file[,ReaderClassName]]
                    [-o file[,WriterClassName] [file[,WriterClassName] ...]]
-                   [-t file[,WriterClassName]]
-
+                   [-t file[,WriterClassName]] [--print-readers] [--print-writers]
+    
     Control and status register (CSR) map generator for FPGA/ASIC projects.
-
+    
     optional arguments:
       -h, --help            show this help message and exit
       -v, --version         show program's version number and exit
@@ -43,6 +43,9 @@ Use -h/--help key to get all options available.
                             write output to file(s)
       -t file[,WriterClassName], --template file[,WriterClassName]
                             write CSR map template to file
+      --print-readers       print names of all available readers
+      --print-writers       print names of all available writers
+
 
 Import (Python)
 ===============
@@ -53,6 +56,7 @@ Corsair can be imported to your Python module to enable creation of a custom wor
 
     import corsair
 
+    # create and fill the CSR map
     config = corsair.Configuration()
     config['interface_generic']['type'] = 'axil'
 
@@ -62,6 +66,7 @@ Corsair can be imported to your Python module to enable creation of a custom wor
     rmap = corsair.RegisterMap(config)
     rmap.add_regs(reg_a)
 
+    # do your custom processing
     rmap_custom_processig(rmap)
     
 More information can be found in the API section:

@@ -106,6 +106,14 @@ def parse_arguments():
                         metavar='file[,WriterClassName]',
                         dest='template_writer',
                         help='write CSR map template to file')
+    parser.add_argument('--print-readers',
+                        dest='need_print_readers',
+                        action='store_true',
+                        help='print names of all available readers')
+    parser.add_argument('--print-writers',
+                        dest='need_print_writers',
+                        action='store_true',
+                        help='print names of all available writers')
 
     # check if no arguments provided
     if len(sys.argv) == 1:
@@ -126,6 +134,16 @@ def main():
     """Program main."""
     # parse arguments
     args = parse_arguments()
+
+    if args.need_print_readers:
+        print('Readers available:')
+        for name in readers_by_name.keys():
+            print('  %s' % name)
+
+    if args.need_print_writers:
+        print('Writers available:')
+        for name in writers_by_name.keys():
+            print('  %s' % name)
 
     # create template if needed
     if args.template_writer:
