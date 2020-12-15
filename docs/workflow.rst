@@ -53,6 +53,17 @@ Corsair can be imported to your Python module to enable creation of a custom wor
 
     import corsair
 
+    config = corsair.Configuration()
+    config['interface_generic']['type'] = 'axil'
+
+    reg_a = corsair.Register('rega', address=4)
+    reg_a.add_bfields(corsair.BitField('bfa', lsb=0, width=8))
+
+    rmap = corsair.RegisterMap(config)
+    rmap.add_regs(reg_a)
+
+    rmap_custom_processig(rmap)
+    
 More information can be found in the API section:
 
 * :ref:`Configuration <config-api>`
