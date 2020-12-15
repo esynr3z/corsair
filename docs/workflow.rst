@@ -4,8 +4,8 @@
 Workflow
 ========
 
-Run from command line
-=====================
+Standalone (CLI)
+================
 
 It is as easy as:
 
@@ -23,7 +23,7 @@ It is as easy as:
     corsair -i ip_csr.json -o ip_regmap.v ip_regmap.md ip_regmap.h
 
 
-Use -h/--help key to get all options allowed.
+Use -h/--help key to get all options available.
 
 ::
 
@@ -44,10 +44,10 @@ Use -h/--help key to get all options allowed.
       -t file[,WriterClassName], --template file[,WriterClassName]
                             write CSR map template to file
 
-Custom workflow
+Import (Python)
 ===============
 
-Corsair can be imported to your module to enable creation of a custom workflow.
+Corsair can be imported to your Python module to enable creation of a custom workflow.
 
 ::
 

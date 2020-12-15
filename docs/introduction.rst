@@ -9,10 +9,10 @@ Introduction
 
 
 
-Corsair is a tool that makes it easy to organize and support control and status register (CSR) map for any FPGA/ASIC project.
+Corsair is a tool that makes it easy to organize and support control and status register (CSR) map for an any FPGA/ASIC project.
 You just need to create and fill single CSR map description file once and then generate HDL code, headers, documentation and etc.
 
-Installation of the latest stable version from pypi:
+Instal the latest stable version from pypi:
 
 ::
 
