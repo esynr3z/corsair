@@ -16,7 +16,7 @@ class JSONWriter():
         Create JSON file based on a :class:`RegisterMap` object:
 
         >>> writer = JSONWriter()
-        >>> rmap = RegisterMap(Configuration())
+        >>> rmap = RegisterMap(config=Configuration())
         >>> writer('_build/doctest/map.json', rmap)
         Write '_build/doctest/map.json' file with JSONWriter:
           Prepare data ... OK
@@ -30,6 +30,8 @@ class JSONWriter():
         print("Write '%s' file with JSONWriter:" % path)
         print("  Prepare data ... ", end='')
         json_data = {
+            'name': rmap.name,
+            'version': rmap.version,
             'configuration': rmap.config.as_dict(),
             'register_map': list(rmap.as_dict().values())
         }
@@ -49,7 +51,7 @@ class YAMLWriter():
         Create YAML file based on a :class:`RegisterMap` object:
 
         >>> writer = YAMLWriter()
-        >>> rmap = RegisterMap(Configuration())
+        >>> rmap = RegisterMap(config=Configuration())
         >>> writer('_build/doctest/map.yaml', rmap)
         Write '_build/doctest/map.yaml' file with YAMLWriter:
           Prepare data ... OK
@@ -63,6 +65,8 @@ class YAMLWriter():
         print("Write '%s' file with YAMLWriter:" % path)
         print("  Prepare data ... ", end='')
         yaml_data = {
+            'name': rmap.name,
+            'version': rmap.version,
             'configuration': rmap.config.as_dict(),
             'register_map': list(rmap.as_dict().values())
         }

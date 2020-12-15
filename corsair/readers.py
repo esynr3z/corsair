@@ -48,7 +48,9 @@ class JSONReader():
 
             # Read register map
             print("  Read register map ... ", end='')
-            rmap = RegisterMap(config=config)
+            rmap_name = json_data['name']
+            rmap_version = json_data['version']
+            rmap = RegisterMap(config=config, name=rmap_name, version=rmap_version)
             for json_reg in json_data['register_map']:
                 json_reg_filtered = {k: v for k, v in json_reg.items() if k in ['name', 'description', 'address']}
                 reg = Register(**json_reg_filtered)
@@ -97,7 +99,9 @@ class YAMLReader():
 
             # Read register map
             print("  Read register map ... ", end='')
-            rmap = RegisterMap(config=config)
+            rmap_name = yaml_data['name']
+            rmap_version = yaml_data['version']
+            rmap = RegisterMap(config=config, name=rmap_name, version=rmap_version)
             for yaml_reg in yaml_data['register_map']:
                 yaml_reg_filtered = {k: v for k, v in yaml_reg.items() if k in ['name', 'description', 'address']}
                 reg = Register(**yaml_reg_filtered)

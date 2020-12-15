@@ -1,4 +1,7 @@
 {
+    "name": "csrmap",
+    "version": "1.0",
+
     "configuration": {
 
         "register_reset": "sync_pos",

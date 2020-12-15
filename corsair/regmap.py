@@ -425,7 +425,7 @@ class RegisterMap():
         ...     Register('reg_b', 'Register B', address=4)
         ... ])
         >>> print(rmap)
-        register_map:
+        register_map: v1.0
           (0x0) reg_a: Register A
             empty
           (0x4) reg_b: Register B
@@ -456,9 +456,11 @@ class RegisterMap():
 
     Attributes:
         name: Name of a map.
+        version: Version of a map.
     """
-    def __init__(self, name='register_map', config=Configuration()):
+    def __init__(self, name='register_map', version='1.0', config=Configuration()):
         self.name = name
+        self.version = version
         self.config = config
         self._regs = []
 
@@ -475,7 +477,7 @@ class RegisterMap():
             return not self.__eq__(other)
 
     def __repr__(self):
-        return 'RegisterMap(%s, %s)' % (repr(self.name), repr(self.config))
+        return 'RegisterMap(%s, %s, %s)' % (repr(self.name), repr(self.version), repr(self.config))
 
     def __str__(self):
         return self.as_str()
@@ -485,7 +487,7 @@ class RegisterMap():
         inner_indent = indent + '  '
         regs = [reg.as_str(inner_indent) for reg in self.regs]
         regs_str = '\n'.join(regs) if regs else inner_indent + 'empty'
-        return indent + '%s:\n' % (self.name) + regs_str
+        return indent + '%s: v%s\n' % (self.name, self.version) + regs_str
 
     def as_dict(self):
         """Returns register map as a dictionary."""
