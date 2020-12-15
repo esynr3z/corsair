@@ -11,7 +11,20 @@ from .regmap import BitField, Register, RegisterMap
 
 
 class JSONReader():
-    """Read CSR map description file in JSON format."""
+    """Read CSR map description file in JSON format.
+
+    Examples:
+
+        Read provided file and create :class:`RegisterMap` object:
+
+        >>> reader = JSONReader()
+        >>> rmap = reader('../tests/data/map.json')
+        Read '../tests/data/map.json' CSR map file with JSONReader:
+          Open file ... OK
+          Read configuration ... OK
+          Read register map ... OK
+
+    """
     def __init__(self):
         pass
 
@@ -48,7 +61,19 @@ class JSONReader():
 
 
 class YAMLReader():
-    """Read CSR map description file in YAML format."""
+    """Read CSR map description file in YAML format.
+
+    Examples:
+
+        Read provided file and create :class:`RegisterMap` object:
+
+        >>> reader = YAMLReader()
+        >>> rmap = reader('../tests/data/map.yml')
+        Read '../tests/data/map.yml' CSR map file with YAMLReader:
+          Open file ... OK
+          Read configuration ... OK
+          Read register map ... OK
+    """
     def __init__(self):
         pass
 
