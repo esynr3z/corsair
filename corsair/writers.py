@@ -9,7 +9,19 @@ import yaml
 
 
 class JSONWriter():
-    """Write CSR map description file to a JSON file."""
+    """Write CSR map description file to a JSON file.
+
+    Examples:
+
+        Create JSON file based on a :class:`RegisterMap` object:
+
+        >>> writer = JSONWriter()
+        >>> rmap = RegisterMap(Configuration())
+        >>> writer('_build/doctest/map.json', rmap)
+        Write '_build/doctest/map.json' file with JSONWriter:
+          Prepare data ... OK
+          Save data to file ... OK
+    """
     def __init__(self):
         pass
 
@@ -30,7 +42,19 @@ class JSONWriter():
 
 
 class YAMLWriter():
-    """Write CSR map description file to a YAML file."""
+    """Write CSR map description file to a YAML file.
+
+    Examples:
+
+        Create YAML file based on a :class:`RegisterMap` object:
+
+        >>> writer = YAMLWriter()
+        >>> rmap = RegisterMap(Configuration())
+        >>> writer('_build/doctest/map.yaml', rmap)
+        Write '_build/doctest/map.yaml' file with YAMLWriter:
+          Prepare data ... OK
+          Save data to file ... OK
+    """
     def __init__(self):
         pass
 
