@@ -10,26 +10,19 @@ from . import utils
 class Parameter():
     """Generic parameter.
 
+    Examples:
+
+        Create parameter with check that value never exceed 42:
+
+        >>> print(Parameter('param_name', 42, lambda val: val <= 42))
+        param_name: 42
+
     Attributes:
         name: Name of the parameter.
-        value: Value of the parameter.
-        checker: Lambda function to perform value checking.
-
+        checker: Lambda function to perform value validation.
+            Returns True if value check is OK, and False otherwise.
     """
     def __init__(self, name, value=None, checker=lambda val: True):
-        """Initialize parameter.
-
-        Args:
-            name: String with the parameter's name.
-            value (optional): Value of the parameter.
-            checker (optional):
-                Lambda function to perform value checking.
-                Returns True if value check is OK, and False otherwise.
-
-        Raises:
-            ValueError: An error occured if value does not match checker rules.
-
-        """
         self._value = None
 
         self.name = name
@@ -37,7 +30,6 @@ class Parameter():
         self.value = value
 
     def __eq__(self, other):
-        """Check if objects are equal."""
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
@@ -47,18 +39,15 @@ class Parameter():
             )
 
     def __ne__(self, other):
-        """Check if objects are non equal."""
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
             return not self.__eq__(other)
 
     def __repr__(self):
-        """Returns string representation of an object."""
         return 'Parameter(%s, %s)' % (repr(self.name), repr(self.value))
 
     def __str__(self):
-        """Returns 'informal' string representation of an object."""
         return self.as_str()
 
     def as_str(self, indent=''):
@@ -66,15 +55,21 @@ class Parameter():
         return indent + '%s: %s' % (self.name, utils.try_int_to_str(self._value))
 
     def as_dict(self):
-        """Returns dictionary with parameters's key attributes."""
+        """Returns dictionary with parameters's name and value."""
         return {'name': self.name, 'value': self.value}
 
     @property
     def value(self):
-        """Current value of the parameter.
+        """Value of the parameter.
 
-        Raises:
-            ValueError: An error occured if value fails the check after set.
+        Getter:
+            Get current value of the parameter.
+
+        Setter:
+            Set new value of the parameter.
+
+            Raises:
+                ValueError: An error occured if new value fails the check.
         """
         return self._value
 
@@ -86,11 +81,7 @@ class Parameter():
         self._check()
 
     def _check(self):
-        """Check parameter value correctness.
-
-        Raises:
-            ValueError: An error occured if value does not match checker rules.
-        """
+        """Check parameter value correctness."""
         if self.checker(self.value) is False:
             raise ValueError('"%s" parameter with "%s" value failed the check!' % (self.name,
                                                                                    self.value))
@@ -99,52 +90,66 @@ class Parameter():
 class ParameterGroup():
     """Group of parameters or other groups.
 
+    Examples:
+
+        Create group and add parameters:
+
+        >>> pg = ParameterGroup('group_a')
+        >>> pg.add_params([Parameter('p1', 42), Parameter('p2', 'abc')])
+        >>> print(pg)
+        group_a:
+          p1: 42
+          p2: abc
+
+        Other way to do the same:
+
+        >>> pg = ParameterGroup('group_a')
+        >>> pg.values = {'p1':42, 'p2':'abc'}
+        >>> print(pg)
+        group_a:
+          p1: 42
+          p2: abc
+
+        Change parameter value:
+
+        >>> pg = ParameterGroup('group_a')
+        >>> pg.add_params(Parameter('p1', 42))
+        >>> pg['p1'].value = 777
+        >>> print(pg['p1'].value)
+        777
+
     Attributes:
         name: Name of the group.
-        names: List with all the objects (parameters/groups) names
-        params: List with all the objects
-        values: Dictionary with the values of the parameters/groups.
     """
     def __init__(self, name):
-        """Initialize parameter group."""
         self.name = name
         self._params = {}
 
     def __eq__(self, other):
-        """Check if objects are equal."""
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
             return self.as_dict() == other.as_dict()
 
     def __ne__(self, other):
-        """Check if objects are non equal."""
         if self.__class__ != other.__class__:
             raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
         else:
             return not self.__eq__(other)
 
     def __repr__(self):
-        """Returns string representation of an object."""
         return 'ParameterGroup(%s)' % repr(self.name)
 
     def __str__(self):
-        """Returns 'informal' string representation of an object."""
         return self.as_str()
 
     def __getitem__(self, key):
-        """Get parameter or group by name.
-
-        Raises:
-            KeyError: An error occured if parameter or group does not exists.
-        """
         try:
             return self._params[key]
         except KeyError:
             raise KeyError("Parameter/Group with a name '%s' doesn't exist!" % key)
 
     def __setitem__(self, key, value):
-        """Set parameter or group by name"""
         raise KeyError("Not able to set '%s' item directly in '%s' group!"
                        " Try use add_params() method." % (key, self.name))
 
@@ -161,16 +166,20 @@ class ParameterGroup():
 
     @property
     def names(self):
-        """Return all parameters names"""
+        """Names of all parameters/groups contained."""
         return self._params.keys()
 
     @property
     def params(self):
-        """Returns list with parameters objects."""
+        """List with parameters/groups objects contained."""
         return [param for param in self._params.items()]
 
     def add_params(self, new_params):
-        """Add parameters."""
+        """Add parameters.
+
+        Args:
+            new_params : list with parameters/groups or single object
+        """
         # hack to handle single elements
         new_params = utils.listify(new_params)
 
@@ -224,12 +233,10 @@ class Configuration(ParameterGroup):
         name: Configuration name.
     """
     def __init__(self, name='configuration'):
-        """Initialize configuration."""
         super().__init__(name)
         self._init_default_params()
 
     def __repr__(self):
-        """Returns string representation of an object."""
         return 'Configuration()'
 
     def _init_default_params(self):
