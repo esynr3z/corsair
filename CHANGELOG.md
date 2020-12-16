@@ -1,5 +1,6 @@
+## 0.2.0 (unreleased)
 
-## 0.1.0 (unreleased)
+## 0.1.0 (2020-12-16)
 
 * Setup repository
 * Setup documentation
