@@ -33,6 +33,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.doctest',
+    'sphinxcontrib.wavedrom'
 ]
 
 source_suffix = ['.rst', '.md']
@@ -40,6 +41,9 @@ source_suffix = ['.rst', '.md']
 doctest_global_setup = '''
 from corsair import *
 '''
+
+# to inline SVG with wafeforms (JS script enabled by default)
+wavedrom_html_jsinline = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

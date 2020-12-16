@@ -53,7 +53,7 @@ Install Sphinx and extensions:
 
 ::
 
-    python3 -m pip install -U sphinx sphinx_rtd_theme m2r2
+    python3 -m pip install -U sphinx sphinx_rtd_theme m2r2 sphinxcontrib-wavedrom
 
 Run from ``docs`` folder to build the documentation and test docstrings:
 
