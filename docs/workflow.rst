@@ -25,28 +25,6 @@ It is as easy as:
 
 Use -h/--help key to get all options available.
 
-::
-
-    $ python3 -m corsair -h
-    usage: corsair [-h] [-v] [-i file[,ReaderClassName]]
-                   [-o file[,WriterClassName] [file[,WriterClassName] ...]]
-                   [-t file[,WriterClassName]] [--print-readers] [--print-writers]
-    
-    Control and status register (CSR) map generator for FPGA/ASIC projects.
-    
-    optional arguments:
-      -h, --help            show this help message and exit
-      -v, --version         show program's version number and exit
-      -i file[,ReaderClassName], --input file[,ReaderClassName]
-                            read CSR map from file
-      -o file[,WriterClassName] [file[,WriterClassName] ...], --output file[,WriterClassName] [file[,WriterClassName] ...]
-                            write output to file(s)
-      -t file[,WriterClassName], --template file[,WriterClassName]
-                            write CSR map template to file
-      --print-readers       print names of all available readers
-      --print-writers       print names of all available writers
-
-
 Import (Python)
 ===============
 

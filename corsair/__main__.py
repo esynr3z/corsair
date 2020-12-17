@@ -11,68 +11,70 @@ import corsair
 
 __all__ = ['main']
 
-writers_by_name = {
-    'JSONWriter': corsair.JSONWriter(),
-    'YAMLWriter': corsair.YAMLWriter()
+writers = {
+    'csr_map_json': corsair.JSONWriter(),
+    'csr_map_yaml': corsair.YAMLWriter()
 }
 
-writers_by_ext = {
-    '.json': writers_by_name['JSONWriter'],
-    '.yaml': writers_by_name['YAMLWriter'],
-    '.yml': writers_by_name['YAMLWriter']
+writers_default_ext = {
+    '.json': 'csr_map_json',
+    '.yaml': 'csr_map_yaml',
+    '.yml': 'csr_map_yaml'
 }
 
-readers_by_name = {
-    'JSONReader': corsair.JSONReader(),
-    'YAMLReader': corsair.YAMLReader()
+readers = {
+    'csr_map_json': corsair.JSONReader(),
+    'csr_map_yaml': corsair.YAMLReader()
 }
 
-readers_by_ext = {
-    '.json': readers_by_name['JSONReader'],
-    '.yaml': readers_by_name['YAMLReader'],
-    '.yml': readers_by_name['YAMLReader']
+readers_default_ext = {
+    '.json': 'csr_map_json',
+    '.yaml': 'csr_map_yaml',
+    '.yml': 'csr_map_yaml'
+}
+
+template_writers = {
+    'csr_map_json': corsair.JSONWriter(),
+    'csr_map_yaml': corsair.YAMLWriter()
 }
 
 
 def arg_input(arg):
-    """Validate input argument file[,ReaderClassName] and convert it to lambda function."""
+    """Validate input argument file[,type] and return dictionary with path and reader object."""
     args = [x for x in arg.split(',')]
     if len(args) == 1:
-        # use extension to choose agent
+        # use extension to choose reader
         _, csr_ext = os.path.splitext(args[0])
         csr_ext = csr_ext.lower()
         try:
-            readers_by_ext[csr_ext]  # check if exists
-            return lambda: readers_by_ext[csr_ext](args[0])
+            return {'path': args[0], 'obj': readers[readers_default_ext[csr_ext]]}
         except KeyError:  # unknown extension
+            print('unknown extension')
             raise argparse.ArgumentError()
     else:
-        # use provided name for the class
+        # use provided name for the input type
         try:
-            readers_by_name[args[1]]  # check if exists
-            return lambda: readers_by_name[args[1]](args[0])
-        except KeyError:  # unknown class name
+            return {'path': args[0], 'obj': readers[args[1]]}
+        except KeyError:  # unknown input type
             raise argparse.ArgumentError()
 
 
 def arg_output(arg):
-    """Validate output argument file[,WriterClassName] and convert it to lambda function."""
+    """Validate output argument file[,type] and return dictionary with path and writer object."""
     args = [x for x in arg.split(',')]
     if len(args) == 1:
-        # use extension to choose agent
+        # use extension to choose writer
         _, csr_ext = os.path.splitext(args[0])
         csr_ext = csr_ext.lower()
         try:
-            writers_by_ext[csr_ext]  # check if exists
-            return lambda rmap: writers_by_ext[csr_ext](args[0], rmap)
+            return {'path': args[0], 'obj': writers[writers_default_ext[csr_ext]]}
         except KeyError:  # unknown extension
             raise argparse.ArgumentError()
     else:
-        # use provided name for the class
+        # use provided name for the output type
         try:
-            writers_by_name[args[1]]  # check if exists
-            return lambda rmap: writers_by_name[args[1]](args[0], rmap)
-        except KeyError:  # unknown class name
+            return {'path': args[0], 'obj': writers[args[1]]}
+        except KeyError:  # unknown output type
             raise argparse.ArgumentError()
 
 
@@ -85,35 +87,56 @@ class ArgumentParser(argparse.ArgumentParser):
 
 def parse_arguments():
     """Parse and validate arguments."""
+
+    description = corsair.__description__
+    description += """
+
+
+Multiple -o/--output arguments can be specified:
+    corsair -i csr.json -o regmap.v -o regmap.md
+"""
+    description += "\nAvailable input types for -i/--input argument:\n"
+    for name in readers.keys():
+        description += "  %s - %s\n" % (name, readers[name].description)
+    description += "If no input type is specified explicitly, it will be chosen based on the file extension:\n"
+    for ext in readers_default_ext.keys():
+        description += "  %s - %s\n" % (ext, readers_default_ext[ext])
+
+    description += "\nAvailable output types for -o/--output argument:\n"
+    for name in writers.keys():
+        description += "  %s - %s\n" % (name, writers[name].description)
+    description += "If no output type is specified explicitly, it will be chosen based on the file extension:\n"
+    for ext in writers_default_ext.keys():
+        description += "  %s - %s\n" % (ext, writers_default_ext[ext])
+
+    description += "\nAvailable output types for -t/--template argument:\n"
+    for name in template_writers.keys():
+        description += "  %s\n" % name
+    description += "If no output type is specified explicitly, "
+    description += "it will be chosen based on the file extension as for -o/--output\n"
+
     parser = ArgumentParser(prog=corsair.__title__,
-                            description=corsair.__description__)
+                            description=description,
+                            formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('-v', '--version',
                         action='version',
                         version='%(prog)s v' + corsair.__version__)
     parser.add_argument('-i', '--input',
                         type=arg_input,
-                        metavar='file[,ReaderClassName]',
+                        metavar='file[,type]',
                         dest='reader',
-                        help='read CSR map from file')
+                        help='read CSR map from file; input type can be specified explicitly')
     parser.add_argument('-o', '--output',
                         type=arg_output,
-                        metavar='file[,WriterClassName]',
-                        nargs='+',
+                        metavar='file[,type]',
+                        action='append',
                         dest='writers',
-                        help='write output to file(s)')
+                        help='write output to file; output type can be specified explicitly')
     parser.add_argument('-t', '--template',
                         type=arg_output,
-                        metavar='file[,WriterClassName]',
+                        metavar='file[,type]',
                         dest='template_writer',
-                        help='write CSR map template to file')
-    parser.add_argument('--print-readers',
-                        dest='need_print_readers',
-                        action='store_true',
-                        help='print names of all available readers')
-    parser.add_argument('--print-writers',
-                        dest='need_print_writers',
-                        action='store_true',
-                        help='print names of all available writers')
+                        help='write template to file; template type can be specified explicitly')
 
     # check if no arguments provided
     if len(sys.argv) == 1:
@@ -135,18 +158,9 @@ def main():
     # parse arguments
     args = parse_arguments()
 
-    if args.need_print_readers:
-        print('Readers available:')
-        for name in readers_by_name.keys():
-            print('  %s - %s' % (name, readers_by_name[name].description))
-
-    if args.need_print_writers:
-        print('Writers available:')
-        for name in writers_by_name.keys():
-            print('  %s - %s' % (name, writers_by_name[name].description))
-
     # create template if needed
     if args.template_writer:
+        # prepare rmap
         regs = [corsair.Register('spam', ' Register spam', 0),
                 corsair.Register('eggs', ' Register eggs', 4)]
         regs[0].add_bfields([
@@ -156,16 +170,23 @@ def main():
         regs[1].add_bfields(corsair.BitField('baz', 'Bit field baz', lsb=16, width=16, access='ro'))
         rmap = corsair.RegisterMap()
         rmap.add_regs(regs)
-        args.template_writer(rmap)
+        # write template
+        output_path = args.template_writer['path']
+        template_writer = args.template_writer['obj']
+        template_writer(path=output_path, rmap=rmap)
 
     # parse CSR file
     if args.reader:
-        rmap = args.reader()
+        input_path = args.reader['path']
+        reader = args.reader['obj']
+        rmap = reader(input_path)
 
     # create all output artifacts
     if args.writers:
-        for writer in args.writers:
-            writer(rmap)
+        for arg_writer in args.writers:
+            output_path = arg_writer['path']
+            writer = arg_writer['obj']
+            writer(path=output_path, rmap=rmap)
 
     sys.exit(0)
 

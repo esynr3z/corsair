@@ -89,8 +89,7 @@ class TestCLI:
         csr_file = test_data_dir.join('map.json')
         output_json = tmpdir.join('map_out.json')
         output_yaml = tmpdir.join('map_out.yaml')
-        self._run_cli(['-i', str(csr_file), '-o', str(output_yaml), str(output_yaml)])
-        self._run_cli(['-i', str(output_yaml), '-o', str(output_json)])
+        self._run_cli(['-i', str(csr_file), '-o', str(output_yaml), '-o', str(output_json)])
         orig_rmap = corsair.JSONReader()(str(csr_file))
         json_rmap = corsair.JSONReader()(str(output_json))
         yaml_rmap = corsair.YAMLReader()(str(output_yaml))
@@ -99,8 +98,8 @@ class TestCLI:
     def test_template_write(self, tmpdir, capsys):
         """Template file should be generated."""
         template_json = tmpdir.join('template')
-        self._run_cli(['-t', '%s,JSONWriter' % str(template_json)])
-        exit_code = self._run_cli(['-i', '%s,JSONReader' % str(template_json)])
+        self._run_cli(['-t', '%s,csr_map_json' % str(template_json)])
+        exit_code = self._run_cli(['-i', '%s,csr_map_json' % str(template_json)])
         captured = capsys.readouterr()
         assert exit_code == 0
         assert 'Read register map ... OK' in captured.out
