@@ -138,12 +138,12 @@ def main():
     if args.need_print_readers:
         print('Readers available:')
         for name in readers_by_name.keys():
-            print('  %s' % name)
+            print('  %s - %s' % (name, readers_by_name[name].description))
 
     if args.need_print_writers:
         print('Writers available:')
         for name in writers_by_name.keys():
-            print('  %s' % name)
+            print('  %s - %s' % (name, writers_by_name[name].description))
 
     # create template if needed
     if args.template_writer:

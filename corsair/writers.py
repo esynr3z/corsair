@@ -6,6 +6,7 @@
 
 import json
 import yaml
+import jinja2
 
 
 class JSONWriter():
@@ -23,7 +24,7 @@ class JSONWriter():
           Save data to file ... OK
     """
     def __init__(self):
-        pass
+        self.description = 'Write CSR map description file to a JSON file'
 
     def __call__(self, path, rmap):
         """Write JSON file based on RegisterMap object attributes."""
@@ -58,7 +59,7 @@ class YAMLWriter():
           Save data to file ... OK
     """
     def __init__(self):
-        pass
+        self.description = 'Write CSR map description file to a YAML file'
 
     def __call__(self, path, rmap):
         """Write YAML file based on RegisterMap object attributes."""

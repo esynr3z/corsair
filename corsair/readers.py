@@ -26,7 +26,7 @@ class JSONReader():
 
     """
     def __init__(self):
-        pass
+        self.description = 'Read CSR map description file in JSON format'
 
     def __call__(self, path):
         """Read JSON file and fill RegisterMap object attributes.
@@ -77,7 +77,7 @@ class YAMLReader():
           Read register map ... OK
     """
     def __init__(self):
-        pass
+        self.description = 'Read CSR map description file in YAML format'
 
     def __call__(self, path):
         """Read YAML file and fill RegisterMap object attributes.
