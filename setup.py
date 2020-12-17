@@ -19,7 +19,8 @@ setuptools.setup(
     },
     packages=setuptools.find_packages(),
     install_requires=[
-        'pyyaml'
+        'pyyaml',
+        'jinja2'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
