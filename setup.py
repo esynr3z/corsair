@@ -18,6 +18,11 @@ setuptools.setup(
         'Documentation': 'https://corsair.readthedocs.io'
     },
     packages=setuptools.find_packages(),
+    entry_points={
+        'console_scripts': [
+            'corsair = corsair.__main__:main',
+        ],
+    },
     install_requires=[
         'pyyaml',
         'jinja2'
