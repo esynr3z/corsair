@@ -71,7 +71,7 @@ class TestCLI:
         exit_code = self._run_cli(['-i', str(csr_file)])
         captured = capsys.readouterr()
         assert exit_code == 0
-        assert 'Read register map ... OK' in captured.out
+        assert 'Read registers ... OK' in captured.out
 
     def test_chain_convert(self, test_data_dir, tmpdir):
         """Application should do the conversion: original CSR -> YAML -> JSON."""
@@ -102,4 +102,4 @@ class TestCLI:
         exit_code = self._run_cli(['-i', '%s,csr_json' % str(template_json)])
         captured = capsys.readouterr()
         assert exit_code == 0
-        assert 'Read register map ... OK' in captured.out
+        assert 'Read registers ... OK' in captured.out

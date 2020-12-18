@@ -7,9 +7,9 @@ CSR map description file
 General structure
 =================
 
-CSR map description file consists of two parts: configuration and register map. Configuration is a collection (dictionary) of global parameters to control the whole generation process. And register map is a simply array of CSRs.
+CSR map description file consists of two parts: ``configuration`` and ``registers``. ``configuration`` is a collection (dictionary) of global parameters to control the whole generation process. And ``registers`` is a simply list of CSRs.
 
-Schematic representation of the structure is below (``{}`` is for a dictionary, ``[]`` - for an array). Description files in JSON or YAML formats follow in particular that structure with almost no changes.
+Schematic representation of the structure is below (``{}`` is for a dictionary, ``[]`` - for a list). Description files in JSON or YAML formats follow in particular that structure with almost no changes.
 
 * name
 * version
@@ -161,12 +161,10 @@ interface_specific
 
 Group of interface type specific parameters. This block is unque for every interface type.
 
+Registers
+=========
 
-
-Register map
-============
-
-Array of CSRs.
+List of CSRs.
 
 Register
 --------

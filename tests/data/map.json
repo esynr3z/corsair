@@ -24,7 +24,7 @@
 
     },
 
-    "register_map" : [
+    "registers" : [
         {
             "address": "0x000",
             "bit_fields": [

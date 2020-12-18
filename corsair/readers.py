@@ -22,7 +22,7 @@ class CsrJsonReader():
         Read '../tests/data/map.json' CSR map file with CsrJsonReader:
           Open file ... OK
           Read configuration ... OK
-          Read register map ... OK
+          Read registers ... OK
 
     """
     def __init__(self):
@@ -46,12 +46,12 @@ class CsrJsonReader():
             config.values = json_data['configuration']
             print("OK")
 
-            # Read register map
-            print("  Read register map ... ", end='')
+            # Read registers
+            print("  Read registers ... ", end='')
             rmap_name = json_data['name']
             rmap_version = json_data['version']
             rmap = RegisterMap(config=config, name=rmap_name, version=rmap_version)
-            for json_reg in json_data['register_map']:
+            for json_reg in json_data['registers']:
                 json_reg_filtered = {k: v for k, v in json_reg.items() if k in ['name', 'description', 'address']}
                 reg = Register(**json_reg_filtered)
                 for json_bf in json_reg['bit_fields']:
@@ -74,7 +74,7 @@ class CsrYamlReader():
         Read '../tests/data/map.yml' CSR map file with CsrYamlReader:
           Open file ... OK
           Read configuration ... OK
-          Read register map ... OK
+          Read registers ... OK
     """
     def __init__(self):
         self.description = 'Read CSR map description file in YAML format'
@@ -97,12 +97,12 @@ class CsrYamlReader():
             config.values = yaml_data['configuration']
             print("OK")
 
-            # Read register map
-            print("  Read register map ... ", end='')
+            # Read registers
+            print("  Read registers ... ", end='')
             rmap_name = yaml_data['name']
             rmap_version = yaml_data['version']
             rmap = RegisterMap(config=config, name=rmap_name, version=rmap_version)
-            for yaml_reg in yaml_data['register_map']:
+            for yaml_reg in yaml_data['registers']:
                 yaml_reg_filtered = {k: v for k, v in yaml_reg.items() if k in ['name', 'description', 'address']}
                 reg = Register(**yaml_reg_filtered)
                 for yaml_bf in yaml_reg['bit_fields']:

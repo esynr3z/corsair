@@ -34,7 +34,7 @@ class CsrJsonWriter():
             'name': rmap.name,
             'version': rmap.version,
             'configuration': rmap.config.as_dict(),
-            'register_map': list(rmap.as_dict().values())
+            'registers': list(rmap.as_dict().values())
         }
         print("OK")
 
@@ -69,7 +69,7 @@ class CsrYamlWriter():
             'name': rmap.name,
             'version': rmap.version,
             'configuration': rmap.config.as_dict(),
-            'register_map': list(rmap.as_dict().values())
+            'registers': list(rmap.as_dict().values())
         }
         print("OK")
 
