@@ -5,11 +5,11 @@
 """
 
 import pytest
-from corsair import JSONReader, YAMLReader
+from corsair import CsrJsonReader, CsrYamlReader
 
 
-class TestJSONReader:
-    """Class 'JSONReader' testing."""
+class TestJsonReader:
+    """Class 'CsrJsonReader' testing."""
 
     @pytest.fixture()
     def input_file(self):
@@ -18,7 +18,7 @@ class TestJSONReader:
     def test_read(self, input_file):
         """Test of reading JSON file with CSR map."""
         print('input_file:', input_file)
-        reader = JSONReader()
+        reader = CsrJsonReader()
         rmap = reader(input_file)
         print(rmap.config)
         print(rmap)
@@ -27,8 +27,8 @@ class TestJSONReader:
         assert rmap['START']['STB'].access == 'wo'
 
 
-class TestYAMLReader:
-    """Class 'YAMLReader' testing."""
+class TestYamlReader:
+    """Class 'CsrYamlReader' testing."""
 
     @pytest.fixture()
     def input_file(self):
@@ -37,7 +37,7 @@ class TestYAMLReader:
     def test_read(self, input_file):
         """Test of reading YAML file with CSR map."""
         print('input_file:', input_file)
-        reader = YAMLReader()
+        reader = CsrYamlReader()
         rmap = reader(input_file)
         print(rmap.config)
         print(rmap)

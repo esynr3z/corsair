@@ -3,16 +3,16 @@
 Writers
 =======
 
-JSONWriter
-----------
-.. autoclass:: corsair.JSONWriter
+CsrJsonWriter
+-------------
+.. autoclass:: corsair.CsrJsonWriter
    :members:
    :undoc-members:
    :show-inheritance:
 
-YAMLWriter
-----------
-.. autoclass:: corsair.YAMLWriter
+CsrYamlWriter
+-------------
+.. autoclass:: corsair.CsrYamlWriter
    :members:
    :undoc-members:
    :show-inheritance:

@@ -9,17 +9,17 @@ import yaml
 import jinja2
 
 
-class JSONWriter():
+class CsrJsonWriter():
     """Write CSR map description file to a JSON file.
 
     Examples:
 
         Create JSON file based on a :class:`RegisterMap` object:
 
-        >>> writer = JSONWriter()
+        >>> writer = CsrJsonWriter()
         >>> rmap = RegisterMap(config=Configuration())
         >>> writer('_build/doctest/map.json', rmap)
-        Write '_build/doctest/map.json' file with JSONWriter:
+        Write '_build/doctest/map.json' file with CsrJsonWriter:
           Prepare data ... OK
           Save data to file ... OK
     """
@@ -28,7 +28,7 @@ class JSONWriter():
 
     def __call__(self, path, rmap):
         """Write JSON file based on RegisterMap object attributes."""
-        print("Write '%s' file with JSONWriter:" % path)
+        print("Write '%s' file with CsrJsonWriter:" % path)
         print("  Prepare data ... ", end='')
         json_data = {
             'name': rmap.name,
@@ -44,17 +44,17 @@ class JSONWriter():
         print("OK")
 
 
-class YAMLWriter():
+class CsrYamlWriter():
     """Write CSR map description file to a YAML file.
 
     Examples:
 
         Create YAML file based on a :class:`RegisterMap` object:
 
-        >>> writer = YAMLWriter()
+        >>> writer = CsrYamlWriter()
         >>> rmap = RegisterMap(config=Configuration())
         >>> writer('_build/doctest/map.yaml', rmap)
-        Write '_build/doctest/map.yaml' file with YAMLWriter:
+        Write '_build/doctest/map.yaml' file with CsrYamlWriter:
           Prepare data ... OK
           Save data to file ... OK
     """
@@ -63,7 +63,7 @@ class YAMLWriter():
 
     def __call__(self, path, rmap):
         """Write YAML file based on RegisterMap object attributes."""
-        print("Write '%s' file with YAMLWriter:" % path)
+        print("Write '%s' file with CsrYamlWriter:" % path)
         print("  Prepare data ... ", end='')
         yaml_data = {
             'name': rmap.name,

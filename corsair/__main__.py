@@ -12,30 +12,30 @@ import corsair
 __all__ = ['main']
 
 writers = {
-    'csr_map_json': corsair.JSONWriter(),
-    'csr_map_yaml': corsair.YAMLWriter()
+    'csr_json': corsair.CsrJsonWriter(),
+    'csr_yaml': corsair.CsrYamlWriter()
 }
 
 writers_default_ext = {
-    '.json': 'csr_map_json',
-    '.yaml': 'csr_map_yaml',
-    '.yml': 'csr_map_yaml'
+    '.json': 'csr_json',
+    '.yaml': 'csr_yaml',
+    '.yml': 'csr_yaml'
 }
 
 readers = {
-    'csr_map_json': corsair.JSONReader(),
-    'csr_map_yaml': corsair.YAMLReader()
+    'csr_json': corsair.CsrJsonReader(),
+    'csr_yaml': corsair.CsrYamlReader()
 }
 
 readers_default_ext = {
-    '.json': 'csr_map_json',
-    '.yaml': 'csr_map_yaml',
-    '.yml': 'csr_map_yaml'
+    '.json': 'csr_json',
+    '.yaml': 'csr_yaml',
+    '.yml': 'csr_yaml'
 }
 
-template_writers = {
-    'csr_map_json': corsair.JSONWriter(),
-    'csr_map_yaml': corsair.YAMLWriter()
+templates_available = {
+    'csr_json': type(writers['csr_json']),
+    'csr_yaml': type(writers['csr_yaml'])
 }
 
 
@@ -110,10 +110,10 @@ Multiple -o/--output arguments can be specified:
         description += "  %s - %s\n" % (ext, writers_default_ext[ext])
 
     description += "\nAvailable output types for -t/--template argument:\n"
-    for name in template_writers.keys():
+    for name in templates_available.keys():
         description += "  %s\n" % name
     description += "If no output type is specified explicitly, "
-    description += "it will be chosen based on the file extension as for -o/--output\n"
+    description += "it will be chosen based on the file extension as for -o/--output.\n"
 
     parser = ArgumentParser(prog=corsair.__title__,
                             description=description,
@@ -160,20 +160,23 @@ def main():
 
     # create template if needed
     if args.template_writer:
-        # prepare rmap
-        regs = [corsair.Register('spam', ' Register spam', 0),
-                corsair.Register('eggs', ' Register eggs', 4)]
-        regs[0].add_bfields([
-            corsair.BitField('foo', 'Bit field foo', lsb=0, width=7, access='rw', initial=42),
-            corsair.BitField('bar', 'Bit field bar', lsb=24, width=1, access='wo', modifiers=['self_clear'])
-        ])
-        regs[1].add_bfields(corsair.BitField('baz', 'Bit field baz', lsb=16, width=16, access='ro'))
-        rmap = corsair.RegisterMap()
-        rmap.add_regs(regs)
-        # write template
         output_path = args.template_writer['path']
         template_writer = args.template_writer['obj']
-        template_writer(path=output_path, rmap=rmap)
+        if isinstance(template_writer, tuple(templates_available.values())):
+            # prepare rmap
+            regs = [corsair.Register('spam', 'Register spam', 0),
+                    corsair.Register('eggs', 'Register eggs', 4)]
+            regs[0].add_bfields([
+                corsair.BitField('foo', 'Bit field foo', lsb=0, width=7, access='rw', initial=42),
+                corsair.BitField('bar', 'Bit field bar', lsb=24, width=1, access='wo', modifiers=['self_clear'])
+            ])
+            regs[1].add_bfields(corsair.BitField('baz', 'Bit field baz', lsb=16, width=16, access='ro'))
+            rmap = corsair.RegisterMap()
+            rmap.add_regs(regs)
+            # write template
+            template_writer(path=output_path, rmap=rmap)
+        else:
+            print("Not able to create template for '%s'!" % output_path)
 
     # parse CSR file
     if args.reader:

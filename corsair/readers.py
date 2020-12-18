@@ -10,16 +10,16 @@ from .config import Configuration
 from .regmap import BitField, Register, RegisterMap
 
 
-class JSONReader():
+class CsrJsonReader():
     """Read CSR map description file in JSON format.
 
     Examples:
 
         Read provided file and create :class:`RegisterMap` object:
 
-        >>> reader = JSONReader()
+        >>> reader = CsrJsonReader()
         >>> rmap = reader('../tests/data/map.json')
-        Read '../tests/data/map.json' CSR map file with JSONReader:
+        Read '../tests/data/map.json' CSR map file with CsrJsonReader:
           Open file ... OK
           Read configuration ... OK
           Read register map ... OK
@@ -34,7 +34,7 @@ class JSONReader():
         Returns:
             RegisterMap object.
         """
-        print("Read '%s' CSR map file with JSONReader:" % path)
+        print("Read '%s' CSR map file with CsrJsonReader:" % path)
         with open(path, 'r') as json_file:
             print("  Open file ... ", end='')
             json_data = json.load(json_file)
@@ -62,16 +62,16 @@ class JSONReader():
             return rmap
 
 
-class YAMLReader():
+class CsrYamlReader():
     """Read CSR map description file in YAML format.
 
     Examples:
 
         Read provided file and create :class:`RegisterMap` object:
 
-        >>> reader = YAMLReader()
+        >>> reader = CsrYamlReader()
         >>> rmap = reader('../tests/data/map.yml')
-        Read '../tests/data/map.yml' CSR map file with YAMLReader:
+        Read '../tests/data/map.yml' CSR map file with CsrYamlReader:
           Open file ... OK
           Read configuration ... OK
           Read register map ... OK
@@ -85,7 +85,7 @@ class YAMLReader():
         Returns:
             RegisterMap object.
         """
-        print("Read '%s' CSR map file with YAMLReader:" % path)
+        print("Read '%s' CSR map file with CsrYamlReader:" % path)
         with open(path, 'r') as yaml_file:
             print("  Open file ... ", end='')
             yaml_data = yaml.safe_load(yaml_file)

@@ -24,24 +24,11 @@ from .regmap import (
 )
 
 from .readers import (
-    JSONReader,
-    YAMLReader
+    CsrJsonReader,
+    CsrYamlReader
 )
 
 from .writers import (
-    JSONWriter,
-    YAMLWriter
+    CsrJsonWriter,
+    CsrYamlWriter
 )
-
-__all__ = [
-    'Parameter',
-    'ParameterGroup',
-    'Configuration',
-    'BitField',
-    'Register',
-    'RegisterMap',
-    'JSONReader',
-    'YAMLReader',
-    'JSONWriter',
-    'YAMLWriter'
-]

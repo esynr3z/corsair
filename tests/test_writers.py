@@ -5,12 +5,12 @@
 """
 
 import pytest
-from corsair import JSONReader, YAMLReader
-from corsair import JSONWriter, YAMLWriter
+from corsair import CsrJsonReader, CsrYamlReader
+from corsair import CsrJsonWriter, CsrYamlWriter
 
 
-class TestJSONWriter:
-    """Class 'JSONWriter' testing."""
+class TestCsrJsonWriter:
+    """Class 'CsrJsonWriter' testing."""
 
     @pytest.fixture()
     def input_file(self):
@@ -25,18 +25,18 @@ class TestJSONWriter:
         print('input_file:', input_file)
         print('output_file:', output_file)
         # read some CSR map
-        reader = JSONReader()
+        reader = CsrJsonReader()
         rmap_orig = reader(input_file)
         # write RegisterMap to a JSON file
-        writer = JSONWriter()
+        writer = CsrJsonWriter()
         writer(output_file, rmap_orig)
         # read CSR map again and verify
         rmap_test = reader(output_file)
         assert rmap_test == rmap_orig
 
 
-class TestYAMLWriter:
-    """Class 'YAMLWriter' testing."""
+class TestCsrYamlWriter:
+    """Class 'CsrYamlWriter' testing."""
 
     @pytest.fixture()
     def input_file(self):
@@ -51,10 +51,10 @@ class TestYAMLWriter:
         print('input_file:', input_file)
         print('output_file:', output_file)
         # read some CSR map
-        reader = YAMLReader()
+        reader = CsrYamlReader()
         rmap_orig = reader(input_file)
         # write RegisterMap to a YAML file
-        writer = YAMLWriter()
+        writer = CsrYamlWriter()
         writer(output_file, rmap_orig)
         # read CSR map again and verify
         rmap_test = reader(output_file)

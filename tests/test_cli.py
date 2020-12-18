@@ -80,8 +80,8 @@ class TestCLI:
         output_yaml = tmpdir.join('map_out.yaml')
         self._run_cli(['-i', str(csr_file), '-o', str(output_yaml)])
         self._run_cli(['-i', str(output_yaml), '-o', str(output_json)])
-        orig_rmap = corsair.JSONReader()(str(csr_file))
-        test_rmap = corsair.JSONReader()(str(output_json))
+        orig_rmap = corsair.CsrJsonReader()(str(csr_file))
+        test_rmap = corsair.CsrJsonReader()(str(output_json))
         assert orig_rmap == test_rmap
 
     def test_multiple_write(self, test_data_dir, tmpdir):
@@ -90,16 +90,16 @@ class TestCLI:
         output_json = tmpdir.join('map_out.json')
         output_yaml = tmpdir.join('map_out.yaml')
         self._run_cli(['-i', str(csr_file), '-o', str(output_yaml), '-o', str(output_json)])
-        orig_rmap = corsair.JSONReader()(str(csr_file))
-        json_rmap = corsair.JSONReader()(str(output_json))
-        yaml_rmap = corsair.YAMLReader()(str(output_yaml))
+        orig_rmap = corsair.CsrJsonReader()(str(csr_file))
+        json_rmap = corsair.CsrJsonReader()(str(output_json))
+        yaml_rmap = corsair.CsrYamlReader()(str(output_yaml))
         assert orig_rmap == json_rmap == yaml_rmap
 
     def test_template_write(self, tmpdir, capsys):
         """Template file should be generated."""
         template_json = tmpdir.join('template')
-        self._run_cli(['-t', '%s,csr_map_json' % str(template_json)])
-        exit_code = self._run_cli(['-i', '%s,csr_map_json' % str(template_json)])
+        self._run_cli(['-t', '%s,csr_json' % str(template_json)])
+        exit_code = self._run_cli(['-i', '%s,csr_json' % str(template_json)])
         captured = capsys.readouterr()
         assert exit_code == 0
         assert 'Read register map ... OK' in captured.out
