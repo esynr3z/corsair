@@ -19,6 +19,12 @@ You can clone GitHub repository and run application from the project root:
     cd corsair
     python3 -m corsair --help
 
+Or install it:
+
+::
+
+    python3 setup.py install
+
 
 Code style
 ----------
@@ -30,6 +36,8 @@ Linter settings:
 * Linter: pycodestyle
 * Max line length: 120
 * Errors and warnings to ignore: W504, E402, E731, C406, E741
+
+You can also install `PEP8 Git Commit Hook <https://gist.github.com/esynr3z/206e164023a794eb0c96d827de31bd49>`_ and code style will be checked before any commit.
 
 Testing
 -------
