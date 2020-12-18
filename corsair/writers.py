@@ -7,6 +7,8 @@
 import json
 import yaml
 import jinja2
+from .__version__ import __version__
+from pathlib import Path
 
 
 class CsrJsonWriter():
@@ -78,3 +80,78 @@ class CsrYamlWriter():
             yaml.Dumper.ignore_aliases = lambda *args: True  # hack to disable aliases
             yaml.dump(yaml_data, yaml_file, default_flow_style=False, sort_keys=False)
         print("OK")
+
+
+class _Jinja2Writer():
+    """Basic class for Jinja2-based writers."""
+
+    def _render_to_file(self, template, vars, path):
+        """Render text with Jinja2 and save it to file
+
+        Args:
+            template : path to Jinja2 template
+            vars : dictionary with template variables
+            path : path to output file
+        """
+        print("  Load template ... ", end='')
+        templates_path = str(Path(__file__).parent / 'templates')
+        j2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath=templates_path))
+        j2_template = j2_env.get_template(template)
+        print("OK")
+
+        print("  Render text ... ", end='')
+        rendered_text = j2_template.render(vars)
+        print("OK")
+
+        print("  Save data to file ... ", end='')
+        with open(path, "w") as f:
+            f.write(rendered_text)
+        print("OK")
+
+
+class BridgeVerilogWriter(_Jinja2Writer):
+    """Create Verilog file with bridge to Local Bus.
+
+    Examples:
+
+        Create Verilog file with APB to Local Bus bridge:
+
+        >>> rmap = RegisterMap(config=Configuration())
+        >>> rmap.config['interface_generic']['type'].value = 'apb'
+        >>> writer = BridgeVerilogWriter()
+        >>> writer('_build/doctest/lb_bridge.v', rmap)
+        Write '_build/doctest/lb_bridge.v' file with BridgeVerilogWriter:
+          Prepare data ... OK
+          Load template ... OK
+          Render text ... OK
+          Save data to file ... OK
+    """
+    def __init__(self):
+        self.description = 'Create bridge to Local Bus module in Verilog.'
+
+    def __call__(self, path, rmap):
+        """Create bridge to Local Bus in Verilog."""
+
+        interface_type = rmap.config['interface_generic']['type'].value
+        if interface_type == 'axil':
+            j2_template = 'axil2lb_verilog.j2'
+        elif interface_type == 'apb':
+            j2_template = 'apb2lb_verilog.j2'
+        elif interface_type == 'amm':
+            j2_template = 'amm2lb_verilog.j2'
+        else:
+            print("Local Bus is selected for the CSR interface. Bridge will not be generated.")
+            return
+
+        print("Write '%s' file with BridgeVerilogWriter:" % path)
+        print("  Prepare data ... ", end='')
+
+        j2_vars = {}
+
+        j2_vars['corsair_ver'] = __version__
+        j2_vars['csr_ver'] = rmap.version
+        j2_vars['csr_name'] = rmap.name
+
+        print("OK")
+
+        self._render_to_file(j2_template, j2_vars, path)

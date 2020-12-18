@@ -6,7 +6,8 @@
 
 import pytest
 from corsair import CsrJsonReader, CsrYamlReader
-from corsair import CsrJsonWriter, CsrYamlWriter
+from corsair import CsrJsonWriter, CsrYamlWriter, BridgeVerilogWriter
+from corsair import RegisterMap
 
 
 class TestCsrJsonWriter:
@@ -59,3 +60,25 @@ class TestCsrYamlWriter:
         # read CSR map again and verify
         rmap_test = reader(output_file)
         assert rmap_test == rmap_orig
+
+
+class TestBridgeVerilogWriter:
+    """Class 'BridgeVerilogWriter' testing."""
+
+    @pytest.fixture()
+    def output_file(self, tmpdir):
+        return tmpdir.join('lb_bridge.v')
+
+    def test_apb_write(self, output_file):
+        """Test of creating bridge to LocalBus module in Verilog."""
+        print('output_file:', output_file)
+        # create some CSR map
+        rmap = RegisterMap()
+        rmap.config['interface_generic']['type'].value = 'apb'
+        # write output file
+        writer = BridgeVerilogWriter()
+        writer(output_file, rmap)
+        # read CSR map again and verify
+        with open(output_file, 'r') as f:
+            raw_str = ''.join(f.readlines())
+        assert 'APB to Local Bus bridge' in raw_str

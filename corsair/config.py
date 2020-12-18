@@ -277,10 +277,10 @@ class Configuration(ParameterGroup):
             'lb': [8, 16, 32, 64, 128, 256, 512, 1024]
         }
         ifgen_addr_width_allowed = {
-            'amm': range(1, 64),
-            'apb': range(1, 32),
+            'amm': range(1, 65),
+            'apb': range(1, 33),
             'axil': [32, 64],
-            'lb': range(1, 64)
+            'lb': range(1, 65)
         }
         self['interface_generic'].add_params([
             Parameter(name='data_width', value=32,

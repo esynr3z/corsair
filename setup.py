@@ -17,7 +17,8 @@ setuptools.setup(
     project_urls={
         'Documentation': 'https://corsair.readthedocs.io'
     },
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude='tests'),
+    package_data={'corsair': ['templates/*.j2']},
     entry_points={
         'console_scripts': [
             'corsair = corsair.__main__:main',

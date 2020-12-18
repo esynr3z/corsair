@@ -13,7 +13,8 @@ __all__ = ['main']
 
 writers = {
     'csr_json': corsair.CsrJsonWriter(),
-    'csr_yaml': corsair.CsrYamlWriter()
+    'csr_yaml': corsair.CsrYamlWriter(),
+    'lb_bridge_verilog': corsair.BridgeVerilogWriter(),
 }
 
 writers_default_ext = {

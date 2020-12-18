@@ -30,5 +30,6 @@ from .readers import (
 
 from .writers import (
     CsrJsonWriter,
-    CsrYamlWriter
+    CsrYamlWriter,
+    BridgeVerilogWriter
 )

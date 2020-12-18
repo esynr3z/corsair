@@ -16,3 +16,10 @@ CsrYamlWriter
    :members:
    :undoc-members:
    :show-inheritance:
+
+BridgeVerilogWriter
+-------------------
+.. autoclass:: corsair.BridgeVerilogWriter
+   :members:
+   :undoc-members:
+   :show-inheritance:
