@@ -4,6 +4,7 @@
 """Writers based on a CSR map internal representation (RegisterMap object).
 """
 
+import os
 import json
 import yaml
 import jinja2
@@ -132,12 +133,13 @@ class BridgeVerilogWriter(_Jinja2Writer):
     def __call__(self, path, rmap):
         """Create bridge to Local Bus in Verilog."""
 
-        interface_type = rmap.config['interface_generic']['type'].value
-        if interface_type == 'axil':
+        intf_config = rmap.config['interface_generic']
+        intf_config.add_params(rmap.config['interface_specific'].params)
+        if intf_config['type'].value == 'axil':
             j2_template = 'axil2lb_verilog.j2'
-        elif interface_type == 'apb':
+        elif intf_config['type'].value == 'apb':
             j2_template = 'apb2lb_verilog.j2'
-        elif interface_type == 'amm':
+        elif intf_config['type'].value == 'amm':
             j2_template = 'amm2lb_verilog.j2'
         else:
             print("Local Bus is selected for the CSR interface. Bridge will not be generated.")
@@ -151,6 +153,8 @@ class BridgeVerilogWriter(_Jinja2Writer):
         j2_vars['corsair_ver'] = __version__
         j2_vars['csr_ver'] = rmap.version
         j2_vars['csr_name'] = rmap.name
+        j2_vars['module_name'] = Path(path).stem
+        j2_vars['config'] = intf_config
 
         print("OK")
 
