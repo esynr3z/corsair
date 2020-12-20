@@ -7,8 +7,10 @@
         "register_reset": "sync_pos",
         "reg_map": {
             "read_filler": "0xDEADBEEF",
-            "address_auto_increment": "none",
-            "address_alignment": "data_width"
+            "address_increment_mode": "none",
+            "address_increment_value": 4,
+            "address_alignment_mode": "data_width",
+            "address_alignment_value": 4
         },
         "lb_bridge": {
             "type": "apb"
@@ -19,7 +21,7 @@
     "reg_map" : [
         {
             "address": "0x000",
-            "bit_fields": [
+            "bfields": [
                 {
                     "name": "LEN",
                     "description": "Length of pulse",
@@ -32,7 +34,7 @@
         },
         {
             "address": "0x004",
-            "bit_fields": [
+            "bfields": [
                 {
                     "name": "CNT",
                     "description": "Counter value",
@@ -51,7 +53,7 @@
             "name": "START",
             "description": "Start processes",
             "address": "0x008",
-            "bit_fields": [
+            "bfields": [
                 {
                     "name": "STA",
                     "description": "Start process A",
@@ -95,7 +97,7 @@
             "name": "STAT",
             "description": "Status",
             "address": "0x010",
-            "bit_fields": [
+            "bfields": [
                 {
                     "name": "DIR",
                     "description": "Current direction",
@@ -119,7 +121,7 @@
             "name": "CTL",
             "description": "Control",
             "address": "0x020",
-            "bit_fields": [
+            "bfields": [
                 {
                     "name": "ENA",
                     "description": "Enable A",
@@ -140,7 +142,7 @@
             "name": "FLAG",
             "description": "Flags",
             "address": "0x024",
-            "bit_fields": [
+            "bfields": [
                 {
                     "name": "EVA",
                     "description": "Event A",
@@ -169,7 +171,7 @@
             "name": "VERSION",
             "description": "Current version",
             "address": "0x040",
-            "bit_fields": [
+            "bfields": [
                 {
                     "name": "MINOR",
                     "description": "Minor version",

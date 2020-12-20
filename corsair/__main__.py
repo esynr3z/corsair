@@ -89,14 +89,20 @@ def main():
 
     # parse configuration file
     if args.config:
-        pass
+        config = corsair.ConfigurationReader()(args.config)
+    else:
+        config = corsair.Configuration()
 
     # parse register map file
-    if args.reg_map_hdl:
+    if args.input:
+        rmap = corsair.RegisterMapReader()(args.input, config)
+
+    # create register map HDL
+    if args.reg_map:
         pass
 
-    # create hdl
-    if args.hdl:
+    # create bridge to LocalBus HDL
+    if args.lb_bridge:
         pass
 
     # create docs

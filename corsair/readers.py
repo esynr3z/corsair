@@ -63,10 +63,10 @@ class RegisterMapReader(_Reader):
         # Read registers
         print("  Read registers ... ", end='')
         rmap = RegisterMap(config=config)
-        for json_reg in data['registers']:
+        for json_reg in data['reg_map']:
             json_reg_filtered = {k: v for k, v in json_reg.items() if k in ['name', 'description', 'address']}
             reg = Register(**json_reg_filtered)
-            for json_bf in json_reg['bit_fields']:
+            for json_bf in json_reg['bfields']:
                 reg.add_bfields(BitField(**json_bf))
             rmap.add_regs(reg)
         print("OK")

@@ -458,10 +458,10 @@ class RegisterMap():
         name: Name of a map.
         version: Version of a map.
     """
-    def __init__(self, name='register_map', version='1.0', config=Configuration()):
-        self.name = name
-        self.version = version
+    def __init__(self, config=Configuration()):
         self.config = config
+        self.name = config['name'].value
+        self.version = config['version'].value
         self._regs = []
 
     def __eq__(self, other):

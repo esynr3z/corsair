@@ -227,13 +227,9 @@ class ParameterGroup():
 
 
 class Configuration(ParameterGroup):
-    """Collection of global parameters.
-
-    Attributes:
-        name: Configuration name.
-    """
-    def __init__(self, name='configuration'):
-        super().__init__(name)
+    """Collection of global parameters."""
+    def __init__(self):
+        super().__init__('configuration')
         self._init_default_params()
 
     def __repr__(self):
@@ -241,14 +237,10 @@ class Configuration(ParameterGroup):
 
     def _init_default_params(self):
         """Initalize all default params"""
-
-        # parameter read_filler
-        self.add_params(Parameter(name='read_filler', value=0x0))
-
-        # group address_calculation
-        self.add_params(ParameterGroup('address_calculation'))
-
-        self['address_calculation'].add_params([
+        # group reg_map
+        self.add_params(ParameterGroup('reg_map'))
+        self['reg_map'].add_params([
+            Parameter(name='read_filler', value=0x0),
             Parameter(name='auto_increment_mode', value='none',
                       validator=lambda val: val in ['none', 'data_width', 'custom']),
             Parameter(name='auto_increment_value', value=4, validator=lambda val: val >= 1),
@@ -257,37 +249,46 @@ class Configuration(ParameterGroup):
             Parameter(name='alignment_value', value=4, validator=lambda val: val >= 1)
         ])
 
-        # parameter register_reset
-        reg_rst_allowlist = ['sync_pos', 'sync_neg', 'async_pos', 'async_neg', 'init_only']
-        self.add_params(Parameter(name='register_reset', value='sync_pos',
-                                  validator=lambda val: val in reg_rst_allowlist))
-
-        # group interface_generic
+        # group lb_bridge
         self.add_params(ParameterGroup('interface_generic'))
-
-        ifgen_type_allowed = ['amm', 'apb', 'axil', 'lb']
+        lb_bridge_type_allowed = ['amm', 'apb', 'axil', 'none']
         self['interface_generic'].add_params(
-            Parameter(name='type', value='lb', validator=lambda val: val in ifgen_type_allowed)
+            Parameter(name='type', value='none', validator=lambda val: val in lb_bridge_type_allowed)
         )
 
-        ifgen_data_width_allowed = {
+        # group docs
+        self.add_params(ParameterGroup('docs'))
+
+        # common params
+        data_width_allowed = {
             'amm': [8, 16, 32, 64, 128, 256, 512, 1024],
             'apb': [8, 16, 32],
             'axil': [32, 64],
             'lb': [8, 16, 32, 64, 128, 256, 512, 1024]
         }
-        ifgen_addr_width_allowed = {
+        self.add_params(Parameter(
+            name='data_width',
+            value=32,
+            validator=lambda val: val in data_width_allowed[self['interface_generic']['type'].value])
+        )
+
+        addr_width_allowed = {
             'amm': range(1, 65),
             'apb': range(1, 33),
             'axil': [32, 64],
             'lb': range(1, 65)
         }
-        self['interface_generic'].add_params([
-            Parameter(name='data_width', value=32,
-                      validator=lambda val: val in ifgen_data_width_allowed[self['interface_generic']['type'].value]),
-            Parameter(name='address_width', value=32,
-                      validator=lambda val: val in ifgen_addr_width_allowed[self['interface_generic']['type'].value])
-        ])
+        self.add_params(Parameter(
+            name='address_width',
+            value=32,
+            validator=lambda val: val in addr_width_allowed[self['interface_generic']['type'].value])
+        )
 
-        # group interface_specific
-        self.add_params(ParameterGroup('interface_specific'))
+        self.add_params([
+            Parameter(name='name', value='regs'),
+            Parameter(name='version', value='1.0')]
+        )
+
+        reg_rst_allowlist = ['sync_pos', 'sync_neg', 'async_pos', 'async_neg', 'init_only']
+        self.add_params(Parameter(name='register_reset', value='sync_pos',
+                                  validator=lambda val: val in reg_rst_allowlist))
