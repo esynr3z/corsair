@@ -21,7 +21,7 @@ class ArgumentParser(argparse.ArgumentParser):
 
 
 def check_json_yaml(file):
-    if get_file_ext(file) not in ['.json', '.yaml', '.yml'] <= 0:
+    if utils.get_file_ext(file) not in ['.json', '.yaml', '.yml'] <= 0:
         raise argparse.ArgumentTypeError("%s has wrong extension!" % file)
     return file
 
@@ -34,16 +34,16 @@ def parse_arguments():
     parser.add_argument('-v', '--version',
                         action='version',
                         version='%(prog)s v' + corsair.__version__)
-    parser.add_argument('-r', '--reg-map',
+    parser.add_argument('-i', '--input',
                         type=check_json_yaml,
                         metavar='file',
-                        dest='reg_map',
-                        help='read register map from file')
+                        dest='input',
+                        help='read register map and configuration from input file')
     parser.add_argument('-c', '--config',
                         type=check_json_yaml,
                         metavar='file',
                         dest='config',
-                        help='read configuration from file')
+                        help='read global configuration from file')
     parser.add_argument('-t', '--template',
                         dest='template',
                         const='json',
@@ -53,24 +53,18 @@ def parse_arguments():
                         type=str,
                         choices=['json', 'yaml'],
                         help='create register map template file in selected format (default: %(const)s)'),
-    parser.add_argument('--hdl',
-                        dest='hdl',
-                        const='verilog',
-                        default=None,
-                        action='store',
-                        nargs='?',
-                        type=str,
-                        choices=['verilog', 'vhdl'],
-                        help='create register map HDL files in selected language (default: %(const)s)')
-    parser.add_argument('--doc',
-                        dest='doc',
-                        const='markdown',
-                        default=None,
-                        action='store',
-                        nargs='?',
-                        type=str,
-                        choices=['markdown', 'pdf'],
-                        help='create docs for register map in selected format (default: %(const)s)')
+    parser.add_argument('--reg-map',
+                        dest='reg_map',
+                        action='store_true',
+                        help='create register map HDL file')
+    parser.add_argument('--lb-bridge',
+                        dest='lb_bridge',
+                        action='store_true',
+                        help='create register map HDL file')
+    parser.add_argument('--docs',
+                        dest='docs',
+                        action='store_true',
+                        help='create docs for register map')
 
     # check if no arguments provided
     if len(sys.argv) == 1:
@@ -79,6 +73,7 @@ def parse_arguments():
 
     # get arguments namespace
     args = parser.parse_args()
+    print(args)
     exit(0)
     return args
 
@@ -97,7 +92,7 @@ def main():
         pass
 
     # parse register map file
-    if args.reg_map:
+    if args.reg_map_hdl:
         pass
 
     # create hdl

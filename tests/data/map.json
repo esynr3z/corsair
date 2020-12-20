@@ -1,30 +1,22 @@
 {
-    "name": "csrmap",
-    "version": "1.0",
-
-    "configuration": {
-
+    "config": {
+        "name":"regs",
+        "version":"1.0",
+        "data_width": 32,
+        "address_width": 12,
         "register_reset": "sync_pos",
-
-        "read_filler": "0xDEADBEEF",
-
-        "address_calculation": {
-            "auto_increment": "none",
-            "alignment": "data_width"
+        "reg_map": {
+            "read_filler": "0xDEADBEEF",
+            "address_auto_increment": "none",
+            "address_alignment": "data_width"
         },
-
-        "interface_generic": {
-            "type": "lb",
-            "data_width": 32,
-            "address_width": 12
+        "lb_bridge": {
+            "type": "apb"
         },
-
-        "interface_specific":{
+        "docs": {
         }
-
     },
-
-    "registers" : [
+    "reg_map" : [
         {
             "address": "0x000",
             "bit_fields": [

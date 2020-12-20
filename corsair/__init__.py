@@ -24,8 +24,8 @@ from .regmap import (
 )
 
 from .readers import (
-    CsrJsonReader,
-    CsrYamlReader
+    RegisterMapReader,
+    ConfigurationReader
 )
 
 from .writers import (
