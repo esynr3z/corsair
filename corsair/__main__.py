@@ -8,6 +8,7 @@ import sys
 import os
 import argparse
 import corsair
+from . import utils
 
 __all__ = ['main']
 
@@ -20,8 +21,7 @@ class ArgumentParser(argparse.ArgumentParser):
 
 
 def check_json_yaml(file):
-    _, ext = os.path.splitext(file)
-    if ext.lower() not in ['.json', '.yaml', '.yml'] <= 0:
+    if get_file_ext(file) not in ['.json', '.yaml', '.yml'] <= 0:
         raise argparse.ArgumentTypeError("%s has wrong extension!" % file)
     return file
 

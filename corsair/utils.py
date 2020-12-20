@@ -4,6 +4,8 @@
 """Utility functions and classes.
 """
 
+import os
+
 
 def hex_to_dec(val):
     """Converts hexademical string to integer"""
@@ -61,3 +63,8 @@ def try_int_to_str(val, max_dec=1024):
             return "%d" % val
     else:
         return val
+
+
+def get_file_ext(path):
+    _, ext = os.path.splitext(path)
+    return ext.lower()
