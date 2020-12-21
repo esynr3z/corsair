@@ -1,103 +1,76 @@
 .. _csr-map:
 
-========================
-CSR map description file
-========================
+=============================
+Register map description file
+=============================
 
-General structure
-=================
+Overview
+========
 
-CSR map description file consists of two parts: ``configuration`` and ``registers``. ``configuration`` is a collection (dictionary) of global parameters to control the whole generation process. And ``registers`` is a simply list of CSRs.
+Register map description file is the only input file of Corsair in fact. It consists of two parts: ``config`` and ``regmap``. ``config`` is a collection (dictionary) of global parameters to control the whole generation process. And ``regmap`` is a simply list of registers.
 
-Schematic representation of the structure is below (``{}`` is for a dictionary, ``[]`` - for a list). Description files in JSON or YAML formats follow in particular that structure with almost no changes.
 
-* name
-* version
-* configuration: {}
-    * parameter_a
-    * parameter_group_b {}
-        * parameter_c
-        * parameter_d
-    * parameter_e
-* register_map []
-    * register_map[0] {}
-        * name
-        * ...
-        * bit_fields []
-            * bit_fields[0] {}
-                * name
-                * ...
-            * bit_fields[1] {}
-                * name
-                * ...
-    * register_map[1] {}
-    * ...
-
-You can use ``-t`` key to create CSR map description file template in any supported format:
+You can use special key to create register map template in any supported format (JSON or YAML, currently):
 
 ::
 
-    corsair -t template_csr.json
+    corsair --template-regmap template_csr.json
 
+
+``config`` part can be stored (fully or partially) in a separate file. It enables to share one configuration with several maps. To provide separate configuration file use ```-c/--config`` key:
+
+::
+
+    corsair --config config.json
+
+To create template of configuration file:
+
+::
+
+    corsair --template-config config.json
+
+Configurations are aplied one by one - every next is merged with previous one with values to be overwritten.
+In the other words, the sequence or priority (from lowest to highest) is default configuration, then configuration from separate file and configuration from register map file finally. For example, for ``corsair -r map.json -c config.json`` command:
+
+* Configuration with default values are created.
+* If presents, separate configuration file (``-c/--config`` key) is merged with default configuration. New values are written over older ones.
+* If ``config`` section presents in register map file (``-r/--regmap`` key), this configuration is merged with one from previous step.
 
 Configuration
 =============
 
+Configuration is collection with global parameters to control the whole generation process. It may be represented as item under ``config`` label inside register map description file, or/and as separate file (fully or partially).
+
 List of default parameters and groups (relative to configuration root):
 
-* read_filler
-* address_calculation
-    * auto_increment_mode
-    * auto_increment_value
-    * alignment_mode
-    * alignment_value
+* name
+* version
 * register_reset
-* interface_generic
+* data_width
+* address_width
+* regmap
+    * read_filler
+    * address_increment_mode
+    * address_increment_value
+    * address_alignment_mode
+    * address_alignment_value
+* lb_bridge
     * type
-    * data_width
-    * address_width
-* interface_specific
+* docs
 
-read_filler
------------
+name
+----
 
-Value to be returned if read of empty address or WO register is performed.
+Base name of the register map. Will be used to create names of all output artifacts.
 
-**Default value**: 0.
+**Default value**: "regs".
 
-address_calculation
--------------------
+version
+-------
 
-Group of address calculation related parameters.
+Version of the register map.
 
-======================== ============ ======================================================================
-Parameter                Default      Description
-======================== ============ ======================================================================
-``auto_increment_mode``  "none"       Address auto increment mode, if no address is provided for a register
-``auto_increment_value`` 4            Auto increment with provided value: 1 - 1 byte, 4 - 4 bytes, etc
-``alignment_mode``       "data_width" Check for address alignment.
-``alignment_value``      4            Address alignment with provided value: 1 - 1 byte, 4 - 4 bytes, etc
-======================== ============ ======================================================================
-
-Options for ``auto_increment_mode``:
-
-======================= ========================================================================================
-``auto_increment_mode`` Description
-======================= ========================================================================================
-"none"                  No address auto increment. If no address is provided, error will be generated.
-"data_width"            Enable auto increment with value based on ``data_width`` of ``interface_generic`` group
-"custom"                Enable auto increment based on ``auto_increment_value``
-======================= ========================================================================================
-
-Options for ``alignment_mode``:
-
-==================== =========================================================================================
-``alignment_mode``   Description
-==================== =========================================================================================
-"none"               No check of address alignment
-"data_width"         Enable check of address alignment based on ``data_width`` of ``interface_generic`` group
-"custom"             Enable check of address alignment based on ``alignment_value``
-==================== =========================================================================================
+**Default value**: "1.0".
 
 register_reset
 --------------
@@ -118,29 +91,84 @@ Choice of:
 
 **Default value**: "sync_pos".
 
-interface_generic
------------------
+data_width
+----------
 
-Group of generic interface related parameters.
+Data width of the words inside register map.
+
+**Default value**: 32.
+
+data_width
+----------
+
+Bit width of data buses to be used inside register map.
+
+**Default value**: 32.
+
+address_width
+-------------
+
+Bit width of address buses to be used inside register map.
+
+**Default value**: 32.
+
+
+regmap
+------
+
+Group of parameters related to register map HDL module.
+
+=========================== ============ ==========================================================================
+Parameter                   Default      Description
+=========================== ============ ==========================================================================
+``read_filler``             0            Value to be returned if read of empty address or WO register is performed.
+``address_increment_mode``  "none"       Address auto increment mode, if no address is provided for a register
+``address_increment_value`` 4            Auto increment with provided value: 1 - 1 byte, 4 - 4 bytes, etc
+``address_alignment_mode``  "data_width" Check for address alignment.
+``address_alignment_value`` 4            Address alignment with provided value: 1 - 1 byte, 4 - 4 bytes, etc
+=========================== ============ ==========================================================================
+
+Options for ``address_increment_mode``:
+
+========================== ========================================================================================
+``address_increment_mode`` Description
+========================== ========================================================================================
+"none"                     No address auto increment. If no address is provided, error will be generated.
+"data_width"               Enable auto increment with value based on ``data_width``
+"custom"                   Enable auto increment based on ``address_increment_value``
+========================== ========================================================================================
+
+Options for ``address_alignment_mode``:
+
+========================== =========================================================================================
+``address_alignment_mode`` Description
+========================== =========================================================================================
+"none"                     No check of address alignment
+"data_width"               Enable check of address alignment based on ``data_width``
+"custom"                   Enable check of address alignment based on ``address_alignment_value``
+========================== =========================================================================================
+
+lb_bridge
+---------
+
+Group of parameters related to interface bridge to Local Bus HDL module.
 
 ================= ======= =========================================
 Parameter         Default Description
 ================= ======= =========================================
-``type``          "lb"    Interface type. One of the options below.
-``data_width``    32      Data bus bit width
-``address_width`` 32      Address bus bit width
+``type``          "none"  Interface type. One of the options below.
 ================= ======= =========================================
 
 Options for ``type``:
 
-======== ====================
+======== ==========================
 ``type`` Description
-======== ====================
-"amm"    Avalon-MM interface.
-"apb"    APB4 interface.
+======== ==========================
+"amm"    Avalon-MM interface
+"apb"    APB4 interface
 "axil"   AXI4-Lite interface
-"lb"     Local Bus interface.
-======== ====================
+"none"   For Local Bus directly use
+======== ==========================
 
 .. note::
     More details about Local Bus interface can be found in :ref:`Local Bus <local-bus>`.
@@ -153,18 +181,17 @@ Allowed combinations of the parameters:
 "amm"    8, 16, ..., 1024 (power of 2) 1 - 64
 "apb"    8, 16, 32                     1 - 32
 "axil"   32, 64                        32, 64
-"lb"     8, 16, ... (any power of 2)   1 - 64
+"none"   8, 16, ... (any power of 2)   1 - 64
 ======== ============================= =================
 
-interface_specific
-------------------
 
-Group of interface type specific parameters. This block is unque for every interface type.
+Register map
+============
 
-Registers
-=========
+Register map consists of registers (named addresses in a address map). And registers are made of bit fields - group of bits with special properties.
+When register is accessed, collection of bit fields being read or written, actually.
 
-List of CSRs.
+List of registers stored in a ``regmap`` item inside register map description file.
 
 Register
 --------
@@ -177,7 +204,7 @@ Attribute       Default Description
 ``name``        ""      Register name
 ``description`` ""      Register description
 ``address``     0       Register address
-``bit_fields``  []      Array with register bit_fields
+``bfields``     []      Array with register bit fields
 =============== ======= ==============================
 
 .. note::

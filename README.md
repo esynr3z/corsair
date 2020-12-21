@@ -10,27 +10,20 @@ It is as easy as:
 * Create CSR map description file or generate a template with Corsair:
 
 ```sh
-corsair -t ip_csr.json
+corsair -t ip_regs.json
 ```
 
-* Make changes to ```ip_csr.json```
+* Make changes to ```ip_regs.json```
 * Generate output artifacts:
 
 ```sh
-corsair -i ip_csr.json -o ip_regmap.v ip_regmap.md
+corsair -r ip_regs.json --hdl --lb-bridge --docs
 ```
 
-Supported input formats:
-
-* JSON
-* YAML
-
-Supported output formats:
-
-* JSON
-* YAML
-* (**SOON**) Verilog
-* (**SOON**) Markdown
+* You will get:
+  * Register map HDL code
+  * Bridge to some standart interface (e.g. AXI-Lite)
+  * Document, describing the map
 
 For more details about ways the tool can be used and how it works please refer the documentation at [Read the docs](https://corsair.readthedocs.io).
 

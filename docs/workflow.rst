@@ -13,17 +13,34 @@ It is as easy as:
 
 ::
 
-    corsair -t ip_csr.json
+    corsair --template-regmap ip_regs.json
 
-* Make changes to ``ip_csr.json``
+* Make changes to ``ip_regs.json``
 * Generate output artifacts:
 
 ::
 
-    corsair -i ip_csr.json -o ip_regmap.v ip_regmap.md ip_regmap.h
+    corsair -r ip_regs.json --hdl --lb-bridge --docs
 
+* You will get:
+    * Register map HDL code
+    * Bridge to some standart interface (e.g. AXI-Lite)
+    * Document, describing the map
 
 Use -h/--help key to get all options available.
+
+Refer to :ref:`Register map description file <csr-map>` part to get details about input description file.
+
+Integration
+-----------
+
+All generated register maps support only Local Bus interface to make code generation and integration more uniform. Local Bus is a custom interface designed to be simple and easy to create bridge to any popular memmory-mapped interface such as APB, AXI-Lite or Avalon-MM.
+
+.. image:: local_bus.svg
+    :alt: Local Bus architecture
+    :align: center
+
+Follow to :ref:`Local Bus specification <csr-map>` for a details.
 
 Import (Python)
 ===============
@@ -36,7 +53,7 @@ Corsair can be imported to your Python module to enable creation of a custom wor
 
     # create and fill the CSR map
     config = corsair.Configuration()
-    config['interface_generic']['type'] = 'axil'
+    config['lb_bridge']['type'] = 'axil'
 
     reg_a = corsair.Register('rega', address=4)
     reg_a.add_bfields(corsair.BitField('bfa', lsb=0, width=8))

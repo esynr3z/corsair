@@ -4,15 +4,6 @@
 Local Bus specification
 =======================
 
-Introduction
-============
-
-All generated CSR maps support only Local Bus interface to make code generation and integration more uniform. Local Bus is a custom interface designed to be simple and easy to create bridge to any popular memmory-mapped interface such as APB, AXI-Lite or Avalon-MM.
-
-.. image:: local_bus.svg
-    :alt: Local Bus architecture
-    :align: center
-
 Signals
 =======
 

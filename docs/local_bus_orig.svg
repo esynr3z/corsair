@@ -1,0 +1,1236 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   id="svg8"
+   version="1.1"
+   viewBox="0 0 120 70"
+   height="70mm"
+   width="120mm">
+  <defs
+     id="defs2">
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker5098"
+       style="overflow:visible">
+      <path
+         id="path5096"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(0.4,0,0,0.4,4,0)" />
+    </marker>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4914"
+       style="overflow:visible">
+      <path
+         id="path4912"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(0.4,0,0,0.4,4,0)" />
+    </marker>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4772"
+       style="overflow:visible">
+      <path
+         id="path4770"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(0.4,0,0,0.4,4,0)" />
+    </marker>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4624"
+       style="overflow:visible">
+      <path
+         id="path4622"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(0.4,0,0,0.4,4,0)" />
+    </marker>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker2984"
+       style="overflow:visible">
+      <path
+         id="path2982"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker12345"
+       style="overflow:visible">
+      <path
+         id="path12343"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker12151"
+       style="overflow:visible">
+      <path
+         id="path12149"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker12063"
+       style="overflow:visible">
+      <path
+         id="path12061"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker9684"
+       style="overflow:visible">
+      <path
+         id="path9682"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow2Send"
+       refX="0"
+       refY="0"
+       orient="auto">
+      <path
+         transform="matrix(-0.3,0,0,-0.3,0.69,0)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path9331" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow2Lend"
+       refX="0"
+       refY="0"
+       orient="auto">
+      <path
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.625;stroke-linejoin:round;stroke-opacity:1"
+         id="path9319" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1Lend"
+       refX="0"
+       refY="0"
+       orient="auto">
+      <path
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path9301" />
+    </marker>
+    <filter
+       id="filter8736"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence8732"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap8734"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter8736-3"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence8732-1"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap8734-8"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter8736-3-3"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence8732-1-3"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap8734-8-8"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter8736-3-3-8"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence8732-1-3-8"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap8734-8-8-9"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9016"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9012"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9014"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9022"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9018"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9020"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9028"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9024"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9026"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9034"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9030"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9032"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9040"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9036"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9038"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9046"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9042"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9044"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9052"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9048"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9050"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9058"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9054"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9056"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9092"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9088"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9090"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9022-7"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9018-5"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9020-4"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9034-8"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9030-1"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9032-2"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9028-8"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9024-9"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9026-3"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9016-6"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9012-8"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9014-0"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9034-8-1"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9030-1-1"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9032-2-0"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9028-8-5"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9024-9-0"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9026-3-6"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9092-6"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9088-2"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9090-5"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter10062"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence10058"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap10060"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter10068"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence10064"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap10066"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter10074"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence10070"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap10072"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter11574"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence11570"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap11572"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter11580"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence11576"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap11578"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <marker
+       style="overflow:visible"
+       id="Arrow1Mstart-9"
+       refX="0"
+       refY="0"
+       orient="auto">
+      <path
+         transform="matrix(0.4,0,0,0.4,4,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path9304-0" />
+    </marker>
+    <filter
+       id="filter10068-3"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence10064-1"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap10066-1"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter10074-4"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence10070-0"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap10072-3"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker9684-9"
+       style="overflow:visible">
+      <path
+         id="path9682-1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <filter
+       id="filter10062-9"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence10058-6"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap10060-9"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9046-3"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9042-3"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9044-8"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9058-0"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9054-5"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9056-6"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9052-6"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9048-4"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9050-0"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter9040-0"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence9036-4"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap9038-6"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter8736-9"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence8732-14"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap8734-9"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter8736-9-5"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence8732-14-8"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap8734-9-7"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter8736-9-5-0"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence8732-14-8-4"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap8734-9-7-2"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter8736-9-5-0-0"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence8732-14-8-4-4"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap8734-9-7-2-2"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter14127"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence14123"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap14125"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter15712"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence15708"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap15710"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter15736"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence15732"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap15734"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <filter
+       id="filter15760"
+       style="color-interpolation-filters:sRGB">
+      <feTurbulence
+         id="feTurbulence15756"
+         result="turbulence"
+         baseFrequency="0.02 0.02"
+         seed="1"
+         numOctaves="5"
+         type="fractalNoise" />
+      <feDisplacementMap
+         id="feDisplacementMap15758"
+         xChannelSelector="R"
+         yChannelSelector="G"
+         scale="2"
+         in2="turbulence"
+         in="SourceGraphic" />
+    </filter>
+    <marker
+       style="overflow:visible"
+       id="marker14440-5"
+       refX="0"
+       refY="0"
+       orient="auto">
+      <path
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path14438-3" />
+    </marker>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4772-1"
+       style="overflow:visible">
+      <path
+         id="path4770-8"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(0.4,0,0,0.4,4,0)" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker14440-5-79"
+       refX="0"
+       refY="0"
+       orient="auto">
+      <path
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path14438-3-2" />
+    </marker>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4772-2"
+       style="overflow:visible">
+      <path
+         id="path4770-3"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(0.4,0,0,0.4,4,0)" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker14440-5-75"
+       refX="0"
+       refY="0"
+       orient="auto">
+      <path
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path14438-3-9" />
+    </marker>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4772-2-2"
+       style="overflow:visible">
+      <path
+         id="path4770-3-8"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(0.4,0,0,0.4,4,0)" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker14440-5-75-9"
+       refX="0"
+       refY="0"
+       orient="auto">
+      <path
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path14438-3-9-7" />
+    </marker>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4772-1-3"
+       style="overflow:visible">
+      <path
+         id="path4770-8-6"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(0.4,0,0,0.4,4,0)" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker14440-5-79-1"
+       refX="0"
+       refY="0"
+       orient="auto">
+      <path
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path14438-3-2-2" />
+    </marker>
+    <marker
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4772-9"
+       style="overflow:visible">
+      <path
+         id="path4770-31"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(0.4,0,0,0.4,4,0)" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker14440-5-9"
+       refX="0"
+       refY="0"
+       orient="auto">
+      <path
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="path14438-3-4" />
+    </marker>
+  </defs>
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(0,-227)"
+     id="layer1">
+    <rect
+       rx="1.0000006"
+       ry="1.0000006"
+       y="281"
+       x="26"
+       height="10"
+       width="40"
+       id="rect8842"
+       style="fill:none;stroke:#000000;stroke-width:0.5291667;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       id="text8846"
+       y="241.75488"
+       x="37.214466"
+       style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.5291667;stroke-miterlimit:4;stroke-dasharray:none"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';stroke-width:0.5291667;stroke-miterlimit:4;stroke-dasharray:none"
+         y="241.75488"
+         x="37.214466"
+         id="tspan8844">APB bridge</tspan></text>
+    <text
+       id="text8846-3"
+       y="264.45294"
+       x="31.95229"
+       style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.5291667;stroke-miterlimit:4;stroke-dasharray:none"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';stroke-width:0.5291667;stroke-miterlimit:4;stroke-dasharray:none"
+         y="264.45294"
+         x="31.95229"
+         id="tspan8844-0">AXI-Lite bridge</tspan></text>
+    <text
+       id="text8846-3-3-9"
+       y="287.30527"
+       x="30.900482"
+       style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.5291667;stroke-miterlimit:4;stroke-dasharray:none"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';stroke-width:0.5291667;stroke-miterlimit:4;stroke-dasharray:none"
+         y="287.30527"
+         x="30.900482"
+         id="tspan8844-0-0-2">Avalon-MM bridge</tspan></text>
+    <rect
+       rx="1.0000006"
+       ry="1.0000006"
+       y="235"
+       x="26"
+       height="10"
+       width="40"
+       id="rect8842-5"
+       style="fill:none;stroke:#000000;stroke-width:0.52899998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       rx="1.0000006"
+       ry="1.0000006"
+       y="258"
+       x="26"
+       height="10"
+       width="40"
+       id="rect8842-5-4"
+       style="fill:none;stroke:#000000;stroke-width:0.5291667;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       rx="1.0000006"
+       ry="1.0000006"
+       y="235.78302"
+       x="86.000961"
+       height="54.941639"
+       width="26.993813"
+       id="rect11144"
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.5291667;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       id="text11584-3-7"
+       y="260.92291"
+       x="100.30875"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.5291667;stroke-miterlimit:4;stroke-dasharray:none"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';text-align:center;text-anchor:middle;stroke-width:0.5291667;stroke-miterlimit:4;stroke-dasharray:none"
+         y="260.92291"
+         x="100.30875"
+         id="tspan11582-6-5">Register</tspan><tspan
+         id="tspan9107"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';text-align:center;text-anchor:middle;stroke-width:0.5291667;stroke-miterlimit:4;stroke-dasharray:none"
+         y="266.21457"
+         x="100.30875">map</tspan></text>
+    <path
+       id="path2612-5"
+       d="m 9.444706,286.86431 c 0,0 4.364226,-0.0576 6.659288,0.14904 2.633781,0.23709 6.034549,-0.40713 6.034549,-0.40713"
+       style="fill:none;stroke:#000000;stroke-width:0.52916676;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker4772);marker-end:url(#marker14440-5)" />
+    <text
+       id="text9062-6"
+       y="235.78177"
+       x="75.815407"
+       style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.52916676;stroke-miterlimit:4;stroke-dasharray:none"
+       xml:space="preserve"><tspan
+         id="tspan2723-2"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';text-align:center;text-anchor:middle;stroke-width:0.52916676;stroke-miterlimit:4;stroke-dasharray:none"
+         y="235.78177"
+         x="75.815407">Local Bus</tspan></text>
+    <path
+       id="path2612-5-0"
+       d="m 10.297819,263.46099 c 0,0 4.364227,-0.0576 6.659288,0.14904 2.633781,0.23709 6.034549,-0.40713 6.034549,-0.40713"
+       style="fill:none;stroke:#000000;stroke-width:0.52916682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker4772-1);marker-end:url(#marker14440-5-79)" />
+    <path
+       id="path2612-5-2"
+       d="m 10.677854,239.03188 c 0,0 4.364226,-0.0576 6.659288,0.14904 2.63378,0.23709 6.034548,-0.40713 6.034548,-0.40713"
+       style="fill:none;stroke:#000000;stroke-width:0.52916682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker4772-2);marker-end:url(#marker14440-5-75)" />
+    <path
+       id="path2612-5-7"
+       d="m 68.319987,286.67865 c 0,0 4.364223,-0.0576 6.659293,0.14904 2.63378,0.23709 6.03454,-0.40713 6.03454,-0.40713"
+       style="fill:none;stroke:#000000;stroke-width:0.52916682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker4772-9);marker-end:url(#marker14440-5-9)" />
+    <path
+       id="path2612-5-0-8"
+       d="m 69.1731,263.27533 c 0,0 4.36423,-0.0576 6.65929,0.14904 2.63378,0.23709 6.03455,-0.40713 6.03455,-0.40713"
+       style="fill:none;stroke:#000000;stroke-width:0.52916682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker4772-1-3);marker-end:url(#marker14440-5-79-1)" />
+    <path
+       id="path2612-5-2-4"
+       d="m 69.553135,238.84622 c 0,0 4.364225,-0.0576 6.659285,0.14904 2.63378,0.23709 6.03455,-0.40713 6.03455,-0.40713"
+       style="fill:none;stroke:#000000;stroke-width:0.52916682;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#marker4772-2-2);marker-end:url(#marker14440-5-75-9)" />
+    <text
+       id="text9062-6-3"
+       y="260.6778"
+       x="76.1689"
+       style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+       xml:space="preserve"><tspan
+         id="tspan2723-2-6"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';text-align:center;text-anchor:middle;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+         y="260.6778"
+         x="76.1689">Local Bus</tspan></text>
+    <text
+       id="text9062-6-3-1"
+       y="283.67783"
+       x="76.1689"
+       style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+       xml:space="preserve"><tspan
+         id="tspan2723-2-6-0"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';text-align:center;text-anchor:middle;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+         y="283.67783"
+         x="76.1689">Local Bus</tspan></text>
+    <text
+       id="text9062-6-6"
+       y="236.09122"
+       x="16.911098"
+       style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+       xml:space="preserve"><tspan
+         id="tspan2723-2-3"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';text-align:center;text-anchor:middle;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+         y="236.09122"
+         x="16.911098">APB</tspan></text>
+    <text
+       id="text9062-6-6-2"
+       y="260.59589"
+       x="16.289558"
+       style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+       xml:space="preserve"><tspan
+         id="tspan2723-2-3-0"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';text-align:center;text-anchor:middle;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+         y="260.59589"
+         x="16.289558">AXI-Lite</tspan></text>
+    <text
+       id="text9062-6-6-2-6"
+       y="284.13391"
+       x="16.286118"
+       style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+       xml:space="preserve"><tspan
+         id="tspan2723-2-3-0-1"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';text-align:center;text-anchor:middle;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+         y="284.13391"
+         x="16.286118">Avalon-MM</tspan></text>
+    <text
+       id="text9062-6-3-5"
+       y="252.35945"
+       x="46.363892"
+       style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+       xml:space="preserve"><tspan
+         id="tspan2723-2-6-5"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';text-align:center;text-anchor:middle;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+         y="252.35945"
+         x="46.363892">or</tspan></text>
+    <text
+       id="text9062-6-3-5-4"
+       y="276.51346"
+       x="45.329468"
+       style="font-style:normal;font-weight:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+       xml:space="preserve"><tspan
+         id="tspan2723-2-6-5-7"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'xkcd Script';-inkscape-font-specification:'xkcd Script';text-align:center;text-anchor:middle;stroke-width:0.52916682;stroke-miterlimit:4;stroke-dasharray:none"
+         y="276.51346"
+         x="45.329468">or</tspan></text>
+  </g>
+</svg>
