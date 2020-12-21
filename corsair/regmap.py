@@ -299,7 +299,7 @@ class Register():
             'name': self.name,
             'description': self.description,
             'address': self.address,
-            'bit_fields': [bf.as_dict() for bf in self.bfields]
+            'bfields': [bf.as_dict() for bf in self.bfields]
         }
 
     def __len__(self):
@@ -425,7 +425,7 @@ class RegisterMap():
         ...     Register('reg_b', 'Register B', address=4)
         ... ])
         >>> print(rmap)
-        register_map: v1.0
+        regs: v1.0
           (0x0) reg_a: Register A
             empty
           (0x4) reg_b: Register B
@@ -531,25 +531,25 @@ class RegisterMap():
         if len(self) == 0:
             raise ValueError("Register '%s' with no address is not allowed"
                              " to be the first register in a map!" % (reg.name))
-        if self.config['address_calculation']['auto_increment_mode'].value == 'none':
+        if self.config['regmap']['address_increment_mode'].value == 'none':
             raise ValueError("Register '%s' with no address is not allowed"
                              " when address auto increment is disabled!" % (reg.name))
 
         prev_addr = self.regs[-1].address
 
-        if self.config['address_calculation']['auto_increment_mode'].value == 'data_width':
-            addr_step = self.config['interface_generic']['data_width'].value // 8
+        if self.config['regmap']['address_increment_mode'].value == 'data_width':
+            addr_step = self.config['data_width'].value // 8
         else:
-            addr_step = self.config['address_calculation']['auto_increment_value'].value
+            addr_step = self.config['regmap']['address_increment_value'].value
 
         reg.address = prev_addr + addr_step
 
     def _addr_check(self, reg):
         """Check address alignment."""
-        if self.config['address_calculation']['alignment_mode'].value == 'data_width':
-            align_val = self.config['interface_generic']['data_width'].value // 8
-        elif self.config['address_calculation']['alignment_mode'].value == 'custom':
-            align_val = self.config['address_calculation']['alignment_value'].value
+        if self.config['regmap']['address_alignment_mode'].value == 'data_width':
+            align_val = self.config['data_width'].value // 8
+        elif self.config['regmap']['address_alignment_mode'].value == 'custom':
+            align_val = self.config['regmap']['address_alignment_value'].value
         else:
             align_val = 1
 
@@ -577,10 +577,10 @@ class RegisterMap():
                 raise ValueError("Register with name '%s' is already present!" % (reg.name))
             # check bit field conflicts with data width
             for bf in reg:
-                if bf.msb >= self.config['interface_generic']['data_width'].value:
+                if bf.msb >= self.config['data_width'].value:
                     raise ValueError("Register '%s' has field '%s' (msb=%d) "
                                      "that exceeds interface data width %d!" %
-                                     (reg.name, bf.name, bf.msb, self.config['interface_generic']['data_width'].value))
+                                     (reg.name, bf.name, bf.msb, self.config['data_width'].value))
             # aplly calculated address if register address is empty
             if reg.address is None:
                 self._addr_apply(reg)

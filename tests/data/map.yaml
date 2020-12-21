@@ -1,148 +1,167 @@
----
-name: csrmap
-version: '1.0'
-
-configuration:
-
+config:
+  regmap:
+    read_filler: 3735928559
+    address_increment_mode: none
+    address_increment_value: 4
+    address_alignment_mode: data_width
+    address_alignment_value: 4
+  lb_bridge:
+    type: apb
+  docs: {}
+  data_width: 32
+  address_width: 12
+  name: regs
+  version: '1.0'
   register_reset: sync_pos
-
-  read_filler: '0xDEADBEEF'
-
-  address_calculation:
-    auto_increment: none
-    alignment: data_width
-
-  interface_generic:
-    type: lb
-    data_width: 32
-    address_width: 12
-
-  interface_specific: {}
-
-registers:
-
-- address: '0x000'
-  bit_fields:
+regmap:
+- name: LEN
+  description: Length of pulse
+  address: 0
+  bfields:
   - name: LEN
     description: Length of pulse
-    initial: '0x0'
+    initial: 0
     width: 32
     lsb: 0
     access: rw
-
-- address: '0x004'
-  bit_fields:
+    access_flags: false
+    modifiers: []
+- name: CNT
+  description: Counter value
+  address: 4
+  bfields:
   - name: CNT
     description: Counter value
-    initial: '0x0'
+    initial: 0
     width: 16
     lsb: 0
     access: rw
     access_flags: true
     modifiers:
     - external_update
-
 - name: START
   description: Start processes
-  address: '0x008'
-  bit_fields:
+  address: 8
+  bfields:
   - name: STA
     description: Start process A
+    initial: 0
     width: 1
     lsb: 0
     access: wo
+    access_flags: false
     modifiers:
     - self_clear
   - name: STB
     description: Start process B
+    initial: 0
     width: 1
     lsb: 8
     access: wo
+    access_flags: false
     modifiers:
     - self_clear
   - name: STC
     description: Start process C
+    initial: 0
     width: 1
     lsb: 16
     access: wo
+    access_flags: false
     modifiers:
     - self_clear
   - name: KEY
     description: Secret key to start process
+    initial: 0
     width: 8
     lsb: 24
     access: wo
-
+    access_flags: false
+    modifiers: []
 - name: STAT
   description: Status
-  address: '0x010'
-  bit_fields:
+  address: 16
+  bfields:
   - name: DIR
     description: Current direction
+    initial: 0
     width: 1
     lsb: 0
     access: ro
+    access_flags: false
+    modifiers: []
   - name: STATE
     description: Current state
+    initial: 0
     width: 3
     lsb: 3
     access: ro
+    access_flags: false
     modifiers:
     - external_update
-
 - name: CTL
   description: Control
-  address: '0x020'
-  bit_fields:
+  address: 32
+  bfields:
   - name: ENA
     description: Enable A
+    initial: 0
     width: 1
     lsb: 1
     access: rw
+    access_flags: false
+    modifiers: []
   - name: INITB
     description: Initial value for B
+    initial: 0
     width: 8
     lsb: 8
     access: rw
-
+    access_flags: false
+    modifiers: []
 - name: FLAG
   description: Flags
-  address: '0x024'
-  bit_fields:
+  address: 36
+  bfields:
   - name: EVA
     description: Event A
+    initial: 0
     width: 1
     lsb: 0
     access: rw
+    access_flags: false
     modifiers:
     - external_update
     - write1_to_clear
   - name: EVB
     description: Event B
+    initial: 0
     width: 1
     lsb: 2
     access: ro
+    access_flags: false
     modifiers:
     - external_update
     - read_to_clear
-
 - name: VERSION
   description: Current version
-  address: '0x040'
-  bit_fields:
+  address: 64
+  bfields:
   - name: MINOR
     description: Minor version
-    initial: '0x23'
+    initial: 35
     width: 8
     lsb: 0
     access: ro
+    access_flags: false
     modifiers:
     - read_const
   - name: MAJOR
     description: Major version
-    initial: '0x02'
+    initial: 2
     width: 8
     lsb: 16
     access: ro
+    access_flags: false
     modifiers:
     - read_const

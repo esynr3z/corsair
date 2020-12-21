@@ -3,16 +3,16 @@
 Readers
 =======
 
-CsrJsonReader
--------------
-.. autoclass:: corsair.CsrJsonReader
+RegisterMapReader
+-----------------
+.. autoclass:: corsair.RegisterMapReader
    :members:
    :undoc-members:
    :show-inheritance:
 
-CsrYamlReader
--------------
-.. autoclass:: corsair.CsrYamlReader
+ConfigurationReader
+-------------------
+.. autoclass:: corsair.ConfigurationReader
    :members:
    :undoc-members:
    :show-inheritance:

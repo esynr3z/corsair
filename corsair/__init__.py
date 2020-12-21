@@ -29,7 +29,7 @@ from .readers import (
 )
 
 from .writers import (
-    CsrJsonWriter,
-    CsrYamlWriter,
-    BridgeVerilogWriter
+    RegisterMapWriter,
+    ConfigurationWriter,
+    LbBridgeWriter
 )

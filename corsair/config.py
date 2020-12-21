@@ -237,22 +237,22 @@ class Configuration(ParameterGroup):
 
     def _init_default_params(self):
         """Initalize all default params"""
-        # group reg_map
-        self.add_params(ParameterGroup('reg_map'))
-        self['reg_map'].add_params([
+        # group regmap
+        self.add_params(ParameterGroup('regmap'))
+        self['regmap'].add_params([
             Parameter(name='read_filler', value=0x0),
-            Parameter(name='auto_increment_mode', value='none',
+            Parameter(name='address_increment_mode', value='none',
                       validator=lambda val: val in ['none', 'data_width', 'custom']),
-            Parameter(name='auto_increment_value', value=4, validator=lambda val: val >= 1),
-            Parameter(name='alignment_mode', value='data_width',
+            Parameter(name='address_increment_value', value=4, validator=lambda val: val >= 1),
+            Parameter(name='address_alignment_mode', value='data_width',
                       validator=lambda val: val in ['none', 'data_width', 'custom']),
-            Parameter(name='alignment_value', value=4, validator=lambda val: val >= 1)
+            Parameter(name='address_alignment_value', value=4, validator=lambda val: val >= 1)
         ])
 
         # group lb_bridge
-        self.add_params(ParameterGroup('interface_generic'))
+        self.add_params(ParameterGroup('lb_bridge'))
         lb_bridge_type_allowed = ['amm', 'apb', 'axil', 'none']
-        self['interface_generic'].add_params(
+        self['lb_bridge'].add_params(
             Parameter(name='type', value='none', validator=lambda val: val in lb_bridge_type_allowed)
         )
 
@@ -264,24 +264,24 @@ class Configuration(ParameterGroup):
             'amm': [8, 16, 32, 64, 128, 256, 512, 1024],
             'apb': [8, 16, 32],
             'axil': [32, 64],
-            'lb': [8, 16, 32, 64, 128, 256, 512, 1024]
+            'none': [8, 16, 32, 64, 128, 256, 512, 1024]
         }
         self.add_params(Parameter(
             name='data_width',
             value=32,
-            validator=lambda val: val in data_width_allowed[self['interface_generic']['type'].value])
+            validator=lambda val: val in data_width_allowed[self['lb_bridge']['type'].value])
         )
 
         addr_width_allowed = {
             'amm': range(1, 65),
             'apb': range(1, 33),
             'axil': [32, 64],
-            'lb': range(1, 65)
+            'none': range(1, 65)
         }
         self.add_params(Parameter(
             name='address_width',
             value=32,
-            validator=lambda val: val in addr_width_allowed[self['interface_generic']['type'].value])
+            validator=lambda val: val in addr_width_allowed[self['lb_bridge']['type'].value])
         )
 
         self.add_params([

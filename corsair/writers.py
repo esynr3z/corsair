@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Writers based on a CSR map internal representation (RegisterMap object).
+"""File writers.
 """
 
 import os
@@ -9,82 +9,89 @@ import json
 import yaml
 import jinja2
 from .__version__ import __version__
+from . import utils
 from pathlib import Path
 
 
-class CsrJsonWriter():
-    """Write CSR map description file to a JSON file.
+class _DictWriter():
+    """Base class that converts dictionary to file."""
+    def _save_file(self, path, data):
+        """Create file from dictionary."""
+        with open(path, 'w') as f:
+            print("  Save data to file ... ", end='')
+            ext = utils.get_file_ext(path)
+            if ext in ['.yaml', '.yml']:
+                yaml.Dumper.ignore_aliases = lambda *args: True  # hack to disable aliases
+                yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+            elif ext == '.json':
+                json.dump(data, f, indent=4)
+            else:
+                raise ValueError("Unknown extension '%s' of the file '%s'" % (ext, path))
+            print("OK")
+        return data
+
+
+class RegisterMapWriter(_DictWriter):
+    """Write register map to a file.
 
     Examples:
 
         Create JSON file based on a :class:`RegisterMap` object:
 
-        >>> writer = CsrJsonWriter()
-        >>> rmap = RegisterMap(config=Configuration())
+        >>> writer = RegisterMapWriter()
+        >>> rmap = RegisterMap()
         >>> writer('_build/doctest/map.json', rmap)
-        Write '_build/doctest/map.json' file with CsrJsonWriter:
+        Write '_build/doctest/map.json' file with RegisterMapWriter:
           Prepare data ... OK
           Save data to file ... OK
     """
-    def __init__(self):
-        self.description = 'Write CSR map description file to a JSON file'
-
     def __call__(self, path, rmap):
-        """Write JSON file based on RegisterMap object attributes."""
-        print("Write '%s' file with CsrJsonWriter:" % path)
+        """Write output file.
+
+        Args:
+            path : path to file
+            rmap : :class:`RegisterMap` object
+        """
+        print("Write '%s' file with RegisterMapWriter:" % path)
         print("  Prepare data ... ", end='')
-        json_data = {
-            'name': rmap.name,
-            'version': rmap.version,
-            'configuration': rmap.config.as_dict(),
-            'registers': list(rmap.as_dict().values())
+        data = {
+            'config': rmap.config.as_dict(),
+            'regmap': list(rmap.as_dict().values())
         }
         print("OK")
-
-        print("  Save data to file ... ", end='')
-        with open(path, 'w') as json_file:
-            json.dump(json_data, json_file, indent=4)
-        print("OK")
+        self._save_file(path, data)
 
 
-class CsrYamlWriter():
-    """Write CSR map description file to a YAML file.
+class ConfigurationWriter(_DictWriter):
+    """Write configuration to a file.
 
     Examples:
 
-        Create YAML file based on a :class:`RegisterMap` object:
+        Create JSON file based on a :class:`Configuration` object:
 
-        >>> writer = CsrYamlWriter()
-        >>> rmap = RegisterMap(config=Configuration())
-        >>> writer('_build/doctest/map.yaml', rmap)
-        Write '_build/doctest/map.yaml' file with CsrYamlWriter:
+        >>> writer = ConfigurationWriter()
+        >>> config = Configuration()
+        >>> writer('_build/doctest/config.json', config)
+        Write '_build/doctest/config.json' file with ConfigurationWriter:
           Prepare data ... OK
           Save data to file ... OK
     """
-    def __init__(self):
-        self.description = 'Write CSR map description file to a YAML file'
+    def __call__(self, path, config):
+        """Write output file.
 
-    def __call__(self, path, rmap):
-        """Write YAML file based on RegisterMap object attributes."""
-        print("Write '%s' file with CsrYamlWriter:" % path)
+        Args:
+            path : path to file
+            rmap : :class:`Configuration` object
+        """
+        print("Write '%s' file with ConfigurationWriter:" % path)
         print("  Prepare data ... ", end='')
-        yaml_data = {
-            'name': rmap.name,
-            'version': rmap.version,
-            'configuration': rmap.config.as_dict(),
-            'registers': list(rmap.as_dict().values())
-        }
+        data = config.as_dict()
         print("OK")
-
-        print("  Save data to file ... ", end='')
-        with open(path, 'w') as yaml_file:
-            yaml.Dumper.ignore_aliases = lambda *args: True  # hack to disable aliases
-            yaml.dump(yaml_data, yaml_file, default_flow_style=False, sort_keys=False)
-        print("OK")
+        self._save_file(path, data)
 
 
 class _Jinja2Writer():
-    """Basic class for Jinja2-based writers."""
+    """Basic class for rendering Jinja2 templates."""
 
     def _render_to_file(self, template, vars, path):
         """Render text with Jinja2 and save it to file
@@ -110,51 +117,45 @@ class _Jinja2Writer():
         print("OK")
 
 
-class BridgeVerilogWriter(_Jinja2Writer):
-    """Create Verilog file with bridge to Local Bus.
+class LbBridgeWriter(_Jinja2Writer):
+    """Create HDL file with bridge to Local Bus.
 
     Examples:
 
         Create Verilog file with APB to Local Bus bridge:
 
-        >>> rmap = RegisterMap(config=Configuration())
-        >>> rmap.config['interface_generic']['type'].value = 'apb'
-        >>> writer = BridgeVerilogWriter()
-        >>> writer('_build/doctest/lb_bridge.v', rmap)
-        Write '_build/doctest/lb_bridge.v' file with BridgeVerilogWriter:
+        >>> config = Configuration()
+        >>> config['lb_bridge']['type'].value = 'apb'
+        >>> writer = LbBridgeWriter()
+        >>> writer('_build/doctest/lb_bridge.v', config)
+        Write '_build/doctest/lb_bridge.v' file with LbBridgeWriter:
           Prepare data ... OK
           Load template ... OK
           Render text ... OK
           Save data to file ... OK
     """
-    def __init__(self):
-        self.description = 'Create bridge to Local Bus module in Verilog.'
-
-    def __call__(self, path, rmap):
+    def __call__(self, path, config):
         """Create bridge to Local Bus in Verilog."""
 
-        intf_config = rmap.config['interface_generic']
-        intf_config.add_params(rmap.config['interface_specific'].params)
-        if intf_config['type'].value == 'axil':
+        if config['lb_bridge']['type'].value == 'axil':
             j2_template = 'axil2lb_verilog.j2'
-        elif intf_config['type'].value == 'apb':
+        elif config['lb_bridge']['type'].value == 'apb':
             j2_template = 'apb2lb_verilog.j2'
-        elif intf_config['type'].value == 'amm':
+        elif config['lb_bridge']['type'].value == 'amm':
             j2_template = 'amm2lb_verilog.j2'
         else:
             print("Local Bus is selected for the CSR interface. Bridge will not be generated.")
             return
 
-        print("Write '%s' file with BridgeVerilogWriter:" % path)
+        print("Write '%s' file with LbBridgeWriter:" % path)
         print("  Prepare data ... ", end='')
 
         j2_vars = {}
 
         j2_vars['corsair_ver'] = __version__
-        j2_vars['csr_ver'] = rmap.version
-        j2_vars['csr_name'] = rmap.name
         j2_vars['module_name'] = Path(path).stem
-        j2_vars['config'] = intf_config
+        j2_vars['addr_width'] = config['address_width']
+        j2_vars['data_width'] = config['data_width']
 
         print("OK")
 

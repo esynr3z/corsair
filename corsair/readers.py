@@ -11,10 +11,10 @@ from .regmap import BitField, Register, RegisterMap
 from . import utils
 
 
-class _Reader():
-    """Base class for readers."""
+class _DictReader():
+    """Base class that converts file to a dictionary."""
     def _open_file(self, path):
-        """Read JSON/YAML file to dictionary."""
+        """Read file to dictionary."""
         with open(path, 'r') as f:
             print("  Open file ... ", end='')
             ext = utils.get_file_ext(path)
@@ -23,13 +23,13 @@ class _Reader():
             elif ext == '.json':
                 data = json.load(f)
             else:
-                raise ValueError("Wrong extension '%s' of file '%s'" % (ext, path))
+                raise ValueError("Unknown extension '%s' of the file '%s'" % (ext, path))
             print("OK")
         return data
 
 
-class RegisterMapReader(_Reader):
-    """Read register map and configuration from JSON/YAML file.
+class RegisterMapReader(_DictReader):
+    """Read register map and configuration from file.
 
     Examples:
 
@@ -37,17 +37,16 @@ class RegisterMapReader(_Reader):
 
         >>> reader = RegisterMapReader()
         >>> rmap = reader('../tests/data/map.json')
-        Read '../tests/data/map.json' CSR map file with RegisterMapReader:
+        Read '../tests/data/map.json' file with RegisterMapReader:
           Open file ... OK
           Read configuration ... OK
           Read registers ... OK
-
     """
     def __call__(self, path, config=Configuration()):
-        """Read JSON/YAML file and fill RegisterMap object attributes.
+        """Read input file.
 
         Returns:
-            RegisterMap object.
+            :class:`RegisterMap` object.
         """
         print("Read '%s' file with RegisterMapReader:" % path)
         data = self._open_file(path)
@@ -63,27 +62,33 @@ class RegisterMapReader(_Reader):
         # Read registers
         print("  Read registers ... ", end='')
         rmap = RegisterMap(config=config)
-        for json_reg in data['reg_map']:
-            json_reg_filtered = {k: v for k, v in json_reg.items() if k in ['name', 'description', 'address']}
-            reg = Register(**json_reg_filtered)
-            for json_bf in json_reg['bfields']:
-                reg.add_bfields(BitField(**json_bf))
+        for data_reg in data['regmap']:
+            data_reg_filtered = {k: v for k, v in data_reg.items() if k in ['name', 'description', 'address']}
+            reg = Register(**data_reg_filtered)
+            for data_bf in data_reg['bfields']:
+                reg.add_bfields(BitField(**data_bf))
             rmap.add_regs(reg)
         print("OK")
         return rmap
 
 
-class ConfigurationReader(_Reader):
-    """Read configuration from JSON/YAML file.
+class ConfigurationReader(_DictReader):
+    """Read configuration from file.
 
     Examples:
+        Read provided file and create :class:`Configuration` object:
 
+        >>> reader = ConfigurationReader()
+        >>> rmap = reader('../tests/data/config.json')
+        Read '../tests/data/config.json' file with ConfigurationReader:
+          Open file ... OK
+          Read configuration ... OK
     """
     def __call__(self, path):
-        """Read configuration from JSON/YAML file.
+        """Read input file.
 
         Returns:
-            Configuration object.
+            :class:`Configuration` object.
         """
         print("Read '%s' file with ConfigurationReader:" % path)
         data = self._open_file(path)

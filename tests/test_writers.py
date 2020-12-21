@@ -5,80 +5,79 @@
 """
 
 import pytest
-from corsair import CsrJsonReader, CsrYamlReader
-from corsair import CsrJsonWriter, CsrYamlWriter, BridgeVerilogWriter
-from corsair import RegisterMap
+from corsair import RegisterMapReader, ConfigurationReader
+from corsair import RegisterMapWriter, ConfigurationWriter, LbBridgeWriter
+from corsair import Configuration, RegisterMap
 
 
-class TestCsrJsonWriter:
-    """Class 'CsrJsonWriter' testing."""
+class TestRegisterMapWriter:
+    """Class 'RegisterMapWriter' testing."""
 
-    @pytest.fixture()
-    def input_file(self):
-        return 'tests/data/map.json'
-
-    @pytest.fixture()
-    def output_file(self, tmpdir):
-        return tmpdir.join('map_out.json')
-
-    def test_write(self, input_file, output_file):
-        """Test of writing CSR map to a JSON file."""
-        print('input_file:', input_file)
-        print('output_file:', output_file)
-        # read some CSR map
-        reader = CsrJsonReader()
-        rmap_orig = reader(input_file)
-        # write RegisterMap to a JSON file
-        writer = CsrJsonWriter()
-        writer(output_file, rmap_orig)
-        # read CSR map again and verify
-        rmap_test = reader(output_file)
+    def _write(self, path):
+        # create regmap
+        rmap_orig = RegisterMap()
+        # write to file
+        RegisterMapWriter()(path, rmap_orig)
+        # read back
+        rmap_test = RegisterMapReader()(path)
         assert rmap_test == rmap_orig
 
-
-class TestCsrYamlWriter:
-    """Class 'CsrYamlWriter' testing."""
-
-    @pytest.fixture()
-    def input_file(self):
-        return 'tests/data/map.yml'
-
-    @pytest.fixture()
-    def output_file(self, tmpdir):
-        return tmpdir.join('map_out.yml')
-
-    def test_write(self, input_file, output_file):
-        """Test of writing CSR map to a YAML file."""
-        print('input_file:', input_file)
+    def test_write_json(self, tmpdir):
+        """Test of writing register map to a JSON file."""
+        output_file = str(tmpdir.join('map_out.json'))
         print('output_file:', output_file)
-        # read some CSR map
-        reader = CsrYamlReader()
-        rmap_orig = reader(input_file)
-        # write RegisterMap to a YAML file
-        writer = CsrYamlWriter()
-        writer(output_file, rmap_orig)
-        # read CSR map again and verify
-        rmap_test = reader(output_file)
-        assert rmap_test == rmap_orig
+        self._write(output_file)
+
+    def test_write_yaml(self, tmpdir):
+        """Test of writing register map to a YAML file."""
+        output_file = str(tmpdir.join('map_out.yaml'))
+        print('output_file:', output_file)
+        self._write(output_file)
 
 
-class TestBridgeVerilogWriter:
-    """Class 'BridgeVerilogWriter' testing."""
+class TestConfigurationWriter:
+    """Class 'ConfigurationWriter' testing."""
+
+    def _write(self, path):
+        # create config
+        config_orig = Configuration()
+        # write to file
+        ConfigurationWriter()(path, config_orig)
+        # read back
+        config_test = ConfigurationReader()(path)
+        assert config_orig == config_test
+
+    def test_write_json(self, tmpdir):
+        """Test of writing configuration to a JSON file."""
+        output_file = str(tmpdir.join('config_out.json'))
+        print('output_file:', output_file)
+        self._write(output_file)
+
+    def test_write_yaml(self, tmpdir):
+        """Test of writing configuration to a YAML file."""
+        output_file = str(tmpdir.join('config_out.yaml'))
+        print('output_file:', output_file)
+        self._write(output_file)
+
+
+class TestBridgeWriter:
+    """Class 'BridgeWriter' testing."""
 
     @pytest.fixture()
     def output_file(self, tmpdir):
-        return tmpdir.join('lb_bridge.v')
+        return
 
-    def test_apb_write(self, output_file):
+    def test_apb_write(self, tmpdir):
         """Test of creating bridge to LocalBus module in Verilog."""
+        output_file = str(tmpdir.join('apb2lb.v'))
         print('output_file:', output_file)
-        # create some CSR map
-        rmap = RegisterMap()
-        rmap.config['interface_generic']['type'].value = 'apb'
+        # create configuration
+        config = Configuration()
+        config['lb_bridge']['type'].value = 'apb'
         # write output file
-        writer = BridgeVerilogWriter()
-        writer(output_file, rmap)
-        # read CSR map again and verify
+        writer = LbBridgeWriter()
+        writer(output_file, config)
+        # read file and verify
         with open(output_file, 'r') as f:
             raw_str = ''.join(f.readlines())
         assert 'APB to Local Bus bridge' in raw_str

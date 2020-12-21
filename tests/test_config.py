@@ -219,9 +219,9 @@ class TestConfiguration:
         config = Configuration()
         new_values = {
             'read_filler': 42,
-            'address_calculation': {
-                'auto_increment_mode': 'custom',
-                'auto_increment_value': 16
+            'regmap': {
+                'address_increment_mode': 'custom',
+                'address_increment_value': 16
             },
             'parameter_a': 777,
             'group_a': {
@@ -235,32 +235,32 @@ class TestConfiguration:
         config.values = new_values
         print(config)
         assert new_values['read_filler'] == config['read_filler'].value
-        assert (new_values['address_calculation']['auto_increment_mode'] ==
-                config['address_calculation']['auto_increment_mode'].value)
+        assert (new_values['regmap']['address_increment_mode'] ==
+                config['regmap']['address_increment_mode'].value)
         assert new_values['group_a'] == config['group_a'].values
 
     def test_address_calculation_validator(self):
         config = Configuration()
         # no exception here
-        print(config['address_calculation']['auto_increment_mode'])
-        config['address_calculation']['auto_increment_mode'].value = 'data_width'
-        print(config['address_calculation']['auto_increment_mode'])
+        print(config['regmap']['address_increment_mode'])
+        config['regmap']['address_increment_mode'].value = 'data_width'
+        print(config['regmap']['address_increment_mode'])
         # exception on not allowed value
         with pytest.raises(ValueError):
-            config['address_calculation']['auto_increment_mode'].value = 'lalala'
+            config['regmap']['address_increment_mode'].value = 'lalala'
 
-    def test_interface_generic_validator(self):
+    def test_lb_bridge_type_validator(self):
         config = Configuration()
         # no exception here
-        print(config['interface_generic']['type'])
-        print(config['interface_generic']['data_width'])
-        config['interface_generic']['data_width'].value = 8
-        print(config['interface_generic']['data_width'])
-        config['interface_generic']['data_width'].value = 32
-        print(config['interface_generic']['data_width'])
+        print(config['lb_bridge']['type'])
+        print(config['data_width'])
+        config['data_width'].value = 8
+        print(config['data_width'])
+        config['data_width'].value = 32
+        print(config['data_width'])
         # change interface type
-        config['interface_generic']['type'].value = 'apb'
-        print(config['interface_generic']['type'])
+        config['lb_bridge']['type'].value = 'apb'
+        print(config['lb_bridge']['type'])
         # exception on not allowed value
         with pytest.raises(ValueError):
-            config['interface_generic']['data_width'].value = 64
+            config['data_width'].value = 64

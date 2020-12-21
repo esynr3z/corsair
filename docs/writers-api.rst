@@ -3,23 +3,23 @@
 Writers
 =======
 
-CsrJsonWriter
--------------
-.. autoclass:: corsair.CsrJsonWriter
+RegisterMapWriter
+-----------------
+.. autoclass:: corsair.RegisterMapWriter
    :members:
    :undoc-members:
    :show-inheritance:
 
-CsrYamlWriter
--------------
-.. autoclass:: corsair.CsrYamlWriter
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-BridgeVerilogWriter
+ConfigurationWriter
 -------------------
-.. autoclass:: corsair.BridgeVerilogWriter
+.. autoclass:: corsair.ConfigurationWriter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+LbBridgeWriter
+--------------
+.. autoclass:: corsair.LbBridgeWriter
    :members:
    :undoc-members:
    :show-inheritance:

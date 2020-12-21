@@ -1,12 +1,11 @@
 // Created with Corsair v{{ corsair_ver }}
-// CSR map file: {{ csr_name }} v{{ csr_ver }}
 //
 // APB to Local Bus bridge
 //
 
 module {{ module_name }} #(
-    parameter ADDR_W = {{ config['address_width'].value }},
-    parameter DATA_W = {{ config['data_width'].value }},
+    parameter ADDR_W = {{ addr_width }},
+    parameter DATA_W = {{ data_width }},
     parameter STRB_W = DATA_W / 8
 )(
     // APB
