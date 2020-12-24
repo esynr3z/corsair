@@ -154,8 +154,8 @@ class LbBridgeWriter(_Jinja2Writer):
 
         j2_vars['corsair_ver'] = __version__
         j2_vars['module_name'] = Path(path).stem
-        j2_vars['addr_width'] = config['address_width']
-        j2_vars['data_width'] = config['data_width']
+        j2_vars['addr_width'] = config['address_width'].value
+        j2_vars['data_width'] = config['data_width'].value
 
         print("OK")
 
