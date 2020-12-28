@@ -9,7 +9,7 @@ sys.path.append('../..')
 import tempfile
 import pytest
 from pathlib import Path
-from sim import Simulator
+from sim import Simulator, Simulation
 import corsair
 
 
@@ -45,5 +45,14 @@ def test_common(tmpdir, simtool, gui=False, validate=True):
 
 
 if __name__ == '__main__':
+    # run script with key -h to see help
     tmpdir = tempfile.gettempdir()
-    test_common(tmpdir, 'icarus', gui=True, validate=False)
+    tb_dict = {
+        'tb_common': lambda tool, gui: test_common(tmpdir, simtool=tool, gui=gui, validate=False),
+    }
+    sim = Simulation(
+        default_tb='tb_common',
+        default_tool='icarus',
+        default_gui=True,
+        tb_dict=tb_dict)
+    sim.run()

@@ -9,6 +9,7 @@ All simulator executables must be visible in PATH.
 import os
 import glob
 import subprocess
+import argparse
 from pathlib import Path
 
 
@@ -78,6 +79,37 @@ class Simulator:
     def _run_modelsim(self, gui=True):
         """Run Modelsim"""
         print('Run Modelsim')
+
+
+class Simulation:
+    """Run simulation with command line parameters."""
+    def __init__(self, default_tb='tb_default', default_tool='icarus', default_gui=True, tb_dict={}):
+        self.tb_dict = tb_dict
+
+        self.args_parser = argparse.ArgumentParser()
+        self.args_parser.add_argument('-t',
+                                      default=default_tb,
+                                      metavar='<name>',
+                                      dest='tb',
+                                      help="testbench <name>; default is '%s'" % default_tb)
+        self.args_parser.add_argument('-s',
+                                      default=default_tool,
+                                      metavar='<name>',
+                                      dest='tool',
+                                      help="simulation tool <name>; default is '%s'" % default_tool)
+        self.args_parser.add_argument('-b',
+                                      default=default_gui,
+                                      dest='gui',
+                                      action='store_false',
+                                      help='enable batch mode (no GUI)')
+
+    def run(self):
+        args = self.args_parser.parse_args()
+        try:
+            print("Start simulation for testbench '%s'" % args.tb)
+            self.tb_dict[args.tb](tool=args.tool, gui=args.gui)
+        except KeyError:
+            raise ValueError("Unknown testbench name '%s'" % args.tb)
 
 
 if __name__ == '__main__':
