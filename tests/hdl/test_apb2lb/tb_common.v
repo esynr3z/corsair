@@ -16,11 +16,7 @@ initial begin : main
         $display("!@# TEST FAILED #@!");
     else
         $display("!@# TEST PASSED #@!");
-    `ifdef __ICARUS__
-        $finish;
-    `else
-        $stop;
-    `endif
+    $finish;
 end
 
 `ifdef __ICARUS__

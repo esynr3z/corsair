@@ -7,6 +7,7 @@ All simulator executables must be visible in PATH.
 """
 
 import os
+import shutil
 import glob
 import subprocess
 import argparse
@@ -38,11 +39,28 @@ class Simulator:
     def clean(self):
         """Remove all build artifacts"""
         workdir = Path(self._cwd)
-        rm_list = []
-        rm_list += glob.glob(str(workdir / '*.vvp'))
-        rm_list += glob.glob(str(workdir / '*.vcd'))
-        for path in rm_list:
-            os.remove(path)
+        # remove files
+        rm_files = []
+        rm_files += glob.glob(str(workdir / '*.vvp'))
+        rm_files += glob.glob(str(workdir / '*.vcd'))
+        rm_files += glob.glob(str(workdir / '*.tcl'))
+        rm_files += glob.glob(str(workdir / '*.ini'))
+        rm_files += glob.glob(str(workdir / '*.wlf'))
+        rm_files += glob.glob(str(workdir / '*.do'))
+        rm_files += glob.glob(str(workdir / '*.vstf'))
+        rm_files += glob.glob(str(workdir / 'transcript'))
+        for f in rm_files:
+            os.remove(f)
+        # remove directories
+        rm_dirs = []
+        rm_dirs += [workdir / 'worklib']
+        for d in rm_dirs:
+            if d.exists() and d.is_dir():
+                shutil.rmtree(d)
+
+    def _get_file_ext(self, path):
+        _, ext = os.path.splitext(path)
+        return ext.lower()
 
     def _exec(self, prog, args):
         """Execute external program.
@@ -79,6 +97,49 @@ class Simulator:
     def _run_modelsim(self, gui=True):
         """Run Modelsim"""
         print('Run Modelsim')
+        # prepare compile script
+        defines = ' '.join(['+define+' + define for define in self.defines])
+        incdirs = ' '.join(['+incdir+' + incdir for incdir in self.incdirs])
+        sources = ''
+        for src in self.sources:
+            ext = self._get_file_ext(src)
+            if ext in ['.v', 'sv']:
+                sources += 'vlog %s %s -sv -timescale \"1 ns / 1 ps\" %s\n' % (defines, incdirs, src)
+            elif ext == 'vhd':
+                sources += 'vcom -93 %s\n' % src
+        if not gui:
+            run = 'run -all'
+        else:
+            run = ''
+        compile_tcl = """
+proc rr  {{}} {{
+  write format wave -window .main_pane.wave.interior.cs.body.pw.wf wave.do
+  uplevel #0 source compile.tcl
+}}
+proc q  {{}} {{quit -force                  }}
+vlib {worklib}
+vmap work {worklib}
+{sources}
+eval vsim {worklib}.{top}
+if [file exist wave.do] {{
+  source wave.do
+}}
+{run}
+"""
+        with open(Path(self._cwd) / 'compile.tcl', 'w') as f:
+            f.writelines(compile_tcl.format(worklib=self.worklib,
+                                            top=self.top,
+                                            incdirs=incdirs,
+                                            sources=sources,
+                                            defines=defines,
+                                            run=run))
+        vsim_args = '-do compile.tcl'
+        if not gui:
+            vsim_args += ' -c'
+            vsim_args += ' -onfinish exit'
+        else:
+            vsim_args += ' -onfinish stop'
+        self._exec('vsim', vsim_args)
 
 
 class Simulation:
