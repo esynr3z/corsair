@@ -14,7 +14,7 @@ module {{ module_name }} #(
     input               penable,
     input               pwrite,
     input  [DATA_W-1:0] pwdata,
-    input               pstrb,
+    input  [STRB_W-1:0] pstrb,
     output [DATA_W-1:0] prdata,
     output              pready,
     output              pslverr,

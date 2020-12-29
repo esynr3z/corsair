@@ -22,15 +22,27 @@ class Simulator:
         self._tool = tool
         self._cwd = os.path.dirname(os.path.realpath(__file__))
 
+        self.worklib = 'worklib'
+        self.top = 'top'
         self.sources = []
         self.defines = []
         self.incdirs = []
-        self.worklib = 'worklib'
-        self.top = 'top'
 
     def run(self, gui=True):
         """Run simulation"""
+        # remove previous simulation artifacts
         self.clean()
+        # add behavioral modules
+        self.sources += [
+            str(Path(self._cwd) / 'beh' / 'apb.sv')
+        ]
+        self.defines += [
+            'TOP_NAME=' + self.top
+        ]
+        self.incdirs += [
+            str(Path(self._cwd) / 'beh')
+        ]
+        # run selected simulator
         if self._tool == 'icarus':
             return self._run_icarus(gui)
         elif self._tool == 'modelsim':
@@ -103,7 +115,7 @@ class Simulator:
         sources = ''
         for src in self.sources:
             ext = self._get_file_ext(src)
-            if ext in ['.v', 'sv']:
+            if ext in ['.v', '.sv']:
                 sources += 'vlog %s %s -sv -timescale \"1 ns / 1 ps\" %s\n' % (defines, incdirs, src)
             elif ext == 'vhd':
                 sources += 'vcom -93 %s\n' % src
