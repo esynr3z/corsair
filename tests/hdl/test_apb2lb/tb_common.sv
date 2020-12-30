@@ -63,13 +63,94 @@ apb #(
 // Test body
 int errors = 0;
 
+task validate_write(
+    input logic [ADDR_W-1:0] addr,
+    input logic [DATA_W-1:0] data,
+    input logic [STRB_W-1:0] strb
+);
+    @(posedge clk);
+    wait(lb_wen && lb_wready);
+    @(posedge clk);
+    if (lb_waddr != addr)
+        errors++;
+    if (lb_wdata != data)
+        errors++;
+    if (lb_wstrb != strb)
+        errors++;
+endtask
+
+task handle_read(
+    input  logic [ADDR_W-1:0] addr,
+    input  int                waitstates = 1
+);
+    @(posedge clk);
+    wait(lb_ren);
+    repeat (waitstates) @(posedge clk);
+    lb_rvalid <= 1'b1;
+    case (addr)
+        'h008: lb_rdata <= 'hdeadbeef;
+        'h014: lb_rdata <= 'hc0debabe;
+    endcase
+    @(posedge clk);
+    lb_rdata  <= 0;
+    lb_rvalid <= 1'b0;
+endtask
+
 initial begin : main
+    logic [ADDR_W-1:0] addr;
+    logic [DATA_W-1:0] data;
+    logic [STRB_W-1:0] strb;
+
     wait(!rst);
-    #10;
 
-    apb_mst.write(32'h004, 32'hdeadbeef);
+    // test simple write
+    addr = 'h004;
+    data = 'hdeadbeef;
+    fork
+        apb_mst.write(addr, data);
+        validate_write(addr, data, {STRB_W{1'b1}});
+    join
 
-    #10;
+    // test write with byte strobes
+    addr = 'h00c;
+    data = 'hcafebabe;
+    strb = 'b0110;
+    fork
+        apb_mst.write(addr, data, strb);
+        validate_write(addr, data, strb);
+    join
+
+    // test write with wait states
+    addr = 'h010;
+    data = 'h0acce55;
+    fork
+        apb_mst.write(addr, data);
+        validate_write(addr, data, {STRB_W{1'b1}});
+        begin
+            lb_wready <= 1'b0;
+            repeat (5) @(posedge clk);
+            lb_wready <= 1'b1;
+        end
+    join
+
+    // test read
+    addr = 'h014;
+    fork
+        apb_mst.read(addr, data);
+        handle_read(addr);
+    join
+    if (data != 'hc0debabe)
+        errors++;
+
+    // test read with wait states
+    addr = 'h008;
+    fork
+        apb_mst.read(addr, data);
+        handle_read(addr, 5);
+    join
+    if (data != 'hdeadbeef)
+        errors++;
+
     if (errors)
         $display("!@# TEST FAILED #@!");
     else
