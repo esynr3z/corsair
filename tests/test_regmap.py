@@ -153,6 +153,31 @@ class TestBitField:
         bf = BitField('bf_a', lsb=5, width=4)
         assert bf.bits == [5, 6, 7, 8]
 
+    def test_byte_strobes(self):
+        """Test byte strobes info of the bit field."""
+        bf_a = BitField('bf_a', lsb=0, width=16)
+        bf_b = BitField('bf_b', lsb=0, width=13)
+        bf_c = BitField('bf_c', lsb=8, width=16)
+        bf_d = BitField('bf_d', lsb=14, width=14)
+        assert bf_a.byte_strobes == {0: {'bf_lsb': 0, 'bf_msb': 7,
+                                         'wdata_lsb': 0, 'wdata_msb': 7},
+                                     1: {'bf_lsb': 8, 'bf_msb': 15,
+                                         'wdata_lsb': 8, 'wdata_msb': 15}}
+        assert bf_b.byte_strobes == {0: {'bf_lsb': 0, 'bf_msb': 7,
+                                         'wdata_lsb': 0, 'wdata_msb': 7},
+                                     1: {'bf_lsb': 8, 'bf_msb': 12,
+                                         'wdata_lsb': 8, 'wdata_msb': 12}}
+        assert bf_c.byte_strobes == {1: {'bf_lsb': 0, 'bf_msb': 7,
+                                         'wdata_lsb': 8, 'wdata_msb': 15},
+                                     2: {'bf_lsb': 8, 'bf_msb': 15,
+                                         'wdata_lsb': 16, 'wdata_msb': 23}}
+        assert bf_d.byte_strobes == {1: {'bf_lsb': 0, 'bf_msb': 1,
+                                         'wdata_lsb': 14, 'wdata_msb': 15},
+                                     2: {'bf_lsb': 2, 'bf_msb': 9,
+                                         'wdata_lsb': 16, 'wdata_msb': 23},
+                                     3: {'bf_lsb': 10, 'bf_msb': 13,
+                                         'wdata_lsb': 24, 'wdata_msb': 27}}
+
 
 class TestRegister:
     """Class 'Register' testing."""

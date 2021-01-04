@@ -127,6 +127,22 @@ class BitField():
         return self.lsb + self.width - 1
 
     @property
+    def byte_strobes(self):
+        """Dictionary with LSB and MSB values for every byte in write data bus."""
+        strb = {}
+        first = self.lsb // 8
+        last = self.msb // 8
+        for i in range(first, last + 1):
+            # per every byte strobe
+            wdata_lsb = self.lsb if i == first else i * 8
+            wdata_msb = (i + 1) * 8 - 1 if ((i + 1) * 8 - 1 - self.msb) < 0 else self.msb
+            bf_lsb = wdata_lsb - self.lsb
+            bf_msb = wdata_msb - self.lsb
+            strb[i] = {'bf_lsb': bf_lsb, 'bf_msb': bf_msb,
+                       'wdata_lsb': wdata_lsb, 'wdata_msb': wdata_msb}
+        return strb
+
+    @property
     def access(self):
         """Bit field access mode."""
         return self._access
