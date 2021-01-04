@@ -103,7 +103,8 @@ class _Jinja2Writer():
         """
         print("  Load template ... ", end='')
         templates_path = str(Path(__file__).parent / 'templates')
-        j2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath=templates_path))
+        j2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath=templates_path),
+                                    trim_blocks=True, lstrip_blocks=True)
         j2_template = j2_env.get_template(template)
         print("OK")
 
@@ -156,6 +157,32 @@ class LbBridgeWriter(_Jinja2Writer):
         j2_vars['module_name'] = Path(path).stem
         j2_vars['addr_width'] = config['address_width'].value
         j2_vars['data_width'] = config['data_width'].value
+
+        print("OK")
+
+        self._render_to_file(j2_template, j2_vars, path)
+
+
+class HdlWriter(_Jinja2Writer):
+    """Create HDL file with register map.
+
+    Examples:
+
+    """
+    def __call__(self, path, rmap):
+        """Create register map in Verilog."""
+        j2_template = 'regmap_verilog.j2'
+
+        print("Write '%s' file with HdlWriter:" % path)
+        print("  Prepare data ... ", end='')
+
+        j2_vars = {}
+
+        j2_vars['corsair_ver'] = __version__
+        if not rmap.config['name'].value:
+            rmap.config['name'].value = Path(path).stem
+        j2_vars['rmap'] = rmap
+        j2_vars['config'] = rmap.config
 
         print("OK")
 

@@ -1,0 +1,134 @@
+{# MACRO #}
+{# 'always' header with reset logic #}
+{% macro always_begin(name, width=1, init=0) %}
+    {% set rst_type = config['register_reset'].value%}
+    {% if rst_type == 'init_only' %}
+always @(posedge clk) begin
+    {% else %}
+        {% if rst_type == 'sync_pos' %}
+always @(posedge clk) begin
+    if (rst) begin
+        {% elif rst_type == 'sync_neg' %}
+always @(posedge clk) begin
+    if (!rst) begin
+        {% elif rst_type == 'async_pos' %}
+always @(posedge clk or initposedge rst) begin
+    if (rst) begin
+        {% elif rst_type == 'async_neg' %}
+always @(posedge clk or negedge rst) begin
+    if (!rst) begin
+        {% endif %}
+        {{ name }} <= {{ width }}'h{{ '%x' % init }};
+    {% endif %}
+    end else
+{%- endmacro %}
+{# 'always' write part #}
+{% macro always_write(name, reg, bf) %}
+    {% if 'w' in bf.access %}
+if (lb_wen && (lb_waddr == {{ config['address_width'].value }}'h{{ '%x' % reg.address }})) begin
+        {% for num, val in bf.byte_strobes.items() %}
+        if (lb_wstrb[{{ num }}])
+            {{ name }}[{{ '%d:%d' % (val['bf_msb'], val['bf_lsb']) }}] <= lb_wdata[{{ '%d:%d' % (val['wdata_msb'], val['wdata_lsb']) }}];
+        {% endfor %}
+    {% endif %}
+    end
+{%- endmacro %}
+{# TEMPLATE #}
+// Created with Corsair v{{ corsair_ver }}
+// Register map module v{{ config['version'].value }}
+
+module {{ config['name'].value }} #(
+    parameter ADDR_W = {{ config['address_width'].value }},
+    parameter DATA_W = {{ config['data_width'].value }},
+    parameter STRB_W = DATA_W / 8
+)(
+    // System
+    input clk,
+{% if config['register_reset'].value != 'init_only' %}
+    input rst,
+{% endif %}
+{% for reg in rmap %}
+    // CSR: {{ reg.name }}
+    {% for bf in reg %}
+    output [{{ bf.width - 1}}:0] csr_{{ reg.name }}_{{ bf.name }},
+    {% endfor %}
+{% endfor %}
+    // Local Bus
+    input  [ADDR_W-1:0] lb_waddr,
+    input  [DATA_W-1:0] lb_wdata,
+    input               lb_wen,
+    input  [STRB_W-1:0] lb_wstrb,
+    output              lb_wready,
+    input  [ADDR_W-1:0] lb_raddr,
+    input               lb_ren,
+    output [DATA_W-1:0] lb_rdata,
+    output              lb_rvalid
+);
+
+{% for reg in rmap %}
+//------------------------------------------------------------------------------
+// {{ '0x%x' % reg.address }}
+// {{ reg.name }} - {{ reg.description }}
+//------------------------------------------------------------------------------
+wire [{{ config['data_width'].value - 1 }}:0] csr_{{ reg.name }};
+{# fill enused bits with zeros #}
+    {% set ns = namespace(last_bit=0) %}
+    {% for bf in reg %}
+        {% if bf.lsb > ns.last_bit %}
+assign csr_{{ reg.name }}[{{ bf.lsb - 1 }}:{{ ns.last_bit }}] = 0;
+        {% endif %}
+        {% set ns.last_bit = bf.msb + 1 %}
+    {% endfor %}
+    {% if config['data_width'].value - 1 > ns.last_bit %}
+assign csr_{{ reg.name }}[{{ config['data_width'].value - 1 }}:{{ ns.last_bit }}] = 0;
+    {% endif %}
+
+{# generate bit fields #}
+    {% for bf in reg %}
+//---------------------
+// {{ reg.name }}[{{ bf.msb }}:{{ bf.lsb }}] - {{ bf.name }} - {{ bf.description }}
+// {{ bf.access }}{{ ', ' + ', '.join(bf.modifiers) if bf.modifiers else '' }}
+//---------------------
+        {% if config['register_reset'].value == 'init_only' %}
+reg [{{ bf.width - 1 }}:0] csr_{{ reg.name }}_{{ bf.name }}_ff = {{ bf.width }}'h{{ '%x' % bf.initial }};
+        {% else %}
+reg [{{ bf.width - 1 }}:0] csr_{{ reg.name }}_{{ bf.name }}_ff;
+        {% endif %}
+assign csr_{{ reg.name }}[{{ bf.msb }}:{{ bf.lsb }}] = csr_{{ reg.name }}_{{ bf.name }}_ff;
+assign csr_{{ reg.name }}_{{ bf.name }} = csr_{{ reg.name }}_{{ bf.name }}_ff;
+
+{{ always_begin(name='csr_%s_%s_ff' % (reg.name, bf.name), width=bf.width, init=bf.initial
+)}} {{ always_write(name='csr_%s_%s_ff' % (reg.name, bf.name), reg=reg, bf=bf) }}
+end
+
+    {% endfor %}
+{% endfor %}
+//------------------------------------------------------------------------------
+// Read mux
+//------------------------------------------------------------------------------
+reg [{{ config['data_width'].value - 1 }}:0] lb_rdata_ff;
+{{ always_begin(name='lb_rdata', width=config['data_width'].value, init=config['regmap']['read_filler'].value
+)}} if (lb_ren) begin
+        case (lb_raddr)
+{% for reg in rmap %}
+            {{ config['address_width'].value }}'h{{ '%x' % reg.address }}: lb_rdata <= csr_{{ reg.name }};
+{% endfor %}
+            default: lb_rdata <= {{ config['data_width'].value }}'h{{ '%x' % config['regmap']['read_filler'].value }};
+        endcase
+    end else begin
+        lb_rdata <= {{ config['data_width'].value }}'h{{ '%x' % config['regmap']['read_filler'].value }};
+    end
+end
+assign lb_rdata = lb_rdata_ff;
+
+reg lb_rvalid_ff;
+{{ always_begin(name='lb_rvalid_ff'
+)}} if (lb_ren && lb_rvalid) begin
+        lb_rvalid_ff <= 1'b0;
+    end else if (lb_ren) begin
+        lb_rvalid_ff <= 1'b1;
+    end
+end
+assign lb_rvalid = lb_rvalid_ff;
+
+endmodule

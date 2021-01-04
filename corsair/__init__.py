@@ -31,5 +31,6 @@ from .readers import (
 from .writers import (
     RegisterMapWriter,
     ConfigurationWriter,
-    LbBridgeWriter
+    LbBridgeWriter,
+    HdlWriter
 )

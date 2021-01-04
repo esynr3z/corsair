@@ -285,7 +285,7 @@ class Configuration(ParameterGroup):
         )
 
         self.add_params([
-            Parameter(name='name', value='regs'),
+            Parameter(name='name', value=''),
             Parameter(name='version', value='1.0')]
         )
 
