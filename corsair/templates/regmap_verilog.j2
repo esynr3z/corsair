@@ -33,20 +33,33 @@ always @(posedge clk or negedge rst) begin
     if (!rst) begin
         {% endif %}
         {{ sig }} <= {{ literal(init, width) }};
-    {% endif %}
     end else
+    {%- endif %}
 {%- endmacro %}
 
 {#- 'always' part with write strobes #}
-{% macro always_write(sig, reg, bf) %}
+{% macro always_write(reg, bf) %}
     {% if 'w' in bf.access %}
-if (lb_wen && (lb_waddr == {{ literal(reg.address, config['address_width'].value) }})) begin
+ if (lb_wen && (lb_waddr == {{ literal(reg.address, config['address_width'].value) }})) begin
         {% for num, val in bf.byte_strobes.items() %}
         if (lb_wstrb[{{ num }}])
-            {{ sig }}{{ range(val['bf_msb'], val['bf_lsb']) }} <= lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }};
+            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb']) }} <= lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }};
         {% endfor %}
-    {% endif %}
+        {% if 'external_update' in bf.modifiers %}
+    end else
+        {%- else %}
     end
+        {%- endif %}
+    {%- endif %}
+{%- endmacro %}
+
+{#- 'always' part for external updates #}
+{% macro always_update(reg, bf) %}
+    {% if 'external_update' in bf.modifiers %}
+ if ({{ sig_bf_port_upd(reg, bf) }}) begin
+        {{ sig_bf_ff(reg, bf) }} <= {{ sig_bf_port_new(reg, bf) }};
+    end
+    {%- endif %}
 {%- endmacro %}
 
 {#- signal: csr for rdata bus #}
@@ -57,6 +70,16 @@ csr_{{ reg.name.lower() }}_rdata
 {#- signal: bitfield port out #}
 {% macro sig_bf_port_out(reg, bf) %}
 csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}
+{%- endmacro %}
+
+{#- signal: bitfield port new data for update #}
+{% macro sig_bf_port_new(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_new
+{%- endmacro %}
+
+{#- signal: bitfield port update enable #}
+{% macro sig_bf_port_upd(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_upd
 {%- endmacro %}
 
 {#- signal: bitfield flip-flops for write #}
@@ -85,6 +108,10 @@ module {{ config['name'].value }} #(
     // CSR: {{ reg.name }}
     {% for bf in reg %}
     output {{ range(bf.width - 1) }} {{ sig_bf_port_out(reg, bf) }},
+        {% if 'external_update' in bf.modifiers %}
+    input {{ range(bf.width - 1) }} {{ sig_bf_port_new(reg, bf) }},
+    input {{ sig_bf_port_upd(reg, bf) }},
+        {% endif %}
     {% endfor %}
 {% endfor %}
     // Local Bus
@@ -101,7 +128,7 @@ module {{ config['name'].value }} #(
 
 {% for reg in rmap %}
 //------------------------------------------------------------------------------
-// CSR
+// CSR:
 // [{{ '0x%x' % reg.address }}] - {{ reg.name }} - {{ reg.description }}
 //------------------------------------------------------------------------------
 wire {{ range(config['data_width'].value - 1) }} {{ sig_csr_rdata(reg) }};
@@ -120,7 +147,7 @@ assign {{ sig_csr_rdata(reg) }}{{ range(config['data_width'].value - 1, tmp.last
 {# generate bit fields #}
     {% for bf in reg %}
 //---------------------
-// Bit field
+// Bit field:
 // {{ reg.name }}[{{ bf.msb }}:{{ bf.lsb }}] - {{ bf.name }} - {{ bf.description }}
 // {{ bf.access }}{{ ', ' + ', '.join(bf.modifiers) if bf.modifiers else '' }}
 //---------------------
@@ -132,8 +159,10 @@ reg {{ range(bf.width - 1) }} {{ sig_bf_ff(reg, bf) }};
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_ff(reg, bf) }};
 assign {{ sig_bf_port_out(reg, bf) }} = {{ sig_bf_ff(reg, bf) }};
 
-{{ always_begin(sig=sig_bf_ff(reg, bf), width=bf.width, init=bf.initial
-)}} {{ always_write(sig=sig_bf_ff(reg, bf), reg=reg, bf=bf) }}
+{{ always_begin(sig=sig_bf_ff(reg, bf), width=bf.width, init=bf.initial)
+}}{{ always_write(reg, bf)
+}}{{ always_update(reg, bf)
+}}
 end
 
     {% endfor %}

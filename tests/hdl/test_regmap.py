@@ -28,14 +28,23 @@ def gen_rtl(tmpdir):
     config['lb_bridge']['type'].value = 'apb'
     rmap = corsair.RegisterMap(config)
 
-    # CSR LEN
-    csr_len = corsair.Register('LEN', 'Length of pulse', 0x0)
-    csr_len.add_bfields(corsair.BitField('VAL', 'CSR value', width=32, access='rw'))
-    rmap.add_regs(csr_len)
+    # CSR LENA
+    csr_lena = corsair.Register('LENA', 'Length of pulse A', 0x0)
+    csr_lena.add_bfields(corsair.BitField('VAL', 'CSR value', width=32, access='rw'))
+    rmap.add_regs(csr_lena)
+
+    # CSR LENB
+    csr_lenb = corsair.Register('LENB', 'Length of pulse B', 0x4)
+    csr_lenb.add_bfields(corsair.BitField('VAL', 'CSR value', lsb=8, width=16, initial=0xFFFF, access='rw'))
+    rmap.add_regs(csr_lenb)
 
     # CSR CNT
-    csr_cnt = corsair.Register('CNT', 'Counter', 0x4)
-    csr_cnt.add_bfields(corsair.BitField('VAL', 'CSR value', lsb=8, width=16, initial=0xFFFF, access='rw'))
+    csr_cnt = corsair.Register('CNT', 'Counter for events', 0x10)
+    csr_cnt.add_bfields([
+        corsair.BitField('EVA', 'Event A counter',
+                         lsb=0, width=12, initial=0x000, access='rw', modifiers=['external_update']),
+        corsair.BitField('EVB', 'Event B counter',
+                         lsb=16, width=12, initial=0x000, access='rw', modifiers=['external_update'])])
     rmap.add_regs(csr_cnt)
 
     regmap_path = str(Path(tmpdir) / 'regs.v')
