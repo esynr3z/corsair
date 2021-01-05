@@ -20,20 +20,23 @@ def simtool():
 
 def gen_regmap(tmpdir):
     config = corsair.Configuration()
-    config['version'].value = '42.0'
+    config['version'].value = '0.42'
+    config['data_width'].value = 32
+    config['address_width'].value = 12
+    config['regmap']['read_filler'].value = 0xdeadc0de
     rmap = corsair.RegisterMap(config)
 
-    regs = [corsair.Register('spam', 'Register spam', 0),
-            corsair.Register('eggs', 'Register eggs', 4)]
-    regs[0].add_bfields([
-        corsair.BitField('foo', 'Bit field foo', lsb=0, width=7, access='rw', initial=42),
-        corsair.BitField('bar', 'Bit field bar', lsb=24, width=4, access='rw')
-    ])
-    regs[1].add_bfields(corsair.BitField('baz', 'Bit field baz', lsb=16, width=16, access='rw'))
-    rmap = corsair.RegisterMap(config)
-    rmap.add_regs(regs)
+    # CSR LEN
+    csr_len = corsair.Register('LEN', 'Length of pulse', 0x0)
+    csr_len.add_bfields(corsair.BitField('VAL', 'CSR value', width=32, access='rw'))
+    rmap.add_regs(csr_len)
 
-    regmap_path = str(Path(tmpdir) / 'regmap.v')
+    # CSR CNT
+    csr_cnt = corsair.Register('CNT', 'Counter', 0x4)
+    csr_cnt.add_bfields(corsair.BitField('VAL', 'CSR value', lsb=8, width=16, access='rw'))
+    rmap.add_regs(csr_cnt)
+
+    regmap_path = str(Path(tmpdir) / 'regs.v')
     corsair.HdlWriter()(regmap_path, rmap)
     return (regmap_path, rmap)
 
