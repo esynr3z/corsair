@@ -2,3 +2,5 @@ sphinx
 sphinx_rtd_theme
 m2r2
 sphinxcontrib-wavedrom
+pyyaml
+jinja2
