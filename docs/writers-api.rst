@@ -23,3 +23,10 @@ LbBridgeWriter
    :members:
    :undoc-members:
    :show-inheritance:
+
+HdlWriter
+--------------
+.. autoclass:: corsair.HdlWriter
+   :members:
+   :undoc-members:
+   :show-inheritance:

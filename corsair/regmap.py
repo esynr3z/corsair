@@ -438,6 +438,7 @@ class RegisterMap():
         Create a register map:
 
         >>> rmap = RegisterMap()
+        >>> rmap.config['name'].value = 'regs'
         >>> rmap.add_regs([
         ...     Register('reg_a', 'Register A', address=0),
         ...     Register('reg_b', 'Register B', address=4)
@@ -472,14 +473,11 @@ class RegisterMap():
         reg_a
         reg_b
 
-    Attributes:
-        name: Name of a map.
-        version: Version of a map.
     """
     def __init__(self, config=Configuration()):
         self.config = config
-        self.name = config['name'].value
-        self.version = config['version'].value
+        self.name = self.config['name'].value
+        self.version = self.config['version'].value
         self._regs = []
 
     def __eq__(self, other):
@@ -495,7 +493,7 @@ class RegisterMap():
             return not self.__eq__(other)
 
     def __repr__(self):
-        return 'RegisterMap(%s, %s, %s)' % (repr(self.name), repr(self.version), repr(self.config))
+        return 'RegisterMap(%s)' % (repr(self.config))
 
     def __str__(self):
         return self.as_str()
@@ -505,7 +503,7 @@ class RegisterMap():
         inner_indent = indent + '  '
         regs = [reg.as_str(inner_indent) for reg in self.regs]
         regs_str = '\n'.join(regs) if regs else inner_indent + 'empty'
-        return indent + '%s: v%s\n' % (self.name, self.version) + regs_str
+        return indent + '%s: v%s\n' % (self.config['name'].value, self.config['version'].value) + regs_str
 
     def as_dict(self):
         """Returns register map as a dictionary."""

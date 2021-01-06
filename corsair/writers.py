@@ -167,7 +167,14 @@ class HdlWriter(_Jinja2Writer):
     """Create HDL file with register map.
 
     Examples:
-
+        >>> rmap = RegisterMap()
+        >>> writer = HdlWriter()
+        >>> writer('_build/doctest/regs.v', rmap)
+        Write '_build/doctest/regs.v' file with HdlWriter:
+          Prepare data ... OK
+          Load template ... OK
+          Render text ... OK
+          Save data to file ... OK
     """
     def __call__(self, path, rmap):
         """Create register map in Verilog."""
