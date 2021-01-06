@@ -1,10 +1,19 @@
 {# MACRO #}
-{#- vector range #}
-{% macro range(high, low=0) %}
-    {% if high == low and low != 0 %}
-[{{ high }}]
-    {%- elif high != low %}
-[{{ high }}:{{ low }}]
+{#- vector range for select operations #}
+{% macro range(msb, lsb, is_vector=true) %}
+    {% if is_vector %}
+        {% if msb == lsb %}
+[{{ msb }}]
+        {%- else %}
+[{{ msb }}:{{ lsb }}]
+        {%- endif %}
+    {%- endif %}
+{%- endmacro %}
+
+{#- vector range for declarations #}
+{% macro range_decl(msb, is_vector=true) %}
+    {% if is_vector %}
+[{{ msb }}:0]
     {%- endif %}
 {%- endmacro %}
 
@@ -66,16 +75,16 @@ always @(posedge clk or negedge rst) begin
         {% for num, val in bf.byte_strobes.items() %}
             {% if 'write1_to_clear' in bf.modifiers %}
         if (lb_wstrb[{{ num }}] && lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }})
-            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb']) }} <= {{ zeros(val['bf_msb'] - val['bf_lsb'] + 1) }};
+            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= {{ zeros(val['bf_msb'] - val['bf_lsb'] + 1) }};
             {% elif 'write1_to_set' in bf.modifiers %}
         if (lb_wstrb[{{ num }}] && lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }})
-            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb']) }} <= {{ ones(val['bf_msb'] - val['bf_lsb'] + 1) }};
+            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= {{ ones(val['bf_msb'] - val['bf_lsb'] + 1) }};
             {% elif 'write1_to_toggle' in bf.modifiers %}
         if (lb_wstrb[{{ num }}] && lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }})
-            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb']) }} <= ~{{ sig_bf_ff(reg, bf) }};
+            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= ~{{ sig_bf_ff(reg, bf) }};
             {% else %}
         if (lb_wstrb[{{ num }}])
-            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb']) }} <= lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }};
+            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }};
             {% endif %}
         {% endfor %}
         {% if 'external_update' in bf.modifiers %}
@@ -91,6 +100,15 @@ always @(posedge clk or negedge rst) begin
     {% if 'external_update' in bf.modifiers %}
  if ({{ sig_bf_port_upd(reg, bf) }}) begin
         {{ sig_bf_ff(reg, bf) }} <= {{ sig_bf_port_new(reg, bf) }};
+    end
+    {%- endif %}
+{%- endmacro %}
+
+{#- 'always' part for self clear #}
+{% macro always_clear(reg, bf) %}
+    {% if 'self_clear' in bf.modifiers %}
+ else begin
+        {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
     end
     {%- endif %}
 {%- endmacro %}
@@ -140,9 +158,9 @@ module {{ config['name'].value }} #(
 {% for reg in rmap %}
     // CSR: {{ reg.name }}
     {% for bf in reg %}
-    output {{ range(bf.width - 1) }} {{ sig_bf_port_out(reg, bf) }},
+    output {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_out(reg, bf) }},
         {% if 'external_update' in bf.modifiers %}
-    input {{ range(bf.width - 1) }} {{ sig_bf_port_new(reg, bf) }},
+    input {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_new(reg, bf) }},
     input {{ sig_bf_port_upd(reg, bf) }},
         {% endif %}
     {% endfor %}
@@ -164,7 +182,7 @@ module {{ config['name'].value }} #(
 // CSR:
 // [{{ '0x%x' % reg.address }}] - {{ reg.name }} - {{ reg.description }}
 //------------------------------------------------------------------------------
-wire {{ range(config['data_width'].value - 1) }} {{ sig_csr_rdata(reg) }};
+wire {{ range_decl(config['data_width'].value - 1) }} {{ sig_csr_rdata(reg) }};
 {# fill unused bits with zeros #}
     {% set tmp.last_bit = 0 %}
     {% for bf in reg %}
@@ -185,16 +203,21 @@ assign {{ sig_csr_rdata(reg) }}{{ range(config['data_width'].value - 1, tmp.last
 // {{ bf.access }}{{ ', ' + ', '.join(bf.modifiers) if bf.modifiers else '' }}
 //---------------------
         {% if config['register_reset'].value == 'init_only' %}
-reg {{ range( bf.width - 1) }} {{ sig_bf_ff(reg, bf) }} = {{ literal(bf.initial, bf.width) }};
+reg {{ range_decl( bf.width - 1, bf.is_vector()) }} {{ sig_bf_ff(reg, bf) }} = {{ literal(bf.initial, bf.width) }};
         {% else %}
-reg {{ range(bf.width - 1) }} {{ sig_bf_ff(reg, bf) }};
+reg {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_ff(reg, bf) }};
         {% endif %}
+        {% if bf.access == 'wo' %}
+assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ zeros(bf.width) }};
+        {% else %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_ff(reg, bf) }};
+        {% endif %}
 assign {{ sig_bf_port_out(reg, bf) }} = {{ sig_bf_ff(reg, bf) }};
 
 {{ always_begin(sig=sig_bf_ff(reg, bf), width=bf.width, init=bf.initial)
 }}{{ always_write(reg, bf)
 }}{{ always_update(reg, bf)
+}}{{ always_clear(reg, bf)
 }}
 end
 
@@ -208,7 +231,7 @@ assign lb_wready = 1'b1;
 //------------------------------------------------------------------------------
 // Read address decoder
 //------------------------------------------------------------------------------
-reg {{ range(config['data_width'].value - 1) }} lb_rdata_ff;
+reg {{ range_decl(config['data_width'].value - 1) }} lb_rdata_ff;
 {{ always_begin(sig='lb_rdata_ff', width=config['data_width'].value, init=config['regmap']['read_filler'].value
 )}} if (lb_ren) begin
         case (lb_raddr)

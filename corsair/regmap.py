@@ -226,6 +226,10 @@ class BitField():
         """Returns list with all bits positions used by a bit field"""
         return list(range(self.lsb, self.msb + 1))
 
+    def is_vector(self):
+        """Returns True if bit fields's width > 1."""
+        return True if self.width > 1 else False
+
 
 class Register():
     """Control and status register.

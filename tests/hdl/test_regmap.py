@@ -58,6 +58,15 @@ def gen_rtl(tmpdir):
                          lsb=16, width=1, access='rw', modifiers=['external_update', 'write1_to_toggle'])])
     rmap.add_regs(csr_ctl)
 
+    # CSR START
+    csr_start = corsair.Register('START', 'START some process', 0x30)
+    csr_start.add_bfields([
+        corsair.BitField('EN', 'Start some process A',
+                         lsb=0, width=1, access='wo', modifiers=['self_clear']),
+        corsair.BitField('KEY', 'Secret key',
+                         lsb=16, width=16, access='wo')])
+    rmap.add_regs(csr_start)
+
     regmap_path = str(Path(tmpdir) / 'regs.v')
     corsair.HdlWriter()(regmap_path, rmap)
 
@@ -66,10 +75,9 @@ def gen_rtl(tmpdir):
     return (regmap_path, apb2lb_path, rmap.config)
 
 
-def test_rw(tmpdir, simtool, gui=False, validate=True):
+def _test(tb_name, tmpdir, simtool, gui=False, validate=True):
     tb_dir = Path(__file__).parent / Path(__file__).stem
-    tb_dir_path = str(tb_dir)
-    tb_name = 'tb_rw'
+    tb_dir_path = str(tb_dir.resolve())
     tb_filename = tb_name + '.sv'
     tb_path = str(tb_dir / tb_filename)
     dut_path, bridge_path, config = gen_rtl(tmpdir)
@@ -86,11 +94,22 @@ def test_rw(tmpdir, simtool, gui=False, validate=True):
         assert '!@# TEST PASSED #@!' in sim.stdout
 
 
+def test_rw(tmpdir, simtool, gui=False, validate=True):
+    tb_name = 'tb_rw'
+    _test(tb_name, tmpdir=tmpdir, simtool=simtool, gui=gui, validate=validate)
+
+
+def test_wo(tmpdir, simtool, gui=False, validate=True):
+    tb_name = 'tb_wo'
+    _test(tb_name, tmpdir=tmpdir, simtool=simtool, gui=gui, validate=validate)
+
+
 if __name__ == '__main__':
     # run script with key -h to see help
     tmpdir = tempfile.gettempdir()
     tb_dict = {
         'tb_rw': lambda tool, gui: test_rw(tmpdir, simtool=tool, gui=gui, validate=False),
+        'tb_wo': lambda tool, gui: test_wo(tmpdir, simtool=tool, gui=gui, validate=False),
     }
     sim = Simulation(
         default_tb='tb_rw',
