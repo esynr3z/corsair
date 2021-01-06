@@ -29,23 +29,34 @@ def gen_rtl(tmpdir):
     rmap = corsair.RegisterMap(config)
 
     # CSR LENA
-    csr_lena = corsair.Register('LENA', 'Length of pulse A', 0x0)
+    csr_lena = corsair.Register('LENA', 'Length of some pulse A', 0x0)
     csr_lena.add_bfields(corsair.BitField('VAL', 'CSR value', width=32, access='rw'))
     rmap.add_regs(csr_lena)
 
     # CSR LENB
-    csr_lenb = corsair.Register('LENB', 'Length of pulse B', 0x4)
+    csr_lenb = corsair.Register('LENB', 'Length of some pulse B', 0x4)
     csr_lenb.add_bfields(corsair.BitField('VAL', 'CSR value', lsb=8, width=16, initial=0xFFFF, access='rw'))
     rmap.add_regs(csr_lenb)
 
     # CSR CNT
-    csr_cnt = corsair.Register('CNT', 'Counter for events', 0x10)
+    csr_cnt = corsair.Register('CNT', 'Counter for some events', 0x10)
     csr_cnt.add_bfields([
-        corsair.BitField('EVA', 'Event A counter',
+        corsair.BitField('EVA', 'Some event A counter',
                          lsb=0, width=12, initial=0x000, access='rw', modifiers=['external_update']),
-        corsair.BitField('EVB', 'Event B counter',
+        corsair.BitField('EVB', 'Some event B counter',
                          lsb=16, width=12, initial=0x000, access='rw', modifiers=['external_update'])])
     rmap.add_regs(csr_cnt)
+
+    # CSR CTL
+    csr_ctl = corsair.Register('CTL', 'Control something', 0x20)
+    csr_ctl.add_bfields([
+        corsair.BitField('DONE', 'Something is done status',
+                         lsb=3, width=1, access='rw', modifiers=['external_update', 'write1_to_clear']),
+        corsair.BitField('GEN', 'Generate something',
+                         lsb=5, width=1, access='rw', modifiers=['external_update', 'write1_to_set']),
+        corsair.BitField('MODE', 'Mode of something',
+                         lsb=16, width=1, access='rw', modifiers=['external_update', 'write1_to_toggle'])])
+    rmap.add_regs(csr_ctl)
 
     regmap_path = str(Path(tmpdir) / 'regs.v')
     corsair.HdlWriter()(regmap_path, rmap)

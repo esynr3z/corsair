@@ -182,6 +182,7 @@ class BitField():
         allowlist = [
             'self_clear',
             'write1_to_clear',
+            'write1_to_set',
             'write1_to_toggle',
             'read_to_clear',
             'read_const',
@@ -198,6 +199,7 @@ class BitField():
                 [],
                 ['external_update'],
                 ['external_update', 'write1_to_clear'],
+                ['external_update', 'write1_to_set'],
                 ['external_update', 'write1_to_toggle'],
                 ['memory']
             ],

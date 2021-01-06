@@ -245,6 +245,7 @@ Options for ``modifiers``:
 ================== ===========================================================================================================================================
 "self_clear"       Write 0 - no effect, write 1 - next tick self clear.
 "write1_to_clear"  Write 0 - no effect, write 1 - current value will be cleared.
+"write1_to_set"    Write 0 - no effect, write 1 - current value will be set.
 "write1_to_toggle" Write 0 - no effect, write 1 - current value will be inversed.
 "read_to_clear"    Any CSR read - current value will be cleared.
 "read_const"       Use "initial" as only value can be readen.
@@ -263,6 +264,8 @@ How ``modifiers`` can be combined with ``access``:
 |            | ["external_update"]                       |
 |            +-------------------------------------------+
 |            | ["external_update", "write1_to_clear"]    |
+|            +-------------------------------------------+
+|            | ["external_update", "write1_to_set"]      |
 |            +-------------------------------------------+
 |            | ["external_update", "write1_to_toggle"]   |
 |            +-------------------------------------------+

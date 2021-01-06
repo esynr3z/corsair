@@ -1,7 +1,11 @@
 {# MACRO #}
 {#- vector range #}
 {% macro range(high, low=0) %}
+    {% if high == low and low != 0 %}
+[{{ high }}]
+    {%- elif high != low %}
 [{{ high }}:{{ low }}]
+    {%- endif %}
 {%- endmacro %}
 
 {#- literal #}
@@ -10,6 +14,24 @@
 1'b{{ val }}
     {%- else %}
 {{ width}}'h{{ '%x' % val }}
+    {%- endif %}
+{%- endmacro %}
+
+{#- special literal for all zeros #}
+{% macro zeros(width=1) %}
+    {% if width == 1 %}
+1'b0
+    {%- else %}
+{{ width }}'h0
+    {%- endif %}
+{%- endmacro %}
+
+{#- special literal for all ones #}
+{% macro ones(width=1) %}
+    {% if width == 1 %}
+1'b1
+    {%- else %}
+{{ "{%d{1'b1}}" % width }}
     {%- endif %}
 {%- endmacro %}
 
@@ -42,8 +64,19 @@ always @(posedge clk or negedge rst) begin
     {% if 'w' in bf.access %}
  if (lb_wen && (lb_waddr == {{ literal(reg.address, config['address_width'].value) }})) begin
         {% for num, val in bf.byte_strobes.items() %}
+            {% if 'write1_to_clear' in bf.modifiers %}
+        if (lb_wstrb[{{ num }}] && lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }})
+            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb']) }} <= {{ zeros(val['bf_msb'] - val['bf_lsb'] + 1) }};
+            {% elif 'write1_to_set' in bf.modifiers %}
+        if (lb_wstrb[{{ num }}] && lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }})
+            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb']) }} <= {{ ones(val['bf_msb'] - val['bf_lsb'] + 1) }};
+            {% elif 'write1_to_toggle' in bf.modifiers %}
+        if (lb_wstrb[{{ num }}] && lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }})
+            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb']) }} <= ~{{ sig_bf_ff(reg, bf) }};
+            {% else %}
         if (lb_wstrb[{{ num }}])
             {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb']) }} <= lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }};
+            {% endif %}
         {% endfor %}
         {% if 'external_update' in bf.modifiers %}
     end else
@@ -136,19 +169,19 @@ wire {{ range(config['data_width'].value - 1) }} {{ sig_csr_rdata(reg) }};
     {% set tmp.last_bit = 0 %}
     {% for bf in reg %}
         {% if bf.lsb > tmp.last_bit %}
-assign {{ sig_csr_rdata(reg) }}{{ range(bf.lsb - 1, tmp.last_bit) }} = {{ literal(0, bf.lsb - tmp.last_bit) }};
+assign {{ sig_csr_rdata(reg) }}{{ range(bf.lsb - 1, tmp.last_bit) }} = {{ zeros(bf.lsb - tmp.last_bit) }};
         {% endif %}
         {% set tmp.last_bit = bf.msb + 1 %}
     {% endfor %}
     {% if config['data_width'].value - 1 > tmp.last_bit %}
-assign {{ sig_csr_rdata(reg) }}{{ range(config['data_width'].value - 1, tmp.last_bit) }} = {{ literal(0, config['data_width'].value - tmp.last_bit) }};
+assign {{ sig_csr_rdata(reg) }}{{ range(config['data_width'].value - 1, tmp.last_bit) }} = {{ zeros(config['data_width'].value - tmp.last_bit) }};
     {% endif %}
 
 {# generate bit fields #}
     {% for bf in reg %}
 //---------------------
 // Bit field:
-// {{ reg.name }}[{{ bf.msb }}:{{ bf.lsb }}] - {{ bf.name }} - {{ bf.description }}
+// {{ reg.name }}{{ range(bf.msb, bf.lsb) }} - {{ bf.name }} - {{ bf.description }}
 // {{ bf.access }}{{ ', ' + ', '.join(bf.modifiers) if bf.modifiers else '' }}
 //---------------------
         {% if config['register_reset'].value == 'init_only' %}

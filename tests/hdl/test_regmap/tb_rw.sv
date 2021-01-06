@@ -37,6 +37,16 @@ logic [11:0] csr_cnt_evb;
 logic [11:0] csr_cnt_evb_new = 0;
 logic csr_cnt_evb_upd = 0;
 
+logic csr_ctl_done;
+logic csr_ctl_done_new = 0;
+logic csr_ctl_done_upd = 0;
+logic csr_ctl_gen;
+logic csr_ctl_gen_new = 0;
+logic csr_ctl_gen_upd = 0;
+logic csr_ctl_mode;
+logic csr_ctl_mode_new = 0;
+logic csr_ctl_mode_upd = 0;
+
 regs dut (
     // System
     .clk (clk),
@@ -52,6 +62,16 @@ regs dut (
     .csr_cnt_evb     (csr_cnt_evb),
     .csr_cnt_evb_new (csr_cnt_evb_new),
     .csr_cnt_evb_upd (csr_cnt_evb_upd),
+    // CSR: CTL
+    .csr_ctl_done     (csr_ctl_done),
+    .csr_ctl_done_new (csr_ctl_done_new),
+    .csr_ctl_done_upd (csr_ctl_done_upd),
+    .csr_ctl_gen      (csr_ctl_gen),
+    .csr_ctl_gen_new  (csr_ctl_gen_new),
+    .csr_ctl_gen_upd  (csr_ctl_gen_upd),
+    .csr_ctl_mode     (csr_ctl_mode),
+    .csr_ctl_mode_new (csr_ctl_mode_new),
+    .csr_ctl_mode_upd (csr_ctl_mode_upd),
     // Local Bus
     .lb_waddr   (lb_waddr),
     .lb_wdata   (lb_wdata),
@@ -218,12 +238,78 @@ task test_ext_upd;
         errors++;
 endtask
 
+// test RW registers with write1_to_xxx modifier
+task test_write1;
+    $display("%t, Start write1 to set/clear/toggle tests!", $time);
+    // test CTL register
+    // hardware set, then write 1 to clear
+    addr = 'h20;
+    @(posedge clk);
+    csr_ctl_done_upd = 1;
+    csr_ctl_done_new = 1;
+    @(posedge clk);
+    csr_ctl_done_upd = 0;
+    @(posedge clk);
+    if (csr_ctl_done != 1)
+        errors++;
+    apb_mst.read(addr, data);
+    if (((data >> 3) & 1) != 1)
+        errors++;
+    data = 1 << 3;
+    apb_mst.write(addr, data);
+    @(posedge clk);
+    if (csr_ctl_done != 0)
+        errors++;
+    apb_mst.read(addr, data);
+    if (((data >> 3) & 1) != 0)
+        errors++;
+
+    // write 1 to set, then hardware clear
+    data = 1 << 5;
+    apb_mst.write(addr, data);
+    @(posedge clk);
+    if (csr_ctl_gen != 1)
+        errors++;
+    apb_mst.read(addr, data);
+    if (((data >> 5) & 1) != 1)
+        errors++;
+    @(posedge clk);
+    csr_ctl_gen_upd = 1;
+    csr_ctl_gen_new = 0;
+    @(posedge clk);
+    csr_ctl_gen_upd = 0;
+    @(posedge clk);
+    if (csr_ctl_gen != 0)
+        errors++;
+    apb_mst.read(addr, data);
+    if (((data >> 5) & 1) != 0)
+        errors++;
+
+    // write 1 several time to toggle
+    data = 1 << 16;
+    apb_mst.write(addr, data);
+    @(posedge clk);
+    if (csr_ctl_mode != 1)
+        errors++;
+    apb_mst.read(addr, data);
+    if (((data >> 16) & 1) != 1)
+        errors++;
+    apb_mst.write(addr, data);
+    @(posedge clk);
+    if (csr_ctl_mode != 0)
+        errors++;
+    apb_mst.read(addr, data);
+    if (((data >> 16) & 1) != 0)
+        errors++;
+endtask
+
 initial begin : main
     wait(!rst);
     repeat(5) @(posedge clk);
 
     test_basic();
     test_ext_upd();
+    test_write1();
 
     repeat(5) @(posedge clk);
     if (errors)
