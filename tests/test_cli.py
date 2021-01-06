@@ -75,6 +75,15 @@ class TestRegisterMap(_TestCLI):
         exit_code = self._run_cli(['--regmap', rmap_new])
         assert exit_code == 0
 
+    def test_create_hdl(self, datadir, tmpdir, capsys):
+        """Create register map verilog map.v file."""
+        rmap_file = str(datadir.join('map.json'))
+        exit_code = self._run_cli(['-r', rmap_file, '--output-dir', str(tmpdir), '--hdl'])
+        captured = capsys.readouterr()
+        assert exit_code == 0
+        assert 'Read registers ... OK' in captured.out
+        assert 'Save data to file ... OK' in captured.out
+
 
 class TestConfig(_TestCLI):
     """Configuration related testing."""

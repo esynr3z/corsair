@@ -30,41 +30,45 @@ def parse_arguments():
                         action='version',
                         version='%(prog)s v' + corsair.__version__)
     parser.add_argument('-r', '--regmap',
-                        metavar='file',
+                        metavar='<file>',
                         dest='regmap',
-                        help='read register map from input file')
+                        help='read register map from input <file>')
     parser.add_argument('-c', '--config',
-                        metavar='file',
+                        metavar='<file>',
                         dest='config',
-                        help='read configuration from file')
+                        help='read configuration from <file>')
     parser.add_argument('--template-regmap',
-                        metavar='file',
+                        metavar='<file>',
                         dest='template_regmap',
-                        help='create register map template file')
+                        help='create register map template <file>')
     parser.add_argument('--template-config',
-                        metavar='file',
+                        metavar='<file>',
                         dest='template_config',
-                        help='create configuration template file')
+                        help='create configuration template <file>')
     parser.add_argument('--dump-regmap',
-                        metavar='file',
+                        metavar='<file>',
                         dest='dump_regmap',
-                        help='dump register map to file')
+                        help='dump register map to <file>')
     parser.add_argument('--dump-config',
-                        metavar='file',
+                        metavar='<file>',
                         dest='dump_config',
-                        help='dump configuration to file')
+                        help='dump configuration to <file>')
+    parser.add_argument('--output-dir',
+                        metavar='<dir>',
+                        dest='outdir',
+                        help='save all generated artifacts to <dir>')
     parser.add_argument('--hdl',
                         dest='hdl',
                         action='store_true',
-                        help='create HDL module with register map')
+                        help='generate HDL module with register map')
     parser.add_argument('--lb-bridge',
                         dest='lb_bridge',
                         action='store_true',
-                        help='create HDL module with bridge to LocalBus')
+                        help='generate HDL module with bridge to LocalBus')
     parser.add_argument('--docs',
                         dest='docs',
                         action='store_true',
-                        help='create docs for register map')
+                        help='generate docs for register map')
 
     # check if no arguments provided
     if len(sys.argv) == 1:
@@ -131,18 +135,29 @@ def main():
         corsair.ConfigurationWriter()(args.dump_config, rmap.config)
 
     # prepare for artifacts generation
-    if args.regmap:
-        outdir = Path(args.regmap).parent
-    elif args.config:
-        outdir = Path(args.config).parent
-    if 'name' in config.names:
-        outname = config['name'].value
-    else:
-        outname = Path(args.regmap).stem
+    if args.regmap or args.config:
+        # output directory
+        if args.outdir:
+            outdir = Path(args.outdir)
+        elif args.regmap:
+            outdir = Path(args.regmap).parent
+        elif args.config:
+            outdir = Path(args.config).parent
+        # output file base name
+        if config['name']:
+            outname = config['name'].value
+        elif args.regmap:
+            outname = Path(args.regmap).stem
+            config['name'].value = outname
+        elif args.config:
+            outname = Path(args.config).stem
+            config['name'].value = outname
 
     # create register map HDL
     if args.hdl:
-        pass
+        hdl_name = '%s.v' % outname
+        hdl_path = str(outdir / hdl_name)
+        corsair.HdlWriter()(hdl_path, rmap)
 
     # create bridge to LocalBus HDL
     if args.lb_bridge:
