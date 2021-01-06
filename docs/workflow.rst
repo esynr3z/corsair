@@ -13,14 +13,14 @@ It is as easy as:
 
 ::
 
-    corsair --template-regmap ip_regs.json
+    corsair --template-regmap regs.json
 
-* Make changes to ``ip_regs.json``
+* Make changes to ``regs.json``
 * Generate output artifacts:
 
 ::
 
-    corsair -r ip_regs.json --hdl --lb-bridge --docs
+    corsair -r regs.json --hdl --lb-bridge --docs
 
 * You will get:
     * Register map HDL code

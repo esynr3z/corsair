@@ -61,9 +61,12 @@ List of default parameters and groups (relative to configuration root):
 name
 ----
 
-Base name of the register map. Will be used to create names of all output artifacts.
+Base name of the register map. Will be used as basic name to create names for all output artifacts.
 
-**Default value**: "regs".
+**Default value**: "".
+
+.. note::
+    If no name is provided, name of a register map description file (or configuration file) will be used instead.
 
 version
 -------
@@ -90,13 +93,6 @@ Choice of:
 ==================== ================================================================
 
 **Default value**: "sync_pos".
-
-data_width
-----------
-
-Data width of the words inside register map.
-
-**Default value**: 32.
 
 data_width
 ----------
