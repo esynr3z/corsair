@@ -250,7 +250,6 @@ Options for ``modifiers``:
 "read_to_clear"    Any CSR read - current value will be cleared.
 "read_const"       Use "initial" as only value can be readen.
 "external_update"  Register can be updated outside the map with some "data" bus and "update" signal.
-"memory"           Access to memory. Read with some "data" bus, "read_enable" and "data_valid" signals. Write with some "data" bus and "write_enable" signals.
 ================== ===========================================================================================================================================
 
 
@@ -268,14 +267,10 @@ How ``modifiers`` can be combined with ``access``:
 |            | ["external_update", "write1_to_set"]      |
 |            +-------------------------------------------+
 |            | ["external_update", "write1_to_toggle"]   |
-|            +-------------------------------------------+
-|            | ["memory"]                                |
 +------------+-------------------------------------------+
 | "wo"       | [] (no modifiers)                         |
 |            +-------------------------------------------+
 |            | ["self_clear"]                            |
-|            +-------------------------------------------+
-|            | ["memory"]                                |
 +------------+-------------------------------------------+
 | "ro"       | [] (no modifiers)                         |
 |            +-------------------------------------------+
@@ -284,6 +279,4 @@ How ``modifiers`` can be combined with ``access``:
 |            | ["external_update"]                       |
 |            +-------------------------------------------+
 |            | ["external_update", "read_to_clear"]      |
-|            +-------------------------------------------+
-|            | ["memory"]                                |
 +------------+-------------------------------------------+

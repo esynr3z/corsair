@@ -187,7 +187,6 @@ class BitField():
             'read_to_clear',
             'read_const',
             'external_update',
-            'memory'
         ]
         for v in value:
             if v not in allowlist:
@@ -201,19 +200,16 @@ class BitField():
                 ['external_update', 'write1_to_clear'],
                 ['external_update', 'write1_to_set'],
                 ['external_update', 'write1_to_toggle'],
-                ['memory']
             ],
             'wo': [
                 [],
                 ['self_clear'],
-                ['memory']
             ],
             'ro': [
                 [],
                 ['read_const'],
                 ['external_update'],
                 ['external_update', 'read_to_clear'],
-                ['memory']
             ],
         }
         if value not in allowlist_comb[self.access]:
