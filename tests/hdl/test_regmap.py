@@ -59,13 +59,33 @@ def gen_rtl(tmpdir):
     rmap.add_regs(csr_ctl)
 
     # CSR START
-    csr_start = corsair.Register('START', 'START some process', 0x30)
+    csr_start = corsair.Register('START', 'Start some process', 0x30)
     csr_start.add_bfields([
         corsair.BitField('EN', 'Start some process A',
                          lsb=0, width=1, access='wo', modifiers=['self_clear']),
         corsair.BitField('KEY', 'Secret key',
                          lsb=16, width=16, access='wo')])
     rmap.add_regs(csr_start)
+
+    # CSR STATUS
+    csr_status = corsair.Register('STATUS', 'Some flags and status information', 0x40)
+    csr_status.add_bfields([
+        corsair.BitField('DIR', 'Current direction flag',
+                         lsb=4, width=1, access='ro'),
+        corsair.BitField('ERR', 'Some error flag',
+                         lsb=8, width=1, access='ro', modifiers=['external_update']),
+        corsair.BitField('CAP', 'Some captured value',
+                         lsb=16, width=12, access='ro', modifiers=['external_update', 'read_to_clear'])])
+    rmap.add_regs(csr_status)
+
+    # CSR VERSION
+    csr_version = corsair.Register('VERSION', 'IP version', 0x44)
+    csr_version.add_bfields([
+        corsair.BitField('MINOR', 'Minor version',
+                         lsb=0, width=8, access='ro', initial=0x10, modifiers=['read_const']),
+        corsair.BitField('MAJOR', 'Major version',
+                         lsb=16, width=8, access='ro', initial=0x02, modifiers=['read_const'])])
+    rmap.add_regs(csr_version)
 
     regmap_path = str(Path(tmpdir) / 'regs.v')
     corsair.HdlWriter()(regmap_path, rmap)
@@ -104,12 +124,18 @@ def test_wo(tmpdir, simtool, gui=False, validate=True):
     _test(tb_name, tmpdir=tmpdir, simtool=simtool, gui=gui, validate=validate)
 
 
+def test_ro(tmpdir, simtool, gui=False, validate=True):
+    tb_name = 'tb_ro'
+    _test(tb_name, tmpdir=tmpdir, simtool=simtool, gui=gui, validate=validate)
+
+
 if __name__ == '__main__':
     # run script with key -h to see help
     tmpdir = tempfile.gettempdir()
     tb_dict = {
         'tb_rw': lambda tool, gui: test_rw(tmpdir, simtool=tool, gui=gui, validate=False),
         'tb_wo': lambda tool, gui: test_wo(tmpdir, simtool=tool, gui=gui, validate=False),
+        'tb_ro': lambda tool, gui: test_ro(tmpdir, simtool=tool, gui=gui, validate=False),
     }
     sim = Simulation(
         default_tb='tb_rw',

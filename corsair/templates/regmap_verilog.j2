@@ -105,9 +105,18 @@ always @(posedge clk or negedge rst) begin
 {%- endmacro %}
 
 {#- 'always' part for self clear #}
-{% macro always_clear(reg, bf) %}
+{% macro always_self_clear(reg, bf) %}
     {% if 'self_clear' in bf.modifiers %}
  else begin
+        {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
+    end
+    {%- endif %}
+{%- endmacro %}
+
+{#- 'always' part with clear after read #}
+{% macro always_read_clear(reg, bf) %}
+    {% if bf.access == 'ro' and 'read_to_clear' in bf.modifiers %}
+ if (lb_ren && (lb_raddr == {{ literal(reg.address, config['address_width'].value) }})) begin
         {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
     end
     {%- endif %}
@@ -118,12 +127,12 @@ always @(posedge clk or negedge rst) begin
 csr_{{ reg.name.lower() }}_rdata
 {%- endmacro %}
 
-{#- signal: bitfield port out #}
-{% macro sig_bf_port_out(reg, bf) %}
+{#- signal: bitfield port io #}
+{% macro sig_bf_port_io(reg, bf) %}
 csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}
 {%- endmacro %}
 
-{#- signal: bitfield port new data for update #}
+{#- signal: bitfield port new data for update  #}
 {% macro sig_bf_port_new(reg, bf) %}
 csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_new
 {%- endmacro %}
@@ -158,7 +167,11 @@ module {{ config['name'].value }} #(
 {% for reg in rmap %}
     // CSR: {{ reg.name }}
     {% for bf in reg %}
-    output {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_out(reg, bf) }},
+        {% if bf.access == 'ro' and 'read_const' not in bf.modifiers and 'external_update' not in bf.modifiers %}
+    input {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_io(reg, bf) }},
+        {% elif 'w' in bf.access %}
+    output {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_io(reg, bf) }},
+        {% endif %}
         {% if 'external_update' in bf.modifiers %}
     input {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_new(reg, bf) }},
     input {{ sig_bf_port_upd(reg, bf) }},
@@ -202,24 +215,34 @@ assign {{ sig_csr_rdata(reg) }}{{ range(config['data_width'].value - 1, tmp.last
 // {{ reg.name }}{{ range(bf.msb, bf.lsb) }} - {{ bf.name }} - {{ bf.description }}
 // {{ bf.access }}{{ ', ' + ', '.join(bf.modifiers) if bf.modifiers else '' }}
 //---------------------
-        {% if config['register_reset'].value == 'init_only' %}
+        {% if bf.access == 'ro' and 'external_update' not in bf.modifiers %}
+        {% elif config['register_reset'].value == 'init_only' %}
 reg {{ range_decl( bf.width - 1, bf.is_vector()) }} {{ sig_bf_ff(reg, bf) }} = {{ literal(bf.initial, bf.width) }};
         {% else %}
 reg {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_ff(reg, bf) }};
         {% endif %}
         {% if bf.access == 'wo' %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ zeros(bf.width) }};
+        {% elif bf.access == 'ro' and 'read_const' in bf.modifiers %}
+assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ literal(bf.initial, bf.width) }};
+        {% elif bf.access == 'ro' and 'external_update' not in bf.modifiers %}
+assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_port_io(reg, bf) }};
         {% else %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_ff(reg, bf) }};
         {% endif %}
-assign {{ sig_bf_port_out(reg, bf) }} = {{ sig_bf_ff(reg, bf) }};
+        {% if 'w' in bf.access %}
+assign {{ sig_bf_port_io(reg, bf) }} = {{ sig_bf_ff(reg, bf) }};
+        {% endif %}
 
+        {% if bf.access != 'ro' or 'external_update' in bf.modifiers %}
 {{ always_begin(sig=sig_bf_ff(reg, bf), width=bf.width, init=bf.initial)
 }}{{ always_write(reg, bf)
 }}{{ always_update(reg, bf)
-}}{{ always_clear(reg, bf)
+}}{{ always_self_clear(reg, bf)
+}}{{ always_read_clear(reg, bf)
 }}
 end
+        {% endif %}
 
     {% endfor %}
 {% endfor %}

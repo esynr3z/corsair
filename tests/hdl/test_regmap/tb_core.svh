@@ -46,6 +46,12 @@ logic csr_ctl_mode_upd = 0;
 logic csr_start_en;
 logic [15:0] csr_start_key;
 
+logic csr_status_dir = 0;
+logic csr_status_err_new = 0;
+logic csr_status_err_upd = 0;
+logic [11:0] csr_status_cap_new = 0;
+logic csr_status_cap_upd = 0;
+
 regs dut (
     // System
     .clk (clk),
@@ -74,6 +80,12 @@ regs dut (
     // CSR: START
     .csr_start_en   (csr_start_en),
     .csr_start_key  (csr_start_key),
+    // CSR: STATUS
+    .csr_status_dir     (csr_status_dir),
+    .csr_status_err_new (csr_status_err_new),
+    .csr_status_err_upd (csr_status_err_upd),
+    .csr_status_cap_new (csr_status_cap_new),
+    .csr_status_cap_upd (csr_status_cap_upd),
     // Local Bus
     .lb_waddr   (lb_waddr),
     .lb_wdata   (lb_wdata),
