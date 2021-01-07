@@ -22,7 +22,8 @@ corsair -r regs.json --hdl --lb-bridge --docs
 
 * You will get:
   * Register map HDL code
-  * Bridge to some standart interface (e.g. AXI-Lite)
+  * Bridge to some standart interface (e.g. AXI-Lite, depends on configuration)
+  * Document, describing the map
 
 For more details about ways the tool can be used and how it works please refer the documentation at [Read the docs](https://corsair.readthedocs.io).
 

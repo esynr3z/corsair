@@ -24,7 +24,7 @@ It is as easy as:
 
 * You will get:
     * Register map HDL code
-    * Bridge to some standart interface (e.g. AXI-Lite)
+    * Bridge to some standart interface (e.g. AXI-Lite, depends on configuration)
     * Document, describing the map
 
 Use -h/--help key to get all options available.
