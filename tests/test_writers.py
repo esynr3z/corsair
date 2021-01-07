@@ -7,6 +7,7 @@
 import pytest
 from corsair import RegisterMapReader, ConfigurationReader
 from corsair import RegisterMapWriter, ConfigurationWriter, LbBridgeWriter
+from corsair import HdlWriter
 from corsair import Configuration, RegisterMap
 
 
@@ -60,12 +61,8 @@ class TestConfigurationWriter:
         self._write(output_file)
 
 
-class TestBridgeWriter:
-    """Class 'BridgeWriter' testing."""
-
-    @pytest.fixture()
-    def output_file(self, tmpdir):
-        return
+class TestLbBridgeWriter:
+    """Class 'LbBridgeWriter' testing."""
 
     def test_apb_write(self, tmpdir):
         """Test of creating bridge to LocalBus module in Verilog."""
@@ -81,3 +78,22 @@ class TestBridgeWriter:
         with open(output_file, 'r') as f:
             raw_str = ''.join(f.readlines())
         assert 'APB to Local Bus bridge' in raw_str
+
+
+class TestHdlWriter:
+    """Class 'HdlWriter' testing."""
+
+    def test_verilog_write(self, tmpdir):
+        """Test of creating regmap module in Verilog."""
+        output_file = str(tmpdir.join('regs.v'))
+        print('output_file:', output_file)
+        # create regmap
+        rmap = RegisterMap()
+        # write output file
+        writer = HdlWriter()
+        writer(output_file, rmap)
+        # read file and verify
+        with open(output_file, 'r') as f:
+            raw_str = ''.join(f.readlines())
+        assert 'module regs' in raw_str
+        assert 'endmodule' in raw_str
