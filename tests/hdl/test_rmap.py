@@ -42,20 +42,20 @@ def gen_rtl(tmpdir):
     csr_cnt = corsair.Register('CNT', 'Counter for some events', 0x10)
     csr_cnt.add_bfields([
         corsair.BitField('EVA', 'Some event A counter',
-                         lsb=0, width=12, initial=0x000, access='rw', modifiers=['upd']),
+                         lsb=0, width=12, initial=0x000, access='rw', modifiers=['hwu']),
         corsair.BitField('EVB', 'Some event B counter',
-                         lsb=16, width=12, initial=0x000, access='rw', modifiers=['upd'])])
+                         lsb=16, width=12, initial=0x000, access='rw', modifiers=['hwu'])])
     rmap.add_regs(csr_cnt)
 
     # CSR CTL
     csr_ctl = corsair.Register('CTL', 'Control something', 0x20)
     csr_ctl.add_bfields([
         corsair.BitField('DONE', 'Something is done status',
-                         lsb=3, width=1, access='rw', modifiers=['upd', 'w1tc']),
+                         lsb=3, width=1, access='rw', modifiers=['hwu', 'w1tc']),
         corsair.BitField('GEN', 'Generate something',
-                         lsb=5, width=1, access='rw', modifiers=['upd', 'w1ts']),
+                         lsb=5, width=1, access='rw', modifiers=['hwu', 'w1ts']),
         corsair.BitField('MODE', 'Mode of something',
-                         lsb=16, width=1, access='rw', modifiers=['upd', 'w1tt'])])
+                         lsb=16, width=1, access='rw', modifiers=['hwu', 'w1tt'])])
     rmap.add_regs(csr_ctl)
 
     # CSR START
@@ -73,9 +73,9 @@ def gen_rtl(tmpdir):
         corsair.BitField('DIR', 'Current direction flag',
                          lsb=4, width=1, access='ro'),
         corsair.BitField('ERR', 'Some error flag',
-                         lsb=8, width=1, access='ro', modifiers=['upd']),
+                         lsb=8, width=1, access='ro', modifiers=['hwu']),
         corsair.BitField('CAP', 'Some captured value',
-                         lsb=16, width=12, access='ro', modifiers=['upd', 'rtc'])])
+                         lsb=16, width=12, access='ro', modifiers=['hwu', 'rtc'])])
     rmap.add_regs(csr_status)
 
     # CSR VERSION

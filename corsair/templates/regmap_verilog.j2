@@ -87,7 +87,7 @@ always @(posedge clk or negedge rst) begin
             {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }};
             {% endif %}
         {% endfor %}
-        {% if 'upd' in bf.modifiers %}
+        {% if 'hwu' in bf.modifiers %}
     end else
         {%- else %}
     end
@@ -97,7 +97,7 @@ always @(posedge clk or negedge rst) begin
 
 {#- 'always' part for external updates #}
 {% macro always_update(reg, bf) %}
-    {% if 'upd' in bf.modifiers %}
+    {% if 'hwu' in bf.modifiers %}
  if ({{ sig_bf_port_upd(reg, bf) }}) begin
         {{ sig_bf_ff(reg, bf) }} <= {{ sig_bf_port_new(reg, bf) }};
     end
@@ -167,12 +167,12 @@ module {{ config['name'].value }} #(
 {% for reg in rmap %}
     // CSR: {{ reg.name }}
     {% for bf in reg %}
-        {% if bf.access == 'ro' and 'const' not in bf.modifiers and 'upd' not in bf.modifiers %}
+        {% if bf.access == 'ro' and 'const' not in bf.modifiers and 'hwu' not in bf.modifiers %}
     input {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_io(reg, bf) }},
         {% elif 'w' in bf.access %}
     output {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_io(reg, bf) }},
         {% endif %}
-        {% if 'upd' in bf.modifiers %}
+        {% if 'hwu' in bf.modifiers %}
     input {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_new(reg, bf) }},
     input {{ sig_bf_port_upd(reg, bf) }},
         {% endif %}
@@ -215,7 +215,7 @@ assign {{ sig_csr_rdata(reg) }}{{ range(config['data_width'].value - 1, tmp.last
 // {{ reg.name }}{{ range(bf.msb, bf.lsb) }} - {{ bf.name }} - {{ bf.description }}
 // {{ bf.access }}{{ ', ' + ', '.join(bf.modifiers) if bf.modifiers else '' }}
 //---------------------
-        {% if bf.access == 'ro' and 'upd' not in bf.modifiers %}
+        {% if bf.access == 'ro' and 'hwu' not in bf.modifiers %}
         {% elif config['register_reset'].value == 'init_only' %}
 reg {{ range_decl( bf.width - 1, bf.is_vector()) }} {{ sig_bf_ff(reg, bf) }} = {{ literal(bf.initial, bf.width) }};
         {% else %}
@@ -225,7 +225,7 @@ reg {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_ff(reg, bf) }};
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ zeros(bf.width) }};
         {% elif bf.access == 'ro' and 'const' in bf.modifiers %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ literal(bf.initial, bf.width) }};
-        {% elif bf.access == 'ro' and 'upd' not in bf.modifiers %}
+        {% elif bf.access == 'ro' and 'hwu' not in bf.modifiers %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_port_io(reg, bf) }};
         {% else %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_ff(reg, bf) }};
@@ -234,7 +234,7 @@ assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_ff(reg, b
 assign {{ sig_bf_port_io(reg, bf) }} = {{ sig_bf_ff(reg, bf) }};
         {% endif %}
 
-        {% if bf.access != 'ro' or 'upd' in bf.modifiers %}
+        {% if bf.access != 'ro' or 'hwu' in bf.modifiers %}
 {{ always_begin(sig=sig_bf_ff(reg, bf), width=bf.width, init=bf.initial)
 }}{{ always_write(reg, bf)
 }}{{ always_update(reg, bf)

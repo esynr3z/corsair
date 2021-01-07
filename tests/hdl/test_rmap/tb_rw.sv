@@ -70,7 +70,7 @@ task test_basic;
         errors++;
 endtask
 
-// test RW registers with upd modifier
+// test RW registers with hwu modifier
 task test_ext_upd;
     $display("%t, Start external update tests!", $time);
     // test CNT register

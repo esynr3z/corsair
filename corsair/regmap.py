@@ -186,7 +186,7 @@ class BitField():
             'w1tt',
             'rtc',
             'const',
-            'upd',
+            'hwu',
         ]
         for v in value:
             if v not in allowlist:
@@ -196,10 +196,10 @@ class BitField():
         allowlist_comb = {
             'rw': [
                 [],
-                ['upd'],
-                ['upd', 'w1tc'],
-                ['upd', 'w1ts'],
-                ['upd', 'w1tt'],
+                ['hwu'],
+                ['hwu', 'w1tc'],
+                ['hwu', 'w1ts'],
+                ['hwu', 'w1tt'],
             ],
             'wo': [
                 [],
@@ -208,8 +208,8 @@ class BitField():
             'ro': [
                 [],
                 ['const'],
-                ['upd'],
-                ['upd', 'rtc'],
+                ['hwu'],
+                ['hwu', 'rtc'],
             ],
         }
         if value not in allowlist_comb[self.access]:

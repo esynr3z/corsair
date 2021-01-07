@@ -38,7 +38,7 @@ regmap:
     access: rw
     access_flags: true
     modifiers:
-    - upd
+    - hwu
 - name: START
   description: Start processes
   address: 8
@@ -98,7 +98,7 @@ regmap:
     access: ro
     access_flags: false
     modifiers:
-    - upd
+    - hwu
 - name: CTL
   description: Control
   address: 32
@@ -131,7 +131,7 @@ regmap:
     access: rw
     access_flags: false
     modifiers:
-    - upd
+    - hwu
     - w1tc
   - name: EVB
     description: Event B
@@ -141,7 +141,7 @@ regmap:
     access: ro
     access_flags: false
     modifiers:
-    - upd
+    - hwu
     - rtc
 - name: VERSION
   description: Current version

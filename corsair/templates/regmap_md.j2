@@ -32,7 +32,7 @@ Register map v{{ config['version'].value }}.
 
 | Name  | Type     | Description
 | :---  | :---     | :---
-| rw    | access   | Read or Write.
+| rw    | access   | Read or Write
 | ro    | access   | Read Only. Write has no effect.
 | wo    | access   | Write Only. Zeros are read.
 | sc    | modifier | Self Clear. Write 0 - no effect, write 1 - next tick self clear.
@@ -41,7 +41,7 @@ Register map v{{ config['version'].value }}.
 | w1tt  | modifier | Write 1 To Toggle. Write 0 - no effect, write 1 - current value will be inversed.
 | rtc   | modifier | Read To Clear. Current value will be cleared next tick after read.
 | const | modifier | Constant. Reset value is hardcoded as only value can be read.
-| upd   | modifier | Update. Register value can be updated from outside the map with hardware.
+| hwu   | modifier | Hardware Update. Register value can be updated from outside the map with hardware.
 
 ## Register map
 

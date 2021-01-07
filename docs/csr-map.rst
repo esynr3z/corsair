@@ -220,33 +220,33 @@ Parameter        Default Description
 ``width``        1       Field width (bits)
 ``lsb``          0       Field LSB position
 ``access``       "rw"    Access mode for the field. One of the options below.
-``access_flags`` False   Enable pulse generation on output "read_access" or "write_access" signals on every read or write
+``access_flags`` False   Enable pulse generation on output special signals on every read or write
 ``modifiers``    []      Access modifiers. Choice of none or multiple options below.
 ================ ======= ================================================================================================
 
 Options for ``access``:
 
-========== =====================
+========== ===============================
 ``access`` Description
-========== =====================
-"rw"       Read and Write access
-"ro"       Read only
-"wo"       Write only
-========== =====================
+========== ===============================
+"rw"       Read or Write.
+"ro"       Read Only. Write has no effect.
+"wo"       Write Only. Zeros are read.
+========== ===============================
 
 Options for ``modifiers``:
 
-============= ===========================================================================================================================================
+============= ===========================================================================================
 ``modifiers`` Description
-============= ===========================================================================================================================================
-"sc"          Write 0 - no effect, write 1 - next tick self clear.
-"w1tc"        Write 0 - no effect, write 1 - current value will be cleared.
-"w1ts"        Write 0 - no effect, write 1 - current value will be set.
-"w1tt"        Write 0 - no effect, write 1 - current value will be inversed.
-"rtc"         Any CSR read - current value will be cleared.
-"const"       Use "initial" as only value can be readen.
-"upd"         Register can be updated outside the map with some "data" bus and "update" signal.
-============= ===========================================================================================================================================
+============= ===========================================================================================
+"sc"          Self Clear. Write 0 - no effect, write 1 - next tick self clear.
+"w1tc"        Write 1 To Clear. Write 0 - no effect, write 1 - current value will be cleared (all zeros).
+"w1ts"        Write 1 To Set. Write 0 - no effect, write 1 - current value will be set (all ones).
+"w1tt"        Write 1 To Toggle. Write 0 - no effect, write 1 - current value will be inversed.
+"rtc"         Read To Clear. Current value will be cleared next tick after read.
+"const"       Constant. Reset value is hardcoded as only value can be read.
+"hwu"         Hardware Update. Register value can be updated from outside the map with hardware.
+============= ===========================================================================================
 
 
 How ``modifiers`` can be combined with ``access``:
@@ -256,13 +256,13 @@ How ``modifiers`` can be combined with ``access``:
 +============+===================+
 | "rw"       | [] (no modifiers) |
 |            +-------------------+
-|            | ["upd"]           |
+|            | ["hwu"]           |
 |            +-------------------+
-|            | ["upd", "w1tc"]   |
+|            | ["hwu", "w1tc"]   |
 |            +-------------------+
-|            | ["upd", "w1ts"]   |
+|            | ["hwu", "w1ts"]   |
 |            +-------------------+
-|            | ["upd", "w1tt"]   |
+|            | ["hwu", "w1tt"]   |
 +------------+-------------------+
 | "wo"       | [] (no modifiers) |
 |            +-------------------+
@@ -272,7 +272,7 @@ How ``modifiers`` can be combined with ``access``:
 |            +-------------------+
 |            | ["const"]         |
 |            +-------------------+
-|            | ["upd"]           |
+|            | ["hwu"]           |
 |            +-------------------+
-|            | ["upd", "rtc"]    |
+|            | ["hwu", "rtc"]    |
 +------------+-------------------+

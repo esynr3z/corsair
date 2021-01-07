@@ -134,13 +134,13 @@ class TestBitField:
     def test_modifiers_access(self):
         """Test of accessing to 'modifiers' attribute of a bit field."""
         bf = BitField('bf_a', access='rw')
-        bf.modifiers = ['upd']
-        assert bf.modifiers == ['upd']
+        bf.modifiers = ['hwu']
+        assert bf.modifiers == ['hwu']
 
     def test_modifiers_init_wrong(self):
         """Test of initializing a bit field with a wrong 'modifiers' value."""
         with pytest.raises(ValueError):
-            BitField('bf_a', access='wo', modifiers=['upd', 'rtc'])
+            BitField('bf_a', access='wo', modifiers=['hwu', 'rtc'])
 
     def test_modifiers_set_wrong(self):
         """Test of setting wrong value to 'modifiers' attribute of a bit field."""

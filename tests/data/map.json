@@ -44,7 +44,7 @@
                     "access": "rw",
                     "access_flags": true,
                     "modifiers": [
-                        "upd"
+                        "hwu"
                     ]
                 }
             ]
@@ -112,7 +112,7 @@
                     "lsb": 3,
                     "access": "ro",
                     "modifiers": [
-                        "upd"
+                        "hwu"
                     ]
                 }
             ]
@@ -150,7 +150,7 @@
                     "lsb": 0,
                     "access": "rw",
                     "modifiers": [
-                        "upd",
+                        "hwu",
                         "w1tc"
                     ]
                 },
@@ -161,7 +161,7 @@
                     "lsb": 2,
                     "access": "ro",
                     "modifiers": [
-                        "upd",
+                        "hwu",
                         "rtc"
                     ]
                 }
