@@ -76,7 +76,7 @@ class TestRegisterMap(_TestCLI):
         assert exit_code == 0
 
     def test_create_hdl(self, datadir, tmpdir, capsys):
-        """Create register map verilog map.v file."""
+        """Create register map verilog regs.v file."""
         rmap_file = str(datadir.join('map.json'))
         exit_code = self._run_cli(['-r', rmap_file, '--output-dir', str(tmpdir), '--hdl'])
         captured = capsys.readouterr()
@@ -141,3 +141,16 @@ class TestLbBridge(_TestCLI):
         with open(lb_bridge_file, 'r') as f:
             raw_str = ''.join(f.readlines())
         assert 'APB to Local Bus bridge' in raw_str
+
+
+class TestDocs(_TestCLI):
+    """Register nap documentation related testing."""
+
+    def test_create_md(self, datadir, tmpdir, capsys):
+        """Create register map documentation regs.md file."""
+        rmap_file = str(datadir.join('map.json'))
+        exit_code = self._run_cli(['-r', rmap_file, '--output-dir', str(tmpdir), '--docs'])
+        captured = capsys.readouterr()
+        assert exit_code == 0
+        assert 'Read registers ... OK' in captured.out
+        assert 'Draw images ... OK' in captured.out
