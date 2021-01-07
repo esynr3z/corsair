@@ -30,3 +30,10 @@ HdlWriter
    :members:
    :undoc-members:
    :show-inheritance:
+
+DocsWriter
+--------------
+.. autoclass:: corsair.DocsWriter
+   :members:
+   :undoc-members:
+   :show-inheritance:

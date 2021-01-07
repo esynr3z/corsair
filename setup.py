@@ -26,7 +26,8 @@ setuptools.setup(
     },
     install_requires=[
         'pyyaml',
-        'jinja2'
+        'jinja2',
+        'wavedrom',
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

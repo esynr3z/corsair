@@ -429,6 +429,14 @@ class Register():
                 # when bit field list is empty or all bit field msb positions are less than the current one
                 self._bfields.append(bf)
 
+    @property
+    def initial(self):
+        """Initial value of the refister after reset."""
+        init = 0
+        for bf in self:
+            init |= bf.initial << bf.lsb
+        return init
+
 
 class RegisterMap():
     """CSR map.

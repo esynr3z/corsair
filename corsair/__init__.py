@@ -32,5 +32,6 @@ from .writers import (
     RegisterMapWriter,
     ConfigurationWriter,
     LbBridgeWriter,
-    HdlWriter
+    HdlWriter,
+    DocsWriter,
 )

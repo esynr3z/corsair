@@ -7,7 +7,7 @@
 import pytest
 from corsair import RegisterMapReader, ConfigurationReader
 from corsair import RegisterMapWriter, ConfigurationWriter, LbBridgeWriter
-from corsair import HdlWriter
+from corsair import HdlWriter, DocsWriter
 from corsair import Configuration, RegisterMap
 
 
@@ -97,3 +97,27 @@ class TestHdlWriter:
             raw_str = ''.join(f.readlines())
         assert 'module regs' in raw_str
         assert 'endmodule' in raw_str
+
+
+class TestDocsWriter:
+    """Class 'DocsWriter' testing."""
+
+    def _read_rmap(self, path):
+        reader = RegisterMapReader()
+        rmap = reader(path)
+
+    def test_md_write(self, tmpdir):
+        """Test of creating markdown regmap file."""
+        rmap_path = 'tests/data/map.json'
+        md_path = str(tmpdir.join('regs.md'))
+        print('rmap_path:', rmap_path)
+        print('md_path:', md_path)
+        # read regmap
+        rmap = RegisterMapReader()(rmap_path)
+        # write output file
+        DocsWriter()(md_path, rmap)
+        # read file and verify
+        with open(md_path, 'r') as f:
+            raw_str = ''.join(f.readlines())
+        assert '## Register map' in raw_str
+        assert 'Back to [Register map](#register-map).' in raw_str
