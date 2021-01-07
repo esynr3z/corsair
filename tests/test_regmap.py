@@ -134,19 +134,19 @@ class TestBitField:
     def test_modifiers_access(self):
         """Test of accessing to 'modifiers' attribute of a bit field."""
         bf = BitField('bf_a', access='rw')
-        bf.modifiers = ['external_update']
-        assert bf.modifiers == ['external_update']
+        bf.modifiers = ['upd']
+        assert bf.modifiers == ['upd']
 
     def test_modifiers_init_wrong(self):
         """Test of initializing a bit field with a wrong 'modifiers' value."""
         with pytest.raises(ValueError):
-            BitField('bf_a', access='wo', modifiers=['external_update', 'read_to_clear'])
+            BitField('bf_a', access='wo', modifiers=['upd', 'rtc'])
 
     def test_modifiers_set_wrong(self):
         """Test of setting wrong value to 'modifiers' attribute of a bit field."""
         bf = BitField('bf_a', access='ro')
         with pytest.raises(ValueError):
-            bf.modifiers = 'self_clear'
+            bf.modifiers = 'sc'
 
     def test_bits(self):
         """Test of adding a field with position that  overlaps with other field in a register."""

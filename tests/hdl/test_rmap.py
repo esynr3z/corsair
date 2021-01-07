@@ -42,27 +42,27 @@ def gen_rtl(tmpdir):
     csr_cnt = corsair.Register('CNT', 'Counter for some events', 0x10)
     csr_cnt.add_bfields([
         corsair.BitField('EVA', 'Some event A counter',
-                         lsb=0, width=12, initial=0x000, access='rw', modifiers=['external_update']),
+                         lsb=0, width=12, initial=0x000, access='rw', modifiers=['upd']),
         corsair.BitField('EVB', 'Some event B counter',
-                         lsb=16, width=12, initial=0x000, access='rw', modifiers=['external_update'])])
+                         lsb=16, width=12, initial=0x000, access='rw', modifiers=['upd'])])
     rmap.add_regs(csr_cnt)
 
     # CSR CTL
     csr_ctl = corsair.Register('CTL', 'Control something', 0x20)
     csr_ctl.add_bfields([
         corsair.BitField('DONE', 'Something is done status',
-                         lsb=3, width=1, access='rw', modifiers=['external_update', 'write1_to_clear']),
+                         lsb=3, width=1, access='rw', modifiers=['upd', 'w1tc']),
         corsair.BitField('GEN', 'Generate something',
-                         lsb=5, width=1, access='rw', modifiers=['external_update', 'write1_to_set']),
+                         lsb=5, width=1, access='rw', modifiers=['upd', 'w1ts']),
         corsair.BitField('MODE', 'Mode of something',
-                         lsb=16, width=1, access='rw', modifiers=['external_update', 'write1_to_toggle'])])
+                         lsb=16, width=1, access='rw', modifiers=['upd', 'w1tt'])])
     rmap.add_regs(csr_ctl)
 
     # CSR START
     csr_start = corsair.Register('START', 'Start some process', 0x30)
     csr_start.add_bfields([
         corsair.BitField('EN', 'Start some process A',
-                         lsb=0, width=1, access='wo', modifiers=['self_clear']),
+                         lsb=0, width=1, access='wo', modifiers=['sc']),
         corsair.BitField('KEY', 'Secret key',
                          lsb=16, width=16, access='wo')])
     rmap.add_regs(csr_start)
@@ -73,18 +73,18 @@ def gen_rtl(tmpdir):
         corsair.BitField('DIR', 'Current direction flag',
                          lsb=4, width=1, access='ro'),
         corsair.BitField('ERR', 'Some error flag',
-                         lsb=8, width=1, access='ro', modifiers=['external_update']),
+                         lsb=8, width=1, access='ro', modifiers=['upd']),
         corsair.BitField('CAP', 'Some captured value',
-                         lsb=16, width=12, access='ro', modifiers=['external_update', 'read_to_clear'])])
+                         lsb=16, width=12, access='ro', modifiers=['upd', 'rtc'])])
     rmap.add_regs(csr_status)
 
     # CSR VERSION
     csr_version = corsair.Register('VERSION', 'IP version', 0x44)
     csr_version.add_bfields([
         corsair.BitField('MINOR', 'Minor version',
-                         lsb=0, width=8, access='ro', initial=0x10, modifiers=['read_const']),
+                         lsb=0, width=8, access='ro', initial=0x10, modifiers=['const']),
         corsair.BitField('MAJOR', 'Major version',
-                         lsb=16, width=8, access='ro', initial=0x02, modifiers=['read_const'])])
+                         lsb=16, width=8, access='ro', initial=0x02, modifiers=['const'])])
     rmap.add_regs(csr_version)
 
     regmap_path = str(Path(tmpdir) / 'regs.v')

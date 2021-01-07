@@ -105,7 +105,7 @@ def main():
                 corsair.Register('eggs', 'Register eggs', 4)]
         regs[0].add_bfields([
             corsair.BitField('foo', 'Bit field foo', lsb=0, width=7, access='rw', initial=42),
-            corsair.BitField('bar', 'Bit field bar', lsb=24, width=1, access='wo', modifiers=['self_clear'])
+            corsair.BitField('bar', 'Bit field bar', lsb=24, width=1, access='wo', modifiers=['sc'])
         ])
         regs[1].add_bfields(corsair.BitField('baz', 'Bit field baz', lsb=16, width=16, access='ro'))
         rmap = corsair.RegisterMap()

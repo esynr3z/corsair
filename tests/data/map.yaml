@@ -38,7 +38,7 @@ regmap:
     access: rw
     access_flags: true
     modifiers:
-    - external_update
+    - upd
 - name: START
   description: Start processes
   address: 8
@@ -51,7 +51,7 @@ regmap:
     access: wo
     access_flags: false
     modifiers:
-    - self_clear
+    - sc
   - name: STB
     description: Start process B
     initial: 0
@@ -60,7 +60,7 @@ regmap:
     access: wo
     access_flags: false
     modifiers:
-    - self_clear
+    - sc
   - name: STC
     description: Start process C
     initial: 0
@@ -69,7 +69,7 @@ regmap:
     access: wo
     access_flags: false
     modifiers:
-    - self_clear
+    - sc
   - name: KEY
     description: Secret key to start process
     initial: 0
@@ -98,7 +98,7 @@ regmap:
     access: ro
     access_flags: false
     modifiers:
-    - external_update
+    - upd
 - name: CTL
   description: Control
   address: 32
@@ -131,8 +131,8 @@ regmap:
     access: rw
     access_flags: false
     modifiers:
-    - external_update
-    - write1_to_clear
+    - upd
+    - w1tc
   - name: EVB
     description: Event B
     initial: 0
@@ -141,8 +141,8 @@ regmap:
     access: ro
     access_flags: false
     modifiers:
-    - external_update
-    - read_to_clear
+    - upd
+    - rtc
 - name: VERSION
   description: Current version
   address: 64
@@ -155,7 +155,7 @@ regmap:
     access: ro
     access_flags: false
     modifiers:
-    - read_const
+    - const
   - name: MAJOR
     description: Major version
     initial: 2
@@ -164,4 +164,4 @@ regmap:
     access: ro
     access_flags: false
     modifiers:
-    - read_const
+    - const

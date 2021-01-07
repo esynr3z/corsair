@@ -50,12 +50,12 @@ task test_ext_upd;
         errors++;
 endtask
 
-// test RO registers with self clear
-task test_self_clear;
-    $display("%t, Start self clear tests!", $time);
+// test RO registers with read to clear
+task test_read_clr;
+    $display("%t, Start read to clear tests!", $time);
     // test STATUS register
     addr = 'h40;
-    // hardware control and several reads to validate self clear action (also check that write has no action)
+    // hardware control and several reads to validate read to clear action (also check that write has no action)
     apb_mst.read(addr, data);
     if (((data >> 16) & 'hFFF) != 0)
         errors++;
@@ -92,7 +92,7 @@ initial begin : main
 
     test_basic();
     test_ext_upd();
-    test_self_clear();
+    test_read_clr();
     test_const();
 
     repeat(5) @(posedge clk);

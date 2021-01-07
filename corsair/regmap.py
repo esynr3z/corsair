@@ -180,13 +180,13 @@ class BitField():
 
         # check if all options are allowed
         allowlist = [
-            'self_clear',
-            'write1_to_clear',
-            'write1_to_set',
-            'write1_to_toggle',
-            'read_to_clear',
-            'read_const',
-            'external_update',
+            'sc',
+            'w1tc',
+            'w1ts',
+            'w1tt',
+            'rtc',
+            'const',
+            'upd',
         ]
         for v in value:
             if v not in allowlist:
@@ -196,20 +196,20 @@ class BitField():
         allowlist_comb = {
             'rw': [
                 [],
-                ['external_update'],
-                ['external_update', 'write1_to_clear'],
-                ['external_update', 'write1_to_set'],
-                ['external_update', 'write1_to_toggle'],
+                ['upd'],
+                ['upd', 'w1tc'],
+                ['upd', 'w1ts'],
+                ['upd', 'w1tt'],
             ],
             'wo': [
                 [],
-                ['self_clear'],
+                ['sc'],
             ],
             'ro': [
                 [],
-                ['read_const'],
-                ['external_update'],
-                ['external_update', 'read_to_clear'],
+                ['const'],
+                ['upd'],
+                ['upd', 'rtc'],
             ],
         }
         if value not in allowlist_comb[self.access]:

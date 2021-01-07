@@ -44,7 +44,7 @@
                     "access": "rw",
                     "access_flags": true,
                     "modifiers": [
-                        "external_update"
+                        "upd"
                     ]
                 }
             ]
@@ -61,7 +61,7 @@
                     "lsb": 0,
                     "access": "wo",
                     "modifiers": [
-                        "self_clear"
+                        "sc"
                     ]
                 },
                 {
@@ -71,7 +71,7 @@
                     "lsb": 8,
                     "access": "wo",
                     "modifiers": [
-                        "self_clear"
+                        "sc"
                     ]
                 },
                 {
@@ -81,7 +81,7 @@
                     "lsb": 16,
                     "access": "wo",
                     "modifiers": [
-                        "self_clear"
+                        "sc"
                     ]
                 },
                 {
@@ -112,7 +112,7 @@
                     "lsb": 3,
                     "access": "ro",
                     "modifiers": [
-                        "external_update"
+                        "upd"
                     ]
                 }
             ]
@@ -150,8 +150,8 @@
                     "lsb": 0,
                     "access": "rw",
                     "modifiers": [
-                        "external_update",
-                        "write1_to_clear"
+                        "upd",
+                        "w1tc"
                     ]
                 },
                 {
@@ -161,8 +161,8 @@
                     "lsb": 2,
                     "access": "ro",
                     "modifiers": [
-                        "external_update",
-                        "read_to_clear"
+                        "upd",
+                        "rtc"
                     ]
                 }
             ]
@@ -180,7 +180,7 @@
                     "lsb": 0,
                     "access": "ro",
                     "modifiers": [
-                        "read_const"
+                        "const"
                     ]
                 },
                 {
@@ -191,7 +191,7 @@
                     "lsb": 16,
                     "access": "ro",
                     "modifiers": [
-                        "read_const"
+                        "const"
                     ]
                 }
             ]
