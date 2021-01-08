@@ -1,4 +1,6 @@
-## 0.2.0 (unreleased)
+## 0.3.0 (unreleased)
+
+## 0.2.0 (2021-01-08)
 
 * Rework CLI keys
 * Fix entry point for CLI
