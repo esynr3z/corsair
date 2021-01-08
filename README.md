@@ -1,5 +1,7 @@
 # Corsair
 
+[![Documentation Status](https://readthedocs.org/projects/corsair/badge/?version=latest)](https://corsair.readthedocs.io/en/latest/?badge=latest)
+
 ![corsair_arch](https://raw.githubusercontent.com/esynr3z/corsair/master/docs/arch.svg)
 
 Corsair is a tool that makes it easy to organize and support control and status register (CSR) map for any FPGA/ASIC project.
