@@ -144,7 +144,7 @@ def main():
         elif args.config:
             outdir = Path(args.config).parent
         # output file base name
-        if config['name']:
+        if config['name'].value:
             outname = config['name'].value
         elif args.regmap:
             outname = Path(args.regmap).stem
@@ -166,7 +166,7 @@ def main():
         else:
             lb_bridge_name = '%s2lb_%s.v' % (config['lb_bridge']['type'].value, outname)
             lb_bridge_path = str(outdir / lb_bridge_name)
-        corsair.LbBridgeWriter()(lb_bridge_path, config)
+            corsair.LbBridgeWriter()(lb_bridge_path, config)
 
     # create docs
     if args.docs:
