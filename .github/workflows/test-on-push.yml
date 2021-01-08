@@ -16,10 +16,8 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools gitpython
         pip install pytest
-        # install package and dependencies, then remove package and left all other stuff
-        pip install . && pip uninstall --yes `python setup.py --name`
+        pip install pyyaml jinja2 wavedrom
         sudo apt-get install iverilog
     - name: Test package
       run: |
