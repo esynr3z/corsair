@@ -35,9 +35,10 @@ class RegisterMapReader(_DictReader):
 
         Read provided file and create :class:`RegisterMap` object:
 
+        >>> from corsair import RegisterMapReader
         >>> reader = RegisterMapReader()
-        >>> rmap = reader('../tests/data/map.json')
-        Read '../tests/data/map.json' file with RegisterMapReader:
+        >>> rmap = reader('tests/data/map.json')
+        Read 'tests/data/map.json' file with RegisterMapReader:
           Open file ... OK
           Read configuration ... OK
           Read registers ... OK
@@ -78,9 +79,10 @@ class ConfigurationReader(_DictReader):
     Examples:
         Read provided file and create :class:`Configuration` object:
 
+        >>> from corsair import ConfigurationReader
         >>> reader = ConfigurationReader()
-        >>> rmap = reader('../tests/data/config.json')
-        Read '../tests/data/config.json' file with ConfigurationReader:
+        >>> rmap = reader('tests/data/config.json')
+        Read 'tests/data/config.json' file with ConfigurationReader:
           Open file ... OK
           Read configuration ... OK
     """

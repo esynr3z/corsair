@@ -39,10 +39,11 @@ class RegisterMapWriter(_DictWriter):
 
         Create JSON file based on a :class:`RegisterMap` object:
 
+        >>> from corsair import RegisterMapWriter, RegisterMap
         >>> writer = RegisterMapWriter()
         >>> rmap = RegisterMap()
-        >>> writer('_build/doctest/map.json', rmap)
-        Write '_build/doctest/map.json' file with RegisterMapWriter:
+        >>> writer('/tmp/map.json', rmap)
+        Write '/tmp/map.json' file with RegisterMapWriter:
           Prepare data ... OK
           Save data to file ... OK
     """
@@ -70,10 +71,11 @@ class ConfigurationWriter(_DictWriter):
 
         Create JSON file based on a :class:`Configuration` object:
 
+        >>> from corsair import Configuration, ConfigurationWriter
         >>> writer = ConfigurationWriter()
         >>> config = Configuration()
-        >>> writer('_build/doctest/config.json', config)
-        Write '_build/doctest/config.json' file with ConfigurationWriter:
+        >>> writer('/tmp/config.json', config)
+        Write '/tmp/config.json' file with ConfigurationWriter:
           Prepare data ... OK
           Save data to file ... OK
     """
@@ -126,11 +128,12 @@ class LbBridgeWriter(_Jinja2Writer):
 
         Create Verilog file with APB to Local Bus bridge:
 
+        >>> from corsair import Configuration, LbBridgeWriter
         >>> config = Configuration()
         >>> config['lb_bridge']['type'].value = 'apb'
         >>> writer = LbBridgeWriter()
-        >>> writer('_build/doctest/lb_bridge.v', config)
-        Write '_build/doctest/lb_bridge.v' file with LbBridgeWriter:
+        >>> writer('/tmp/lb_bridge.v', config)
+        Write '/tmp/lb_bridge.v' file with LbBridgeWriter:
           Prepare data ... OK
           Load template ... OK
           Render text ... OK
@@ -168,10 +171,11 @@ class HdlWriter(_Jinja2Writer):
     """Create HDL file with register map.
 
     Examples:
+        >>> from corsair import RegisterMap, HdlWriter
         >>> rmap = RegisterMap()
         >>> writer = HdlWriter()
-        >>> writer('_build/doctest/regs.v', rmap)
-        Write '_build/doctest/regs.v' file with HdlWriter:
+        >>> writer('/tmp/regs.v', rmap)
+        Write '/tmp/regs.v' file with HdlWriter:
           Prepare data ... OK
           Load template ... OK
           Render text ... OK
@@ -201,10 +205,11 @@ class DocsWriter(_Jinja2Writer):
     """Create documentation for a register map.
 
     Examples:
+        >>> from corsair import RegisterMap, DocsWriter
         >>> rmap = RegisterMap()
         >>> writer = DocsWriter()
-        >>> writer('_build/doctest/regs.md', rmap)
-        Write '_build/doctest/regs.md' file with DocsWriter:
+        >>> writer('/tmp/regs.md', rmap)
+        Write '/tmp/regs.md' file with DocsWriter:
           Prepare data ... OK
           Load template ... OK
           Render text ... OK

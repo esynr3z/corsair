@@ -48,11 +48,23 @@ Install PyTest:
 
     python3 -m pip install -U pytest
 
+Install Icarus Verilog for some tests (e.g. for Ubuntu):
+
+::
+
+    sudo apt install iverilog
+
 Run tests from the root folder:
 
 ::
 
     pytest -v
+
+Run tests for docstrings:
+
+::
+
+    pytest --doctest-modules corsair
 
 Documentation
 -------------
@@ -63,8 +75,8 @@ Install Sphinx and extensions:
 
     python3 -m pip install -U sphinx sphinx_rtd_theme m2r2 sphinxcontrib-wavedrom
 
-Run from ``docs`` folder to build the documentation and test docstrings:
+Run from ``docs`` folder to build the documentation:
 
 ::
 
-    make clean html doctest
+    make clean html
