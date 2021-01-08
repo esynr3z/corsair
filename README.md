@@ -33,10 +33,24 @@ For more details about ways the tool can be used and how it works please refer t
 
 ## Installation
 
-You can install the latest stable version from pypi:
+You can install the latest release:
 
 ```sh
 python3 -m pip install -U corsair
+```
+
+To get the latest development version:
+
+```sh
+python3 -m pip install -U git+https://github.com/esynr3z/corsair.git
+```
+
+Alternatively:
+
+```sh
+git clone https://github.com/esynr3z/corsair.git
+cd corsair
+python3 setup.py install
 ```
 
 ## Development
