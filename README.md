@@ -1,6 +1,8 @@
 # Corsair
 
-[![Documentation Status](https://readthedocs.org/projects/corsair/badge/?version=latest)](https://corsair.readthedocs.io/en/latest/?badge=latest) ![PyTest Status](https://github.com/esynr3z/corsair/workflows/pytest/badge.svg)
+[![Documentation Status](https://readthedocs.org/projects/corsair/badge/?version=latest)](https://corsair.readthedocs.io/en/latest/?badge=latest)
+![PyTest Status](https://github.com/esynr3z/corsair/workflows/pytest/badge.svg)
+[![PyPI version](https://badge.fury.io/py/corsair.svg)](https://badge.fury.io/py/corsair)
 
 ![corsair_arch](https://raw.githubusercontent.com/esynr3z/corsair/master/docs/arch.svg)
 
