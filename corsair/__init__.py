@@ -5,11 +5,13 @@
 It generates HDL code, documentation and other artifacts from CSR map description file.
 """
 
-from .__version__ import (
-    __title__,
-    __description__,
-    __version__
-)
+__title__ = "corsair"
+__description__ = "Control and status register (CSR) map generator for FPGA/ASIC projects."
+
+try:
+    from ._version import version as __version__
+except (ImportError, ModuleNotFoundError) as e:
+    __version__ = 'git-latest'
 
 from .config import (
     Parameter,

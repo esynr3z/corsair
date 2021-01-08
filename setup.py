@@ -1,13 +1,54 @@
 import setuptools
+from pkg_resources import parse_version
+
+VERSION = "0.1.0"
+
+
+# Based on https://github.com/tulip-control/dd/blob/885a716a56e82bfee54b0178d0ce38298b85eb6a/setup.py#L68
+def git_version(version):
+    """Return version with local version identifier."""
+    import git
+    repo = git.Repo('.git')
+    repo.git.status()
+    # assert versions are increasing
+    latest_tag = repo.git.describe(
+        match='v[0-9]*', tags=True, abbrev=0)
+    assert parse_version(latest_tag) <= parse_version(version), (
+        latest_tag, version)
+    sha = repo.head.commit.hexsha[:8]
+    if repo.is_dirty():
+        return '{v}.dev0+{sha}.dirty'.format(
+            v=version, sha=sha)
+    # commit is clean
+    # is it release of `version` ?
+    try:
+        tag = repo.git.describe(
+            match='v[0-9]*', exact_match=True,
+            tags=True, dirty=True)
+    except git.GitCommandError:
+        return '{v}.dev0+{sha}'.format(
+            v=version, sha=sha)
+    assert tag == 'v' + version, (tag, version)
+    return version
 
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
+# Get version
+VERSION_FILE = 'corsair/_version.py'
+try:
+    version = git_version(VERSION)
+except AssertionError:
+    print('No git info: Assume release.')
+    version = VERSION
+with open(VERSION_FILE, 'w') as f:
+    f.write("version = '%s'\n" % version)
 
+# Install package
 setuptools.setup(
     name="corsair",
-    version="0.1.0",
+    version=version,
     author="esynr3z",
     author_email="esynr3z@gmail.com",
     description="Control and Status Register map generator for FPGA/ASIC projects",
@@ -36,3 +77,7 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
 )
+
+# Clear version info
+with open(VERSION_FILE, 'w') as f:
+    f.write("")

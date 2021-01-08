@@ -8,7 +8,7 @@ import os
 import json
 import yaml
 import jinja2
-from .__version__ import __version__
+from corsair import __version__
 from . import utils
 from pathlib import Path
 import wavedrom
