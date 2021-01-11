@@ -6,8 +6,8 @@ Installation
 ------------
 
 .. note::
-Depending on your system, Python executable might be ``python`` or ``python3``.
-If there any permissions issues add ``--user`` key to the installation scripts.
+    Depending on your system, Python executable might be ``python`` or ``python3``.
+    If there any permissions issues, add ``--user`` key to the installation scripts.
 
 Install dependencies first:
 
