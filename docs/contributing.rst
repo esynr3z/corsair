@@ -5,13 +5,17 @@ Contributing
 Installation
 ------------
 
-You can install the latest development version from GitHub:
+.. note::
+Depending on your system, Python executable might be ``python`` or ``python3``.
+If there any permissions issues add ``--user`` key to the installation scripts.
+
+Install dependencies first:
 
 ::
 
-    python3 -m pip install -U git+https://github.com/esynr3z/corsair.git
+    python3 -m pip install gitpython pyyaml jinja2 wavedrom
 
-You can clone GitHub repository and run application from the project root:
+Then clone GitHub repository and you'll be able to run application from the project root:
 
 ::
 

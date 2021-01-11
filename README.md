@@ -33,19 +33,28 @@ For more details about ways the tool can be used and how it works please refer t
 
 ## Installation
 
-You can install the latest release:
+Depending on your system, Python executable might be ```python``` or ```python3```.
+If there any permissions issues, add ```--user``` key to the installation scripts.
+
+You can install the latest stable release:
 
 ```sh
 python3 -m pip install -U corsair
 ```
 
-To get the latest development version:
+To install development verision satisfy dependencies first:
+
+```sh
+python3 -m pip install gitpython
+```
+
+Then you can use ```pip```:
 
 ```sh
 python3 -m pip install -U git+https://github.com/esynr3z/corsair.git
 ```
 
-Alternatively:
+Or alternatively:
 
 ```sh
 git clone https://github.com/esynr3z/corsair.git
