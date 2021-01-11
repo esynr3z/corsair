@@ -23,33 +23,33 @@ logic              lb_rvalid;
 logic [ADDR_W-1:0] lb_raddr;
 logic              lb_ren;
 
-logic [31:0] csr_lena_val;
-logic [15:0] csr_lenb_val;
+logic [31:0] csr_lena_val_out;
+logic [15:0] csr_lenb_val_out;
 
-logic [11:0] csr_cnt_eva;
-logic [11:0] csr_cnt_eva_new = 0;
+logic [11:0] csr_cnt_eva_out;
+logic [11:0] csr_cnt_eva_in = 0;
 logic csr_cnt_eva_upd = 0;
-logic [11:0] csr_cnt_evb;
-logic [11:0] csr_cnt_evb_new = 0;
+logic [11:0] csr_cnt_evb_out;
+logic [11:0] csr_cnt_evb_in = 0;
 logic csr_cnt_evb_upd = 0;
 
-logic csr_ctl_done;
-logic csr_ctl_done_new = 0;
+logic csr_ctl_done_out;
+logic csr_ctl_done_in = 0;
 logic csr_ctl_done_upd = 0;
-logic csr_ctl_gen;
-logic csr_ctl_gen_new = 0;
+logic csr_ctl_gen_out;
+logic csr_ctl_gen_in = 0;
 logic csr_ctl_gen_upd = 0;
-logic csr_ctl_mode;
-logic csr_ctl_mode_new = 0;
+logic csr_ctl_mode_out;
+logic csr_ctl_mode_in = 0;
 logic csr_ctl_mode_upd = 0;
 
-logic csr_start_en;
-logic [15:0] csr_start_key;
+logic csr_start_en_out;
+logic [15:0] csr_start_key_out;
 
-logic csr_status_dir = 0;
-logic csr_status_err_new = 0;
+logic csr_status_dir_in = 0;
+logic csr_status_err_in = 0;
 logic csr_status_err_upd = 0;
-logic [11:0] csr_status_cap_new = 0;
+logic [11:0] csr_status_cap_in = 0;
 logic csr_status_cap_upd = 0;
 
 regs dut (
@@ -57,34 +57,34 @@ regs dut (
     .clk (clk),
     .rst (rst),
     // CSR: LENA
-    .csr_lena_val (csr_lena_val),
+    .csr_lena_val_out (csr_lena_val_out),
     // CSR: LENB
-    .csr_lenb_val (csr_lenb_val),
+    .csr_lenb_val_out (csr_lenb_val_out),
     // CSR: CNT
-    .csr_cnt_eva     (csr_cnt_eva),
-    .csr_cnt_eva_new (csr_cnt_eva_new),
+    .csr_cnt_eva_out     (csr_cnt_eva_out),
+    .csr_cnt_eva_in (csr_cnt_eva_in),
     .csr_cnt_eva_upd (csr_cnt_eva_upd),
-    .csr_cnt_evb     (csr_cnt_evb),
-    .csr_cnt_evb_new (csr_cnt_evb_new),
+    .csr_cnt_evb_out     (csr_cnt_evb_out),
+    .csr_cnt_evb_in (csr_cnt_evb_in),
     .csr_cnt_evb_upd (csr_cnt_evb_upd),
     // CSR: CTL
-    .csr_ctl_done     (csr_ctl_done),
-    .csr_ctl_done_new (csr_ctl_done_new),
+    .csr_ctl_done_out     (csr_ctl_done_out),
+    .csr_ctl_done_in (csr_ctl_done_in),
     .csr_ctl_done_upd (csr_ctl_done_upd),
-    .csr_ctl_gen      (csr_ctl_gen),
-    .csr_ctl_gen_new  (csr_ctl_gen_new),
+    .csr_ctl_gen_out      (csr_ctl_gen_out),
+    .csr_ctl_gen_in  (csr_ctl_gen_in),
     .csr_ctl_gen_upd  (csr_ctl_gen_upd),
-    .csr_ctl_mode     (csr_ctl_mode),
-    .csr_ctl_mode_new (csr_ctl_mode_new),
+    .csr_ctl_mode_out     (csr_ctl_mode_out),
+    .csr_ctl_mode_in (csr_ctl_mode_in),
     .csr_ctl_mode_upd (csr_ctl_mode_upd),
     // CSR: START
-    .csr_start_en   (csr_start_en),
-    .csr_start_key  (csr_start_key),
+    .csr_start_en_out   (csr_start_en_out),
+    .csr_start_key_out  (csr_start_key_out),
     // CSR: STATUS
-    .csr_status_dir     (csr_status_dir),
-    .csr_status_err_new (csr_status_err_new),
+    .csr_status_dir_in     (csr_status_dir_in),
+    .csr_status_err_in (csr_status_err_in),
     .csr_status_err_upd (csr_status_err_upd),
-    .csr_status_cap_new (csr_status_cap_new),
+    .csr_status_cap_in (csr_status_cap_in),
     .csr_status_cap_upd (csr_status_cap_upd),
     // Local Bus
     .lb_waddr   (lb_waddr),

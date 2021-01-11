@@ -16,11 +16,11 @@ task test_basic;
     // test STATUS register
     // simple read with hardware control
     addr = 'h40;
-    csr_status_dir = 0;
+    csr_status_dir_in = 0;
     apb_mst.read(addr, data);
     if ((data >> 4) & 1 != 0)
         errors++;
-    csr_status_dir = 1;
+    csr_status_dir_in = 1;
     apb_mst.read(addr, data);
     if ((data >> 4) & 1 != 1)
         errors++;
@@ -36,7 +36,7 @@ task test_ext_upd;
     if (((data >> 8) & 1) != 0)
         errors++;
     @(posedge clk);
-    csr_status_err_new = 1'b1;
+    csr_status_err_in = 1'b1;
     csr_status_err_upd = 1'b1;
     @(posedge clk);
     csr_status_err_upd = 1'b0;
@@ -60,7 +60,7 @@ task test_read_clr;
     if (((data >> 16) & 'hFFF) != 0)
         errors++;
     @(posedge clk);
-    csr_status_cap_new = 'habc;
+    csr_status_cap_in = 'habc;
     csr_status_cap_upd = 1'b1;
     @(posedge clk);
     csr_status_cap_upd = 1'b0;

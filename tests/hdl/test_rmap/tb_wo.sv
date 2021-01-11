@@ -19,7 +19,7 @@ task test_basic;
     data = 'hdeadbeef;
     apb_mst.write(addr, data);
     @(posedge clk);
-    if (csr_start_key != 'hdead)
+    if (csr_start_key_out != 'hdead)
         errors++;
     data = 'heeeeeeee;
     apb_mst.read(addr, data);
@@ -35,10 +35,10 @@ task test_self_clear;
     data = 1 << 0;
     apb_mst.write(addr, data);
     @(posedge clk);
-    if (csr_start_en != 1)
+    if (csr_start_en_out != 1)
         errors++;
     @(posedge clk);
-    if (csr_start_en != 0)
+    if (csr_start_en_out != 0)
         errors++;
 endtask
 

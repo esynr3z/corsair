@@ -23,7 +23,7 @@ task test_basic;
     data = 'hdeadbeef;
     apb_mst.write(addr, data);
     @(posedge clk);
-    if (csr_lena_val != 'hdeadbeef)
+    if (csr_lena_val_out != 'hdeadbeef)
         errors++;
     data = 'heeeeeeee;
     apb_mst.read(addr, data);
@@ -34,7 +34,7 @@ task test_basic;
     strb = 'b0110;
     apb_mst.write(addr, data, strb);
     @(posedge clk);
-    if (csr_lena_val != 'hde7788ef)
+    if (csr_lena_val_out != 'hde7788ef)
         errors++;
     data = 'heeeeeeee;
     apb_mst.read(addr, data);
@@ -51,7 +51,7 @@ task test_basic;
     data = 'hdeadbeef;
     apb_mst.write(addr, data);
     @(posedge clk);
-    if (csr_lenb_val != 'hadbe)
+    if (csr_lenb_val_out != 'hadbe)
         errors++;
     data = 'heeeeeeee;
     apb_mst.read(addr, data);
@@ -62,7 +62,7 @@ task test_basic;
     strb = 'b0010;
     apb_mst.write(addr, data, strb);
     @(posedge clk);
-    if (csr_lenb_val != 'had88)
+    if (csr_lenb_val_out != 'had88)
         errors++;
     data = 'heeeeeeee;
     apb_mst.read(addr, data);
@@ -79,9 +79,9 @@ task test_ext_upd;
     data = 'hdeadbeef;
     apb_mst.write(addr, data);
     @(posedge clk);
-    if (csr_cnt_eva != 'heef)
+    if (csr_cnt_eva_out != 'heef)
         errors++;
-    if (csr_cnt_evb != 'head)
+    if (csr_cnt_evb_out != 'head)
         errors++;
     data = 'heeeeeeee;
     apb_mst.read(addr, data);
@@ -91,11 +91,11 @@ task test_ext_upd;
     // external update EVA bitfield
     @(posedge clk);
     csr_cnt_eva_upd = 1;
-    csr_cnt_eva_new = 'hfff;
+    csr_cnt_eva_in = 'hfff;
     @(posedge clk);
     csr_cnt_eva_upd = 0;
     @(posedge clk);
-    if (csr_cnt_eva != 'hfff)
+    if (csr_cnt_eva_out != 'hfff)
         errors++;
     data = 'heeeeeeee;
     apb_mst.read(addr, data);
@@ -109,14 +109,14 @@ task test_ext_upd;
             @(posedge clk);
             @(posedge clk);
             csr_cnt_evb_upd = 1;
-            csr_cnt_evb_new = 'h777;
+            csr_cnt_evb_in = 'h777;
             @(posedge clk);
             csr_cnt_evb_upd = 0;
         end
         apb_mst.write(addr, data);
     join
     @(posedge clk);
-    if (csr_cnt_evb != 'h666)
+    if (csr_cnt_evb_out != 'h666)
         errors++;
     data = 'heeeeeeee;
     apb_mst.read(addr, data);
@@ -132,11 +132,11 @@ task test_write1;
     addr = 'h20;
     @(posedge clk);
     csr_ctl_done_upd = 1;
-    csr_ctl_done_new = 1;
+    csr_ctl_done_in = 1;
     @(posedge clk);
     csr_ctl_done_upd = 0;
     @(posedge clk);
-    if (csr_ctl_done != 1)
+    if (csr_ctl_done_out != 1)
         errors++;
     apb_mst.read(addr, data);
     if (((data >> 3) & 1) != 1)
@@ -144,7 +144,7 @@ task test_write1;
     data = 1 << 3;
     apb_mst.write(addr, data);
     @(posedge clk);
-    if (csr_ctl_done != 0)
+    if (csr_ctl_done_out != 0)
         errors++;
     apb_mst.read(addr, data);
     if (((data >> 3) & 1) != 0)
@@ -154,18 +154,18 @@ task test_write1;
     data = 1 << 5;
     apb_mst.write(addr, data);
     @(posedge clk);
-    if (csr_ctl_gen != 1)
+    if (csr_ctl_gen_out != 1)
         errors++;
     apb_mst.read(addr, data);
     if (((data >> 5) & 1) != 1)
         errors++;
     @(posedge clk);
     csr_ctl_gen_upd = 1;
-    csr_ctl_gen_new = 0;
+    csr_ctl_gen_in = 0;
     @(posedge clk);
     csr_ctl_gen_upd = 0;
     @(posedge clk);
-    if (csr_ctl_gen != 0)
+    if (csr_ctl_gen_out != 0)
         errors++;
     apb_mst.read(addr, data);
     if (((data >> 5) & 1) != 0)
@@ -175,14 +175,14 @@ task test_write1;
     data = 1 << 16;
     apb_mst.write(addr, data);
     @(posedge clk);
-    if (csr_ctl_mode != 1)
+    if (csr_ctl_mode_out != 1)
         errors++;
     apb_mst.read(addr, data);
     if (((data >> 16) & 1) != 1)
         errors++;
     apb_mst.write(addr, data);
     @(posedge clk);
-    if (csr_ctl_mode != 0)
+    if (csr_ctl_mode_out != 0)
         errors++;
     apb_mst.read(addr, data);
     if (((data >> 16) & 1) != 0)

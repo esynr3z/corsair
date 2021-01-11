@@ -69,22 +69,22 @@ always @(posedge clk or negedge rst) begin
 {%- endmacro %}
 
 {#- 'always' part with write strobes #}
-{% macro always_write(reg, bf) %}
+{% macro always_write(sig, reg, bf) %}
     {% if 'w' in bf.access %}
  if (lb_wen && (lb_waddr == {{ literal(reg.address, config['address_width'].value) }})) begin
         {% for num, val in bf.byte_strobes.items() %}
             {% if 'w1tc' in bf.modifiers %}
         if (lb_wstrb[{{ num }}] && lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }})
-            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= {{ zeros(val['bf_msb'] - val['bf_lsb'] + 1) }};
+            {{ sig }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= {{ zeros(val['bf_msb'] - val['bf_lsb'] + 1) }};
             {% elif 'w1ts' in bf.modifiers %}
         if (lb_wstrb[{{ num }}] && lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }})
-            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= {{ ones(val['bf_msb'] - val['bf_lsb'] + 1) }};
+            {{ sig }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= {{ ones(val['bf_msb'] - val['bf_lsb'] + 1) }};
             {% elif 'w1tt' in bf.modifiers %}
         if (lb_wstrb[{{ num }}] && lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }})
-            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= ~{{ sig_bf_ff(reg, bf) }};
+            {{ sig }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= ~{{ sig }};
             {% else %}
         if (lb_wstrb[{{ num }}])
-            {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }};
+            {{ sig }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }};
             {% endif %}
         {% endfor %}
         {% if 'hwu' in bf.modifiers %}
@@ -96,28 +96,28 @@ always @(posedge clk or negedge rst) begin
 {%- endmacro %}
 
 {#- 'always' part for external updates #}
-{% macro always_update(reg, bf) %}
+{% macro always_update(sig, reg, bf) %}
     {% if 'hwu' in bf.modifiers %}
  if ({{ sig_bf_port_upd(reg, bf) }}) begin
-        {{ sig_bf_ff(reg, bf) }} <= {{ sig_bf_port_new(reg, bf) }};
+        {{ sig }} <= {{ sig_bf_port_in(reg, bf) }};
     end
     {%- endif %}
 {%- endmacro %}
 
 {#- 'always' part for self clear #}
-{% macro always_self_clear(reg, bf) %}
+{% macro always_self_clear(sig, reg, bf) %}
     {% if 'sc' in bf.modifiers %}
  else begin
-        {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
+        {{ sig }} <= {{ zeros(bf.width) }};
     end
     {%- endif %}
 {%- endmacro %}
 
 {#- 'always' part with clear after read #}
-{% macro always_read_clear(reg, bf) %}
+{% macro always_read_clear(sig, reg, bf) %}
     {% if bf.access == 'ro' and 'rtc' in bf.modifiers %}
  if (lb_ren && (lb_raddr == {{ literal(reg.address, config['address_width'].value) }})) begin
-        {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
+        {{ sig }} <= {{ zeros(bf.width) }};
     end
     {%- endif %}
 {%- endmacro %}
@@ -127,14 +127,14 @@ always @(posedge clk or negedge rst) begin
 csr_{{ reg.name.lower() }}_rdata
 {%- endmacro %}
 
-{#- signal: bitfield port io #}
-{% macro sig_bf_port_io(reg, bf) %}
-csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}
+{#- signal: bitfield port output #}
+{% macro sig_bf_port_out(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_out
 {%- endmacro %}
 
-{#- signal: bitfield port new data for update  #}
-{% macro sig_bf_port_new(reg, bf) %}
-csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_new
+{#- signal: bitfield port input  #}
+{% macro sig_bf_port_in(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_in
 {%- endmacro %}
 
 {#- signal: bitfield port update enable #}
@@ -142,9 +142,14 @@ csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_new
 csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_upd
 {%- endmacro %}
 
-{#- signal: bitfield flip-flops for write #}
-{% macro sig_bf_ff(reg, bf) %}
-csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_ff
+{#- signal: bitfield flip-flops for write (output) #}
+{% macro sig_bf_out_ff(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_out_ff
+{%- endmacro %}
+
+{#- signal: bitfield flip-flops for read (input) #}
+{% macro sig_bf_in_ff(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_in_ff
 {%- endmacro %}
 
 {#- TEMPLATE NAMESPACE #}
@@ -167,13 +172,13 @@ module {{ config['name'].value }} #(
 {% for reg in rmap %}
     // CSR: {{ reg.name }}
     {% for bf in reg %}
-        {% if bf.access == 'ro' and 'const' not in bf.modifiers and 'hwu' not in bf.modifiers %}
-    input {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_io(reg, bf) }},
-        {% elif 'w' in bf.access %}
-    output {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_io(reg, bf) }},
+        {% if 'const' not in bf.modifiers and (bf.access == 'ro' or 'hwu' in bf.modifiers) %}
+    input {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_in(reg, bf) }},
+        {% endif %}
+        {% if 'w' in bf.access %}
+    output {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_out(reg, bf) }},
         {% endif %}
         {% if 'hwu' in bf.modifiers %}
-    input {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_new(reg, bf) }},
     input {{ sig_bf_port_upd(reg, bf) }},
         {% endif %}
     {% endfor %}
@@ -215,31 +220,46 @@ assign {{ sig_csr_rdata(reg) }}{{ range(config['data_width'].value - 1, tmp.last
 // {{ reg.name }}{{ range(bf.msb, bf.lsb) }} - {{ bf.name }} - {{ bf.description }}
 // {{ bf.access }}{{ ', ' + ', '.join(bf.modifiers) if bf.modifiers else '' }}
 //---------------------
-        {% if bf.access == 'ro' and 'hwu' not in bf.modifiers %}
-        {% elif config['register_reset'].value == 'init_only' %}
-reg {{ range_decl( bf.width - 1, bf.is_vector()) }} {{ sig_bf_ff(reg, bf) }} = {{ literal(bf.initial, bf.width) }};
-        {% else %}
-reg {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_ff(reg, bf) }};
+        {% if 'w' in bf.access %}
+            {% if config['register_reset'].value == 'init_only' %}
+reg {{ range_decl( bf.width - 1, bf.is_vector()) }} {{ sig_bf_out_ff(reg, bf) }} = {{ literal(bf.initial, bf.width) }};
+            {% else %}
+reg {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_out_ff(reg, bf) }};
+            {% endif %}
+        {% endif %}
+        {% if 'ro' == bf.access and 'hwu' in bf.modifiers %}
+            {% if config['register_reset'].value == 'init_only' %}
+reg {{ range_decl( bf.width - 1, bf.is_vector()) }} {{ sig_bf_in_ff(reg, bf) }} = {{ literal(bf.initial, bf.width) }};
+            {% else %}
+reg {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_in_ff(reg, bf) }};
+            {% endif %}
         {% endif %}
         {% if bf.access == 'wo' %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ zeros(bf.width) }};
         {% elif bf.access == 'ro' and 'const' in bf.modifiers %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ literal(bf.initial, bf.width) }};
         {% elif bf.access == 'ro' and 'hwu' not in bf.modifiers %}
-assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_port_io(reg, bf) }};
+assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_port_in(reg, bf) }};
+        {% elif bf.access == 'ro' and 'hwu' in bf.modifiers %}
+assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_in_ff(reg, bf) }};
         {% else %}
-assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_ff(reg, bf) }};
+assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_out_ff(reg, bf) }};
         {% endif %}
         {% if 'w' in bf.access %}
-assign {{ sig_bf_port_io(reg, bf) }} = {{ sig_bf_ff(reg, bf) }};
+assign {{ sig_bf_port_out(reg, bf) }} = {{ sig_bf_out_ff(reg, bf) }};
         {% endif %}
 
-        {% if bf.access != 'ro' or 'hwu' in bf.modifiers %}
-{{ always_begin(sig=sig_bf_ff(reg, bf), width=bf.width, init=bf.initial)
-}}{{ always_write(reg, bf)
-}}{{ always_update(reg, bf)
-}}{{ always_self_clear(reg, bf)
-}}{{ always_read_clear(reg, bf)
+        {% if 'w' in bf.access %}
+{{ always_begin(sig=sig_bf_out_ff(reg, bf), width=bf.width, init=bf.initial)
+}}{{ always_write(sig_bf_out_ff(reg, bf), reg, bf)
+}}{{ always_update(sig_bf_out_ff(reg, bf), reg, bf)
+}}{{ always_self_clear(sig_bf_out_ff(reg, bf), reg, bf)
+}}
+end
+        {% elif bf.access == 'ro' and 'hwu' in bf.modifiers %}
+{{ always_begin(sig=sig_bf_in_ff(reg, bf), width=bf.width, init=bf.initial)
+}}{{ always_update(sig_bf_in_ff(reg, bf), reg, bf)
+}}{{ always_read_clear(sig_bf_in_ff(reg, bf), reg, bf)
 }}
 end
         {% endif %}
