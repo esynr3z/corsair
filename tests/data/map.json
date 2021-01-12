@@ -34,6 +34,7 @@
         },
         {
             "address": "0x004",
+            "access_strobes": true,
             "bfields": [
                 {
                     "name": "CNT",
@@ -42,7 +43,6 @@
                     "width": 16,
                     "lsb": 0,
                     "access": "rw",
-                    "access_flags": true,
                     "modifiers": [
                         "hwu"
                     ]

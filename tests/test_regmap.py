@@ -20,13 +20,12 @@ class TestBitField:
         width = 1
         lsb = 0
         access = 'rw'
-        access_flags = False
         modifiers = []
         bf = BitField(name)
         print(repr(bf))
         print(bf)
-        assert ((name, description, initial, width, lsb, access, access_flags, modifiers) ==
-                (bf.name, bf.description, bf.initial, bf.width, bf.lsb, bf.access, bf.access_flags, bf.modifiers))
+        assert ((name, description, initial, width, lsb, access, modifiers) ==
+                (bf.name, bf.description, bf.initial, bf.width, bf.lsb, bf.access, bf.modifiers))
 
     def test_eq(self):
         """Test of equality comparision of bit fields."""
@@ -113,23 +112,6 @@ class TestBitField:
         bf = BitField('bf_a')
         with pytest.raises(ValueError):
             bf.access = 'wr'
-
-    def test_access_flags_access(self):
-        """Test of accessing to 'access_flags' attribute of a bit field."""
-        bf = BitField('bf_a')
-        bf.access_flags = True
-        assert bf.access_flags is True
-
-    def test_access_flags_init_wrong(self):
-        """Test of initializing a bit field with a wrong 'access_flags' value."""
-        with pytest.raises(ValueError):
-            BitField('bf_a', access_flags='true')
-
-    def test_access_flags_set_wrong(self):
-        """Test of setting wrong value to 'access_flags' attribute of a bit field."""
-        bf = BitField('bf_a')
-        with pytest.raises(ValueError):
-            bf.access_flags = 0
 
     def test_modifiers_access(self):
         """Test of accessing to 'modifiers' attribute of a bit field."""
@@ -316,6 +298,23 @@ class TestRegister:
         reg.add_bfields(BitField('bf_c', 'Bit field C', lsb=5, width=6))
         reg.add_bfields(BitField('bf_d', 'Bit field D', lsb=18, width=12))
         assert reg.names == ['bf_a', 'bf_c', 'bf_b', 'bf_d']
+
+    def test_access_strobes_access(self):
+        """Test of accessing to 'access_strobes' attribute of a register."""
+        reg = Register('REGA', 'Register A')
+        reg.access_strobes = True
+        assert reg.access_strobes is True
+
+    def test_access_strobes_init_wrong(self):
+        """Test of initializing a register with a wrong 'access_strobes' value."""
+        with pytest.raises(ValueError):
+            Register('REGA', 'Register A', access_strobes='true')
+
+    def test_access_strobes_set_wrong(self):
+        """Test of setting wrong value to 'access_strobes' attribute of a register."""
+        reg = Register('REGA', 'Register A')
+        with pytest.raises(ValueError):
+            reg.access_strobes = 0
 
 
 class TestRegisterMap:

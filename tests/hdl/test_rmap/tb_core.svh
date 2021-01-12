@@ -26,6 +26,8 @@ logic              lb_ren;
 logic [31:0] csr_lena_val_out;
 logic [15:0] csr_lenb_val_out;
 
+logic csr_cnt_rstrb;
+logic csr_cnt_wstrb;
 logic [11:0] csr_cnt_eva_out;
 logic [11:0] csr_cnt_eva_in = 0;
 logic csr_cnt_eva_upd = 0;
@@ -61,6 +63,8 @@ regs dut (
     // CSR: LENB
     .csr_lenb_val_out (csr_lenb_val_out),
     // CSR: CNT
+    .csr_cnt_rstrb (csr_cnt_rstrb),
+    .csr_cnt_wstrb (csr_cnt_wstrb),
     .csr_cnt_eva_out     (csr_cnt_eva_out),
     .csr_cnt_eva_in (csr_cnt_eva_in),
     .csr_cnt_eva_upd (csr_cnt_eva_upd),

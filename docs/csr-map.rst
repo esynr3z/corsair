@@ -194,14 +194,15 @@ Register
 
 Register related attributes:
 
-=============== ======= ==============================
-Attribute       Default Description
-=============== ======= ==============================
-``name``        ""      Register name
-``description`` ""      Register description
-``address``     0       Register address
-``bfields``     []      Array with register bit fields
-=============== ======= ==============================
+================== ======= =================================================================
+Attribute          Default Description
+================== ======= =================================================================
+``name``           ""      Register name
+``description``    ""      Register description
+``address``        0       Register address
+``access_strobes`` False   Enable pulse generation on special outputs on every read or write
+``bfields``        []      Array with register bit fields
+================== ======= =================================================================
 
 .. note::
     Name and description can be ommited if register is made from the only one bit field. Name and description of that field will be used instead of register's ones.
@@ -211,18 +212,17 @@ Bit field
 
 Field related attributes:
 
-================ ======= ================================================================================================
-Parameter        Default Description
-================ ======= ================================================================================================
-``name``         ""      Field name
-``description``  ""      Field description
-``initial``      0       Initial (reset) value for the field
-``width``        1       Field width (bits)
-``lsb``          0       Field LSB position
-``access``       "rw"    Access mode for the field. One of the options below.
-``access_flags`` False   Enable pulse generation on output special signals on every read or write
-``modifiers``    []      Access modifiers. Choice of none or multiple options below.
-================ ======= ================================================================================================
+=============== ======= ================================================================================================
+Parameter       Default Description
+=============== ======= ================================================================================================
+``name``           ""      Field name
+``description``    ""      Field description
+``initial``        0       Initial (reset) value for the field
+``width``          1       Field width (bits)
+``lsb``            0       Field LSB position
+``access``         "rw"    Access mode for the field. One of the options below.
+``modifiers``      []      Access modifiers. Choice of none or multiple options below.
+=============== ======= ================================================================================================
 
 Options for ``access``:
 

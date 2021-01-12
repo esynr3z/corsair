@@ -40,6 +40,7 @@ def gen_rtl(tmpdir):
 
     # CSR CNT
     csr_cnt = corsair.Register('CNT', 'Counter for some events', 0x10)
+    csr_cnt.access_strobes = True
     csr_cnt.add_bfields([
         corsair.BitField('EVA', 'Some event A counter',
                          lsb=0, width=12, initial=0x000, access='rw', modifiers=['hwu']),

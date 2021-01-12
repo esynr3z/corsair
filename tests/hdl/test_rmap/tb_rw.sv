@@ -189,6 +189,37 @@ task test_write1;
         errors++;
 endtask
 
+task test_access_strobes;
+    $display("%t, Start access strobe tests!", $time);
+    // test CNT register
+    // read after reset
+    addr = 'h10;
+    fork
+        apb_mst.read(addr, data);
+        begin
+            wait(csr_cnt_rstrb);
+            @(posedge clk);
+            if (csr_cnt_rstrb != 1)
+                errors++;
+            @(posedge clk);
+            if (csr_cnt_rstrb != 0)
+                errors++;
+        end
+    join
+    fork
+        apb_mst.write(addr, data);
+        begin
+            wait(csr_cnt_wstrb);
+            @(posedge clk);
+            if (csr_cnt_wstrb != 1)
+                errors++;
+            @(posedge clk);
+            if (csr_cnt_wstrb != 0)
+                errors++;
+        end
+    join
+endtask
+
 initial begin : main
     wait(!rst);
     repeat(5) @(posedge clk);
@@ -196,12 +227,19 @@ initial begin : main
     test_basic();
     test_ext_upd();
     test_write1();
+    test_access_strobes();
 
     repeat(5) @(posedge clk);
     if (errors)
         $display("!@# TEST FAILED #@!");
     else
         $display("!@# TEST PASSED #@!");
+    $finish;
+end
+
+initial begin : timeout
+    #5000;
+    $display("!@# TEST FAILED #@!");
     $finish;
 end
 

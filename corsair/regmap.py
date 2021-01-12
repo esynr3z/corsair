@@ -21,7 +21,6 @@ class BitField():
           width = 8
           lsb = 0
           access = rw
-          access_flags = False
           modifiers = []
 
     Attributes:
@@ -29,14 +28,13 @@ class BitField():
         description: Description of the bit field.
     """
     def __init__(self, name, description='', initial=0, width=1,
-                 lsb=0, access='rw', access_flags=False, modifiers=[]):
+                 lsb=0, access='rw', modifiers=[]):
         self.name = name
         self.description = description
         self.initial = initial
         self.width = width
         self.lsb = lsb
         self.access = access
-        self.access_flags = access_flags
         self.modifiers = modifiers
 
     def __eq__(self, other):
@@ -65,7 +63,6 @@ class BitField():
         bf_str += inner_indent + 'width = %s\n' % self.width
         bf_str += inner_indent + 'lsb = %s\n' % self.lsb
         bf_str += inner_indent + 'access = %s\n' % self.access
-        bf_str += inner_indent + 'access_flags = %s\n' % self.access_flags
         bf_str += inner_indent + 'modifiers = %s' % self.modifiers
         return bf_str
 
@@ -78,7 +75,6 @@ class BitField():
             'width': self.width,
             'lsb': self.lsb,
             'access': self.access,
-            'access_flags': self.access_flags,
             'modifiers': self.modifiers
         }
 
@@ -155,19 +151,6 @@ class BitField():
             self._access = value
 
     @property
-    def access_flags(self):
-        """Enable access flags generation."""
-        return self._access_flags
-
-    @access_flags.setter
-    def access_flags(self, value):
-        if isinstance(value, bool):
-            self._access_flags = value
-        else:
-            raise ValueError("Access flags attribute has to be 'bool', "
-                             "but '%s' provided for '%s' field!" % (type(value), self.name))
-
-    @property
     def modifiers(self):
         """List of an access modifiers."""
         return self._modifiers
@@ -241,19 +224,18 @@ class Register():
         ... ])
         >>> print(reg)
         (0x8) reg_a: Register A description
+          access_strobes = False
           bf_a: Bit field A
             initial = 0
             width = 1
             lsb = 0
             access = rw
-            access_flags = False
             modifiers = []
           bf_b: Bit field B
             initial = 0
             width = 1
             lsb = 1
             access = rw
-            access_flags = False
             modifiers = []
 
         Access bit field via name or index:
@@ -279,12 +261,13 @@ class Register():
         bf_a
         bf_b
     """
-    def __init__(self, name='', description='', address=None):
+    def __init__(self, name='', description='', address=None, access_strobes=False):
         self._bfields = []
 
         self.name = name
         self.description = description
         self.address = address
+        self.access_strobes = access_strobes
 
     def __eq__(self, other):
         if self.__class__ != other.__class__:
@@ -309,7 +292,10 @@ class Register():
         inner_indent = indent + '  '
         bfields = [bf.as_str(inner_indent) for bf in self.bfields]
         bfields_str = '\n'.join(bfields) if bfields else inner_indent + 'empty'
-        return indent + '(0x%x) %s: %s\n' % (self.address, self.name, self.description) + bfields_str
+        reg_str = indent + '(0x%x) %s: %s\n' % (self.address, self.name, self.description)
+        reg_str += inner_indent + 'access_strobes = %s\n' % self.access_strobes
+        reg_str += bfields_str
+        return reg_str
 
     def as_dict(self):
         """Returns dictionary with register's key attributes."""
@@ -317,6 +303,7 @@ class Register():
             'name': self.name,
             'description': self.description,
             'address': self.address,
+            'access_strobes': self.access_strobes,
             'bfields': [bf.as_dict() for bf in self.bfields]
         }
 
@@ -378,6 +365,19 @@ class Register():
             self._address = None
         elif utils.is_non_neg_int(value, err_msg):
             self._address = value
+
+    @property
+    def access_strobes(self):
+        """Enable access strobes generation."""
+        return self._access_strobes
+
+    @access_strobes.setter
+    def access_strobes(self, value):
+        if isinstance(value, bool):
+            self._access_strobes = value
+        else:
+            raise ValueError("Access strobes attribute has to be 'bool', "
+                             "but '%s' provided for '%s' field!" % (type(value), self.name))
 
     @property
     def names(self):

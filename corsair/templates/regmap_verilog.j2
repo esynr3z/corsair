@@ -71,7 +71,7 @@ always @(posedge clk or negedge rst) begin
 {#- 'always' part with write strobes #}
 {% macro always_write(sig, reg, bf) %}
     {% if 'w' in bf.access %}
- if (lb_wen && (lb_waddr == {{ literal(reg.address, config['address_width'].value) }})) begin
+ if ({{ sig_csr_wen(reg) }}) begin
         {% for num, val in bf.byte_strobes.items() %}
             {% if 'w1tc' in bf.modifiers %}
         if (lb_wstrb[{{ num }}] && lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }})
@@ -98,8 +98,8 @@ always @(posedge clk or negedge rst) begin
 {#- 'always' part for external updates #}
 {% macro always_update(sig, reg, bf) %}
     {% if 'hwu' in bf.modifiers %}
- if ({{ sig_bf_port_upd(reg, bf) }}) begin
-        {{ sig }} <= {{ sig_bf_port_in(reg, bf) }};
+ if ({{ port_bf_upd(reg, bf) }}) begin
+        {{ sig }} <= {{ port_bf_in(reg, bf) }};
     end
     {%- endif %}
 {%- endmacro %}
@@ -116,7 +116,7 @@ always @(posedge clk or negedge rst) begin
 {#- 'always' part with clear after read #}
 {% macro always_read_clear(sig, reg, bf) %}
     {% if bf.access == 'ro' and 'rtc' in bf.modifiers %}
- if (lb_ren && (lb_raddr == {{ literal(reg.address, config['address_width'].value) }})) begin
+ if ({{ sig_csr_ren(reg) }}) begin
         {{ sig }} <= {{ zeros(bf.width) }};
     end
     {%- endif %}
@@ -127,18 +127,18 @@ always @(posedge clk or negedge rst) begin
 csr_{{ reg.name.lower() }}_rdata
 {%- endmacro %}
 
-{#- signal: bitfield port output #}
-{% macro sig_bf_port_out(reg, bf) %}
+{#- port: bitfield output #}
+{% macro port_bf_out(reg, bf) %}
 csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_out
 {%- endmacro %}
 
-{#- signal: bitfield port input  #}
-{% macro sig_bf_port_in(reg, bf) %}
+{#- port: bitfield input  #}
+{% macro port_bf_in(reg, bf) %}
 csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_in
 {%- endmacro %}
 
-{#- signal: bitfield port update enable #}
-{% macro sig_bf_port_upd(reg, bf) %}
+{#- port: bitfield update enable #}
+{% macro port_bf_upd(reg, bf) %}
 csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_upd
 {%- endmacro %}
 
@@ -150,6 +150,26 @@ csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_out_ff
 {#- signal: bitfield flip-flops for read (input) #}
 {% macro sig_bf_in_ff(reg, bf) %}
 csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_in_ff
+{%- endmacro %}
+
+{#- port: register read access strobe #}
+{% macro port_csr_rstrb(reg) %}
+csr_{{ reg.name.lower() }}_rstrb
+{%- endmacro %}
+
+{#- port: register write access strobe #}
+{% macro port_csr_wstrb(reg) %}
+csr_{{ reg.name.lower() }}_wstrb
+{%- endmacro %}
+
+{#- signal: register read enable #}
+{% macro sig_csr_ren(reg) %}
+csr_{{ reg.name.lower() }}_ren
+{%- endmacro %}
+
+{#- signal: register write enable #}
+{% macro sig_csr_wen(reg) %}
+csr_{{ reg.name.lower() }}_wen
 {%- endmacro %}
 
 {#- TEMPLATE NAMESPACE #}
@@ -171,15 +191,19 @@ module {{ config['name'].value }} #(
 {% endif %}
 {% for reg in rmap %}
     // CSR: {{ reg.name }}
+    {% if reg.access_strobes %}
+    output {{ port_csr_rstrb(reg) }},
+    output {{ port_csr_wstrb(reg) }},
+    {% endif %}
     {% for bf in reg %}
         {% if 'const' not in bf.modifiers and (bf.access == 'ro' or 'hwu' in bf.modifiers) %}
-    input {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_in(reg, bf) }},
+    input {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ port_bf_in(reg, bf) }},
         {% endif %}
         {% if 'w' in bf.access %}
-    output {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_port_out(reg, bf) }},
+    output {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ port_bf_out(reg, bf) }},
         {% endif %}
         {% if 'hwu' in bf.modifiers %}
-    input {{ sig_bf_port_upd(reg, bf) }},
+    input {{ port_bf_upd(reg, bf) }},
         {% endif %}
     {% endfor %}
 {% endfor %}
@@ -213,6 +237,13 @@ assign {{ sig_csr_rdata(reg) }}{{ range(bf.lsb - 1, tmp.last_bit) }} = {{ zeros(
 assign {{ sig_csr_rdata(reg) }}{{ range(config['data_width'].value - 1, tmp.last_bit) }} = {{ zeros(config['data_width'].value - tmp.last_bit) }};
     {% endif %}
 
+wire {{ sig_csr_wen(reg) }};
+wire {{ sig_csr_ren(reg) }};
+
+assign {{ sig_csr_wen(reg) }} = lb_wen && (lb_waddr == {{ literal(reg.address, config['address_width'].value) }});
+assign {{ sig_csr_ren(reg) }} = lb_ren && (lb_raddr == {{ literal(reg.address, config['address_width'].value) }});
+assign {{ port_csr_wstrb(reg) }} = lb_wready && {{ sig_csr_wen(reg) }};
+assign {{ port_csr_rstrb(reg) }} = lb_rvalid && {{ sig_csr_ren(reg) }};
 {# generate bit fields #}
     {% for bf in reg %}
 //---------------------
@@ -239,14 +270,14 @@ assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ zeros(bf.width) 
         {% elif bf.access == 'ro' and 'const' in bf.modifiers %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ literal(bf.initial, bf.width) }};
         {% elif bf.access == 'ro' and 'hwu' not in bf.modifiers %}
-assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_port_in(reg, bf) }};
+assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ port_bf_in(reg, bf) }};
         {% elif bf.access == 'ro' and 'hwu' in bf.modifiers %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_in_ff(reg, bf) }};
         {% else %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ sig_bf_out_ff(reg, bf) }};
         {% endif %}
         {% if 'w' in bf.access %}
-assign {{ sig_bf_port_out(reg, bf) }} = {{ sig_bf_out_ff(reg, bf) }};
+assign {{ port_bf_out(reg, bf) }} = {{ sig_bf_out_ff(reg, bf) }};
         {% endif %}
 
         {% if 'w' in bf.access %}

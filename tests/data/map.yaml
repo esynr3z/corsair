@@ -24,11 +24,11 @@ regmap:
     width: 32
     lsb: 0
     access: rw
-    access_flags: false
     modifiers: []
 - name: CNT
   description: Counter value
   address: 4
+  access_strobes: true
   bfields:
   - name: CNT
     description: Counter value
@@ -36,7 +36,6 @@ regmap:
     width: 16
     lsb: 0
     access: rw
-    access_flags: true
     modifiers:
     - hwu
 - name: START
@@ -49,7 +48,6 @@ regmap:
     width: 1
     lsb: 0
     access: wo
-    access_flags: false
     modifiers:
     - sc
   - name: STB
@@ -58,7 +56,6 @@ regmap:
     width: 1
     lsb: 8
     access: wo
-    access_flags: false
     modifiers:
     - sc
   - name: STC
@@ -67,7 +64,6 @@ regmap:
     width: 1
     lsb: 16
     access: wo
-    access_flags: false
     modifiers:
     - sc
   - name: KEY
@@ -76,7 +72,6 @@ regmap:
     width: 8
     lsb: 24
     access: wo
-    access_flags: false
     modifiers: []
 - name: STAT
   description: Status
@@ -88,7 +83,6 @@ regmap:
     width: 1
     lsb: 0
     access: ro
-    access_flags: false
     modifiers: []
   - name: STATE
     description: Current state
@@ -96,7 +90,6 @@ regmap:
     width: 3
     lsb: 3
     access: ro
-    access_flags: false
     modifiers:
     - hwu
 - name: CTL
@@ -109,7 +102,6 @@ regmap:
     width: 1
     lsb: 1
     access: rw
-    access_flags: false
     modifiers: []
   - name: INITB
     description: Initial value for B
@@ -117,7 +109,6 @@ regmap:
     width: 8
     lsb: 8
     access: rw
-    access_flags: false
     modifiers: []
 - name: FLAG
   description: Flags
@@ -129,7 +120,6 @@ regmap:
     width: 1
     lsb: 0
     access: rw
-    access_flags: false
     modifiers:
     - hwu
     - w1tc
@@ -139,7 +129,6 @@ regmap:
     width: 1
     lsb: 2
     access: ro
-    access_flags: false
     modifiers:
     - hwu
     - rtc
@@ -153,7 +142,6 @@ regmap:
     width: 8
     lsb: 0
     access: ro
-    access_flags: false
     modifiers:
     - const
   - name: MAJOR
@@ -162,6 +150,5 @@ regmap:
     width: 8
     lsb: 16
     access: ro
-    access_flags: false
     modifiers:
     - const
