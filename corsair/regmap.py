@@ -454,8 +454,10 @@ class RegisterMap():
         >>> print(rmap)
         regs: v1.0
           (0x0) reg_a: Register A
+            access_strobes = False
             empty
           (0x4) reg_b: Register B
+            access_strobes = False
             empty
 
         Access register via name or index:
