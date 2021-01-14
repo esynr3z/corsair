@@ -224,7 +224,6 @@ class Register():
         ... ])
         >>> print(reg)
         (0x8) reg_a: Register A description
-          access_strobes = False
           bf_a: Bit field A
             initial = 0
             width = 1
@@ -293,7 +292,6 @@ class Register():
         bfields = [bf.as_str(inner_indent) for bf in self.bfields]
         bfields_str = '\n'.join(bfields) if bfields else inner_indent + 'empty'
         reg_str = indent + '(0x%x) %s: %s\n' % (self.address, self.name, self.description)
-        reg_str += inner_indent + 'access_strobes = %s\n' % self.access_strobes
         reg_str += bfields_str
         return reg_str
 
@@ -454,10 +452,8 @@ class RegisterMap():
         >>> print(rmap)
         regs: v1.0
           (0x0) reg_a: Register A
-            access_strobes = False
             empty
           (0x4) reg_b: Register B
-            access_strobes = False
             empty
 
         Access register via name or index:
