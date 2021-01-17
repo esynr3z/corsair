@@ -4,8 +4,116 @@
 // AXI-Lite to Local Bus bridge
 //
 
-module (
-    input wire clk
+module  {{ module_name }} #(
+    parameter ADDR_W = {{ addr_width }},
+    parameter DATA_W = {{ data_width }},
+    parameter STRB_W = DATA_W / 8
+)(
+    input               clk,
+    input               reset,
+    // AXI
+    input  [ADDR_W-1:0] AXIL_AWADDR,
+    input  [2:0]        AXIL_AWPROT,
+    input               AXIL_AWVALID,
+    output              AXIL_AWREADY,
+    input  [DATA_W-1:0] AXIL_WDATA,
+    input  [STRB_W-1:0] AXIL_WSTRB,
+    input               AXIL_WVALID,
+    output              AXIL_WREADY,
+    output [1:0]        AXIL_BRESP,
+    output              AXIL_BVALID,
+    input               AXIL_BREADY,
+
+    input  [ADDR_W-1:0] AXIL_ARADDR,
+    input  [2:0]        AXIL_ARPROT,
+    input               AXIL_ARVALID,
+    output              AXIL_ARREADY,
+    output [DATA_W-1:0] AXIL_RDATA,
+    output [1:0]        AXIL_RRESP,
+    output              AXIL_RVALID,
+    input               AXIL_RREADY,
+
+    // Local Bus
+    input               wready,
+    output [ADDR_W-1:0] waddr,
+    output [DATA_W-1:0] wdata,
+    output              wen,
+    output [STRB_W-1:0] wstrb,
+    input  [DATA_W-1:0] rdata,
+    input               rvalid,
+    output [ADDR_W-1:0] raddr,
+    output              ren
 );
+    reg [ADDR_W-1:0] waddr_int;
+    reg [ADDR_W-1:0] raddr_int;
+    reg [DATA_W-1:0] wdata_int;
+    reg [STRB_W-1:0] strb_int;
+    reg awflag;
+    reg wflag;
+    reg arflag;
+    
+    assign AXIL_AWREADY = ~awflag;
+    assign AXIL_WREADY  = ~wflag;
+    assign waddr        = waddr_int;
+    assign wdata        = wdata_int;
+    assign wstrb        = strb_int;
+    assign wen          = awflag && wflag;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset == 1'b1) begin
+            waddr_int <= 'd0;
+            wdata_int <= 'd0;
+            strb_int  <= 'd0;
+            awflag    <= 1'b0;
+            wflag     <= 1'b0;
+        end else begin
+            if (AXIL_AWVALID == 1'b1 && awflag == 1'b0) begin
+                awflag    <= 1'b1;
+                waddr_int <= AXIL_AWADDR;
+            end else if (wen == 1'b1 && wready == 1'b1) begin
+                awflag    <= 1'b0;
+            end
+
+            if (AXIL_WVALID == 1'b1 && wflag == 1'b0) begin
+                wflag     <= 1'b1;
+                wdata_int <= AXIL_WDATA;
+                strb_int  <= AXIL_WSTRB;
+            end else if (wen == 1'b1 && wready == 1'b1) begin
+                wflag     <= 1'b0;
+            end
+
+            if (AXIL_BVALID == 1'b1 && AXIL_BREADY == 1'b1) begin
+                AXIL_BVALID <= 1'b0;
+            end else if ((AXIL_WVALID == 1'b1 && awflag == 1'b1) || (AXIL_AWVALID == 1'b1 && wflag == 1'b1) || (wflag == 1'b1 && awflag == 1'b1)) begin
+                AXIL_BVALID <= wready;
+            end
+        end
+    end
+
+    assign raddr = raddr_int;
+    assign ren = value;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset == 1'b1) begin
+            raddr_int   <= 'd0;
+            arflag      <= 1'b0;
+            AXIL_RDATA  <= 'd0;
+            AXIL_RVALID <= 1'b0;
+        end else begin
+            if (AXIL_ARVALID == 1'b1 && arflag == 1'b0) begin
+                arflag    <= 1'b1;
+                raddr_int <= AXIL_ARADDR;
+            end else if (AXIL_RVALID == 1'b1 && AXIL_RREADY == 1'b1) begin
+                arflag    <= 1'b0;
+            end
+
+            if (rvalid == 1'b1 && AXIL_RVALID == 1'b0) begin
+                AXIL_RDATA  <= rdata;
+                AXIL_RVALID <= 1'b1;
+            end else if (AXIL_RVALID == 1'b1 && AXIL_RREADY == 1'b1) begin
+                AXIL_RVALID <= 1'b0;
+            end
+        end
+    end
 
 endmodule
