@@ -2,7 +2,40 @@
 
 module tb_ro;
 
-`include "tb_core.svh"
+// Clock and reset
+logic clk = 1'b0;
+always #5 clk <= ~clk;
+
+logic rst = 1'b1;
+initial begin
+    repeat (5) @(negedge clk);
+    rst <= 1'b0;
+end
+
+// DUT
+localparam ADDR_W = `DUT_ADDR_W;
+localparam DATA_W = `DUT_DATA_W;
+localparam STRB_W = DATA_W / 8;
+
+logic              lb_wready;
+logic [ADDR_W-1:0] lb_waddr;
+logic [DATA_W-1:0] lb_wdata;
+logic              lb_wen;
+logic [STRB_W-1:0] lb_wstrb;
+logic [DATA_W-1:0] lb_rdata;
+logic              lb_rvalid;
+logic [ADDR_W-1:0] lb_raddr;
+logic              lb_ren;
+
+// DUT
+`include "dut.svh"
+
+// Bridge to Local Bus
+`ifdef BRIDGE_APB
+    `include "bridge_apb2lb.svh"
+`else
+    $error("Unknown bridge!");
+`endif
 
 // Test body
 int errors = 0;
@@ -17,11 +50,11 @@ task test_basic;
     // simple read with hardware control
     addr = 'h40;
     csr_status_dir_in = 0;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if ((data >> 4) & 1 != 0)
         errors++;
     csr_status_dir_in = 1;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if ((data >> 4) & 1 != 1)
         errors++;
 endtask
@@ -32,7 +65,7 @@ task test_ext_upd;
     // test STATUS register
     addr = 'h40;
     // hardware update and read (also check that write has no action)
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (((data >> 8) & 1) != 0)
         errors++;
     @(posedge clk);
@@ -40,12 +73,12 @@ task test_ext_upd;
     csr_status_err_upd = 1'b1;
     @(posedge clk);
     csr_status_err_upd = 1'b0;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (((data >> 8) & 1) != 1)
         errors++;
     data = 0;
-    apb_mst.write(addr, data);
-    apb_mst.read(addr, data);
+    mst.write(addr, data);
+    mst.read(addr, data);
     if (((data >> 8) & 1) != 1)
         errors++;
 endtask
@@ -56,7 +89,7 @@ task test_read_clr;
     // test STATUS register
     addr = 'h40;
     // hardware control and several reads to validate read to clear action (also check that write has no action)
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (((data >> 16) & 'hFFF) != 0)
         errors++;
     @(posedge clk);
@@ -65,11 +98,11 @@ task test_read_clr;
     @(posedge clk);
     csr_status_cap_upd = 1'b0;
     data = 'hffffffff;
-    apb_mst.write(addr, data);
-    apb_mst.read(addr, data);
+    mst.write(addr, data);
+    mst.read(addr, data);
     if (((data >> 16) & 'hFFF) != 'habc)
         errors++;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (((data >> 16) & 'hFFF) != 0)
         errors++;
 endtask
@@ -80,8 +113,8 @@ task test_const;
     // test VERSION register
     addr = 'h44;
     data = 'heeeeeeee;
-    apb_mst.write(addr, data);
-    apb_mst.read(addr, data);
+    mst.write(addr, data);
+    mst.read(addr, data);
     if (data != 'h00020010)
         errors++;
 endtask
@@ -97,17 +130,16 @@ initial begin : main
 
     repeat(5) @(posedge clk);
     if (errors)
-        $display("!@# TEST FAILED #@!");
+        $display("!@# TEST FAILED - %d ERRORS #@!", errors);
     else
         $display("!@# TEST PASSED #@!");
     $finish;
 end
 
-`ifdef __ICARUS__
-initial begin
-    $dumpfile("dump.vcd");
-    $dumpvars(0, `TOP_NAME);
+initial begin : timeout
+    #5000;
+    $display("!@# TEST FAILED - TIMEOUT #@!");
+    $finish;
 end
-`endif
 
 endmodule

@@ -6,26 +6,22 @@
 
 import sys
 sys.path.append('../..')
-import tempfile
 import pytest
-from pathlib import Path
-from sim import Simulator, Simulation
+from sim import Simulator, CliArgs, path_join, parent_dir
 import corsair
 
 
-@pytest.fixture()
-def simtool():
-    return 'icarus'
+TEST_DIR = parent_dir(__file__)
 
 
-def gen_rtl(tmpdir):
+def gen_rtl(tmpdir, bridge):
     config = corsair.Configuration()
     config['version'].value = '0.42'
     config['data_width'].value = 32
     config['address_width'].value = 12
     config['register_reset'].value = 'sync_pos'
     config['regmap']['read_filler'].value = 0xdeadc0de
-    config['lb_bridge']['type'].value = 'apb'
+    config['lb_bridge']['type'].value = bridge
     rmap = corsair.RegisterMap(config)
 
     # CSR LENA
@@ -88,59 +84,69 @@ def gen_rtl(tmpdir):
                          lsb=16, width=8, access='ro', initial=0x02, modifiers=['const'])])
     rmap.add_regs(csr_version)
 
-    regmap_path = str(Path(tmpdir) / 'regs.v')
+    regmap_path = path_join(tmpdir, 'regs.v')
     corsair.HdlWriter()(regmap_path, rmap)
 
-    apb2lb_path = str(Path(tmpdir) / 'apb2lb.v')
-    corsair.LbBridgeWriter()(apb2lb_path, config)
-    return (regmap_path, apb2lb_path, rmap.config)
+    bridge_path = path_join(tmpdir, '%s2lb.v' % bridge)
+    corsair.LbBridgeWriter()(bridge_path, config)
+    return (regmap_path, bridge_path, rmap.config)
 
 
-def _test(tb_name, tmpdir, simtool, gui=False, validate=True):
-    tb_dir = Path(__file__).parent / Path(__file__).stem
-    tb_dir_path = str(tb_dir.resolve())
-    tb_filename = tb_name + '.sv'
-    tb_path = str(tb_dir / tb_filename)
-    dut_path, bridge_path, config = gen_rtl(tmpdir)
-    sim = Simulator(simtool)
-    sim.incdirs += [tb_dir_path]
-    sim.sources += [tb_path, dut_path, bridge_path]
+@pytest.fixture()
+def simtool():
+    return 'modelsim'
+
+
+@pytest.fixture(params=['apb'])
+def bridge(request):
+    return request.param
+
+
+@pytest.fixture(params=['tb_rw', 'tb_wo', 'tb_ro'])
+def tb(request):
+    return request.param
+
+
+def test(tmpdir, tb, bridge, simtool, defines=[], gui=False, pytest_run=True):
+    # create sim
+    tb_dir = path_join(TEST_DIR, 'test_rmap')
+    beh_dir = path_join(TEST_DIR, 'beh')
+    sim = Simulator(name=simtool, gui=gui, cwd=tmpdir)
+    sim.incdirs += [tmpdir, tb_dir, beh_dir]
+    sim.sources += [path_join(tb_dir, '%s.sv' % tb)]
+    sim.sources += beh_dir.glob('*.sv')
+    sim.defines += defines
+    sim.top = tb
+    sim.setup()
+    # prepare test
+    dut_src, bridge_src, config = gen_rtl(tmpdir, bridge)
+    sim.sources += [dut_src, bridge_src]
     sim.defines += [
         'DUT_DATA_W=%d' % config['data_width'].value,
-        'DUT_ADDR_W=%d' % config['address_width'].value
+        'DUT_ADDR_W=%d' % config['address_width'].value,
+        'BRIDGE_%s' % bridge.upper()
     ]
-    sim.top = tb_name
-    retval = sim.run(gui)
-    if validate:
-        assert '!@# TEST PASSED #@!' in sim.stdout
-
-
-def test_rw(tmpdir, simtool, gui=False, validate=True):
-    tb_name = 'tb_rw'
-    _test(tb_name, tmpdir=tmpdir, simtool=simtool, gui=gui, validate=validate)
-
-
-def test_wo(tmpdir, simtool, gui=False, validate=True):
-    tb_name = 'tb_wo'
-    _test(tb_name, tmpdir=tmpdir, simtool=simtool, gui=gui, validate=validate)
-
-
-def test_ro(tmpdir, simtool, gui=False, validate=True):
-    tb_name = 'tb_ro'
-    _test(tb_name, tmpdir=tmpdir, simtool=simtool, gui=gui, validate=validate)
+    # run sim
+    sim.run()
+    if pytest_run:
+        assert sim.is_passed
 
 
 if __name__ == '__main__':
     # run script with key -h to see help
-    tmpdir = tempfile.gettempdir()
-    tb_dict = {
-        'tb_rw': lambda tool, gui: test_rw(tmpdir, simtool=tool, gui=gui, validate=False),
-        'tb_wo': lambda tool, gui: test_wo(tmpdir, simtool=tool, gui=gui, validate=False),
-        'tb_ro': lambda tool, gui: test_ro(tmpdir, simtool=tool, gui=gui, validate=False),
-    }
-    sim = Simulation(
-        default_tb='tb_rw',
-        default_tool='icarus',
-        default_gui=True,
-        tb_dict=tb_dict)
-    sim.run()
+    cli = CliArgs(default_test='test')
+    cli.args_parser.add_argument('--tb', default='tb_rw', metavar='<tb>', dest='tb',
+                                 help="run testbench named <tb>; default is 'tb_rw'")
+    cli.args_parser.add_argument('--bridge', default='apb', metavar='<bridge>', dest='bridge',
+                                 help="bridge <bridge> to LocalBus; default is 'apb'")
+    args = cli.parse()
+    try:
+        globals()[args.test](tmpdir='work',
+                             tb=args.tb,
+                             bridge=args.bridge,
+                             simtool=args.simtool,
+                             gui=args.gui,
+                             defines=args.defines,
+                             pytest_run=False)
+    except KeyError:
+        print("There is no test with name '%s'!" % args.test)

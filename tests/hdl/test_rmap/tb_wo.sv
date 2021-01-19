@@ -2,7 +2,40 @@
 
 module tb_wo;
 
-`include "tb_core.svh"
+// Clock and reset
+logic clk = 1'b0;
+always #5 clk <= ~clk;
+
+logic rst = 1'b1;
+initial begin
+    repeat (5) @(negedge clk);
+    rst <= 1'b0;
+end
+
+// DUT
+localparam ADDR_W = `DUT_ADDR_W;
+localparam DATA_W = `DUT_DATA_W;
+localparam STRB_W = DATA_W / 8;
+
+logic              lb_wready;
+logic [ADDR_W-1:0] lb_waddr;
+logic [DATA_W-1:0] lb_wdata;
+logic              lb_wen;
+logic [STRB_W-1:0] lb_wstrb;
+logic [DATA_W-1:0] lb_rdata;
+logic              lb_rvalid;
+logic [ADDR_W-1:0] lb_raddr;
+logic              lb_ren;
+
+// DUT
+`include "dut.svh"
+
+// Bridge to Local Bus
+`ifdef BRIDGE_APB
+    `include "bridge_apb2lb.svh"
+`else
+    $error("Unknown bridge!");
+`endif
 
 // Test body
 int errors = 0;
@@ -17,12 +50,12 @@ task test_basic;
     // simple write with hardware control
     addr = 'h30;
     data = 'hdeadbeef;
-    apb_mst.write(addr, data);
+    mst.write(addr, data);
     @(posedge clk);
     if (csr_start_key_out != 'hdead)
         errors++;
     data = 'heeeeeeee;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (data != 0)
         errors++;
 endtask
@@ -33,7 +66,7 @@ task test_self_clear;
     // siple write with hardware control
     addr = 'h30;
     data = 1 << 0;
-    apb_mst.write(addr, data);
+    mst.write(addr, data);
     @(posedge clk);
     if (csr_start_en_out != 1)
         errors++;
@@ -51,17 +84,16 @@ initial begin : main
 
     repeat(5) @(posedge clk);
     if (errors)
-        $display("!@# TEST FAILED #@!");
+        $display("!@# TEST FAILED - %d ERRORS #@!", errors);
     else
         $display("!@# TEST PASSED #@!");
     $finish;
 end
 
-`ifdef __ICARUS__
-initial begin
-    $dumpfile("dump.vcd");
-    $dumpvars(0, `TOP_NAME);
+initial begin : timeout
+    #5000;
+    $display("!@# TEST FAILED - TIMEOUT #@!");
+    $finish;
 end
-`endif
 
 endmodule

@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module tb_common;
+module tb;
 
 // Clock and reset
 logic clk = 1'b0;
@@ -27,38 +27,11 @@ logic              lb_rvalid = 1'b0;
 logic [ADDR_W-1:0] lb_raddr;
 logic              lb_ren;
 
-apb2lb dut (
-    // APB
-    .psel    (apb_mst.psel),
-    .paddr   (apb_mst.paddr),
-    .penable (apb_mst.penable),
-    .pwrite  (apb_mst.pwrite),
-    .pwdata  (apb_mst.pwdata),
-    .pstrb   (apb_mst.pstrb),
-    .prdata  (apb_mst.prdata),
-    .pready  (apb_mst.pready),
-    .pslverr (apb_mst.pslverr),
-    // Local Bus
-    .wready  (lb_wready),
-    .waddr   (lb_waddr),
-    .wdata   (lb_wdata),
-    .wen     (lb_wen),
-    .wstrb   (lb_wstrb),
-    .rdata   (lb_rdata),
-    .rvalid  (lb_rvalid),
-    .raddr   (lb_raddr),
-    .ren     (lb_ren)
-);
-
-// APB master
-apb #(
-    .ADDR_W (ADDR_W),
-    .DATA_W (DATA_W),
-    .STRB_W (STRB_W)
-) apb_mst (
-    .pclk    (clk),
-    .presetn (~rst)
-);
+`ifdef DUT_APB
+    `include "dut_apb2lb.svh"
+`else
+    $error("Unknown bridge!");
+`endif
 
 // Test body
 int errors = 0;
@@ -107,7 +80,7 @@ initial begin : main
     addr = 'h004;
     data = 'hdeadbeef;
     fork
-        apb_mst.write(addr, data);
+        mst.write(addr, data);
         validate_write(addr, data, {STRB_W{1'b1}});
     join
 
@@ -116,7 +89,7 @@ initial begin : main
     data = 'hcafebabe;
     strb = 'b0110;
     fork
-        apb_mst.write(addr, data, strb);
+        mst.write(addr, data, strb);
         validate_write(addr, data, strb);
     join
 
@@ -124,7 +97,7 @@ initial begin : main
     addr = 'h010;
     data = 'h0acce55;
     fork
-        apb_mst.write(addr, data);
+        mst.write(addr, data);
         validate_write(addr, data, {STRB_W{1'b1}});
         begin
             lb_wready <= 1'b0;
@@ -136,7 +109,7 @@ initial begin : main
     // test read
     addr = 'h014;
     fork
-        apb_mst.read(addr, data);
+        mst.read(addr, data);
         handle_read(addr);
     join
     if (data != 'hc0debabe)
@@ -145,24 +118,23 @@ initial begin : main
     // test read with wait states
     addr = 'h008;
     fork
-        apb_mst.read(addr, data);
+        mst.read(addr, data);
         handle_read(addr, 5);
     join
     if (data != 'hdeadbeef)
         errors++;
 
     if (errors)
-        $display("!@# TEST FAILED #@!");
+        $display("!@# TEST FAILED - %d ERRORS #@!", errors);
     else
         $display("!@# TEST PASSED #@!");
     $finish;
 end
 
-`ifdef __ICARUS__
-initial begin
-    $dumpfile("dump.vcd");
-    $dumpvars(0, `TOP_NAME);
+initial begin : timeout
+    #5000;
+    $display("!@# TEST FAILED - TIMEOUT #@!");
+    $finish;
 end
-`endif
 
 endmodule

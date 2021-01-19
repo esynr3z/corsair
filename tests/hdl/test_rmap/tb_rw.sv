@@ -2,7 +2,40 @@
 
 module tb_rw;
 
-`include "tb_core.svh"
+// Clock and reset
+logic clk = 1'b0;
+always #5 clk <= ~clk;
+
+logic rst = 1'b1;
+initial begin
+    repeat (5) @(negedge clk);
+    rst <= 1'b0;
+end
+
+// DUT
+localparam ADDR_W = `DUT_ADDR_W;
+localparam DATA_W = `DUT_DATA_W;
+localparam STRB_W = DATA_W / 8;
+
+logic              lb_wready;
+logic [ADDR_W-1:0] lb_waddr;
+logic [DATA_W-1:0] lb_wdata;
+logic              lb_wen;
+logic [STRB_W-1:0] lb_wstrb;
+logic [DATA_W-1:0] lb_rdata;
+logic              lb_rvalid;
+logic [ADDR_W-1:0] lb_raddr;
+logic              lb_ren;
+
+// DUT
+`include "dut.svh"
+
+// Bridge to Local Bus
+`ifdef BRIDGE_APB
+    `include "bridge_apb2lb.svh"
+`else
+    $error("Unknown bridge!");
+`endif
 
 // Test body
 int errors = 0;
@@ -16,56 +49,56 @@ task test_basic;
     // test LENA register
     // read after reset
     addr = 'h0;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (data != 'h00000000)
         errors++;
     // write with read back
     data = 'hdeadbeef;
-    apb_mst.write(addr, data);
+    mst.write(addr, data);
     @(posedge clk);
     if (csr_lena_val_out != 'hdeadbeef)
         errors++;
     data = 'heeeeeeee;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (data != 'hdeadbeef)
         errors++;
     // byte write with read back
     data = 'h66778899;
     strb = 'b0110;
-    apb_mst.write(addr, data, strb);
+    mst.write(addr, data, strb);
     @(posedge clk);
     if (csr_lena_val_out != 'hde7788ef)
         errors++;
     data = 'heeeeeeee;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (data != 'hde7788ef)
         errors++;
 
     // test LENB register
     // read after reset
     addr = 'h4;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (data != 'h00ffff00)
         errors++;
     // write with read back
     data = 'hdeadbeef;
-    apb_mst.write(addr, data);
+    mst.write(addr, data);
     @(posedge clk);
     if (csr_lenb_val_out != 'hadbe)
         errors++;
     data = 'heeeeeeee;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (data != 'h00adbe00)
         errors++;
     // byte write with read back
     data = 'h66778899;
     strb = 'b0010;
-    apb_mst.write(addr, data, strb);
+    mst.write(addr, data, strb);
     @(posedge clk);
     if (csr_lenb_val_out != 'had88)
         errors++;
     data = 'heeeeeeee;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (data != 'h00ad8800)
         errors++;
 endtask
@@ -77,14 +110,14 @@ task test_ext_upd;
     // write with read back
     addr = 'h10;
     data = 'hdeadbeef;
-    apb_mst.write(addr, data);
+    mst.write(addr, data);
     @(posedge clk);
     if (csr_cnt_eva_out != 'heef)
         errors++;
     if (csr_cnt_evb_out != 'head)
         errors++;
     data = 'heeeeeeee;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (data != 'h0ead0eef)
         errors++;
 
@@ -98,7 +131,7 @@ task test_ext_upd;
     if (csr_cnt_eva_out != 'hfff)
         errors++;
     data = 'heeeeeeee;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (data != 'h0ead0fff)
         errors++;
 
@@ -113,13 +146,13 @@ task test_ext_upd;
             @(posedge clk);
             csr_cnt_evb_upd = 0;
         end
-        apb_mst.write(addr, data);
+        mst.write(addr, data);
     join
     @(posedge clk);
     if (csr_cnt_evb_out != 'h666)
         errors++;
     data = 'heeeeeeee;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (data != 'h06660fff)
         errors++;
 endtask
@@ -138,25 +171,25 @@ task test_write1;
     @(posedge clk);
     if (csr_ctl_done_out != 1)
         errors++;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (((data >> 3) & 1) != 1)
         errors++;
     data = 1 << 3;
-    apb_mst.write(addr, data);
+    mst.write(addr, data);
     @(posedge clk);
     if (csr_ctl_done_out != 0)
         errors++;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (((data >> 3) & 1) != 0)
         errors++;
 
     // write 1 to set, then hardware clear
     data = 1 << 5;
-    apb_mst.write(addr, data);
+    mst.write(addr, data);
     @(posedge clk);
     if (csr_ctl_gen_out != 1)
         errors++;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (((data >> 5) & 1) != 1)
         errors++;
     @(posedge clk);
@@ -167,24 +200,24 @@ task test_write1;
     @(posedge clk);
     if (csr_ctl_gen_out != 0)
         errors++;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (((data >> 5) & 1) != 0)
         errors++;
 
     // write 1 several time to toggle
     data = 1 << 16;
-    apb_mst.write(addr, data);
+    mst.write(addr, data);
     @(posedge clk);
     if (csr_ctl_mode_out != 1)
         errors++;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (((data >> 16) & 1) != 1)
         errors++;
-    apb_mst.write(addr, data);
+    mst.write(addr, data);
     @(posedge clk);
     if (csr_ctl_mode_out != 0)
         errors++;
-    apb_mst.read(addr, data);
+    mst.read(addr, data);
     if (((data >> 16) & 1) != 0)
         errors++;
 endtask
@@ -195,7 +228,7 @@ task test_access_strobes;
     // read after reset
     addr = 'h10;
     fork
-        apb_mst.read(addr, data);
+        mst.read(addr, data);
         begin
             wait(csr_cnt_rstrb);
             @(posedge clk);
@@ -207,7 +240,7 @@ task test_access_strobes;
         end
     join
     fork
-        apb_mst.write(addr, data);
+        mst.write(addr, data);
         begin
             wait(csr_cnt_wstrb);
             @(posedge clk);
@@ -231,7 +264,7 @@ initial begin : main
 
     repeat(5) @(posedge clk);
     if (errors)
-        $display("!@# TEST FAILED #@!");
+        $display("!@# TEST FAILED - %d ERRORS #@!", errors);
     else
         $display("!@# TEST PASSED #@!");
     $finish;
@@ -239,15 +272,8 @@ end
 
 initial begin : timeout
     #5000;
-    $display("!@# TEST FAILED #@!");
+    $display("!@# TEST FAILED - TIMEOUT #@!");
     $finish;
 end
-
-`ifdef __ICARUS__
-initial begin
-    $dumpfile("dump.vcd");
-    $dumpvars(0, `TOP_NAME);
-end
-`endif
 
 endmodule
