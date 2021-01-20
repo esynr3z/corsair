@@ -56,6 +56,7 @@ class RegisterMapWriter(_DictWriter):
         """
         print("Write '%s' file with RegisterMapWriter:" % path)
         print("  Prepare data ... ", end='')
+        rmap._validate()
         data = {
             'config': rmap.config.as_dict(),
             'regmap': list(rmap.as_dict().values())
@@ -187,6 +188,7 @@ class HdlWriter(_Jinja2Writer):
 
         print("Write '%s' file with HdlWriter:" % path)
         print("  Prepare data ... ", end='')
+        rmap._validate()
 
         j2_vars = {}
 
@@ -222,6 +224,7 @@ class DocsWriter(_Jinja2Writer):
 
         print("Write '%s' file with DocsWriter:" % path)
         print("  Prepare data ... ", end='')
+        rmap._validate()
 
         j2_vars = {}
 
