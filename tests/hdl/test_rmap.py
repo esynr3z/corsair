@@ -84,6 +84,24 @@ def gen_rtl(tmpdir, bridge):
                          lsb=16, width=8, access='ro', initial=0x02, modifiers=['const'])])
     rmap.add_regs(csr_version)
 
+    # CSR INTSTAT
+    csr_intstat = corsair.Register('INTSTAT', 'Interrupt status', 0x50, complementary=True)
+    csr_intstat.add_bfields([
+        corsair.BitField('CH0', 'Channel 0 interrupt',
+                         lsb=0, width=1, access='ro'),
+        corsair.BitField('CH1', 'Channel 1 interrupt',
+                         lsb=1, width=1, access='ro')])
+    rmap.add_regs(csr_intstat)
+
+    # CSR INTCLR
+    csr_intclr = corsair.Register('INTCLR', 'Interrupt clear', 0x50, complementary=True)
+    csr_intclr.add_bfields([
+        corsair.BitField('CH0', 'Channel 0 interrupt clear',
+                         lsb=0, width=1, access='wo', modifiers=['sc']),
+        corsair.BitField('CH1', 'Channel 1 interrupt clear',
+                         lsb=1, width=1, access='wo', modifiers=['sc'])])
+    rmap.add_regs(csr_intclr)
+
     regmap_path = path_join(tmpdir, 'regs.v')
     corsair.HdlWriter()(regmap_path, rmap)
 
@@ -102,7 +120,7 @@ def bridge(request):
     return request.param
 
 
-@pytest.fixture(params=['tb_rw', 'tb_wo', 'tb_ro'])
+@pytest.fixture(params=['tb_rw', 'tb_wo', 'tb_ro', 'tb_compl'])
 def tb(request):
     return request.param
 

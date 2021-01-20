@@ -260,13 +260,14 @@ class Register():
         bf_a
         bf_b
     """
-    def __init__(self, name='', description='', address=None, access_strobes=False):
+    def __init__(self, name='', description='', address=None, access_strobes=False, complementary=False):
         self._bfields = []
 
         self.name = name
         self.description = description
         self.address = address
         self.access_strobes = access_strobes
+        self.complementary = complementary
 
     def __eq__(self, other):
         if self.__class__ != other.__class__:
@@ -302,6 +303,7 @@ class Register():
             'description': self.description,
             'address': self.address,
             'access_strobes': self.access_strobes,
+            'complementary': self.complementary,
             'bfields': [bf.as_dict() for bf in self.bfields]
         }
 
@@ -378,6 +380,19 @@ class Register():
                              "but '%s' provided for '%s' field!" % (type(value), self.name))
 
     @property
+    def complementary(self):
+        """Enable complementary mode for the register."""
+        return self._complementary
+
+    @complementary.setter
+    def complementary(self, value):
+        if isinstance(value, bool):
+            self._complementary = value
+        else:
+            raise ValueError("Complementary mode attribute has to be 'bool', "
+                             "but '%s' provided for '%s' field!" % (type(value), self.name))
+
+    @property
     def names(self):
         """Return all bit field names"""
         return [bf.name for bf in self]
@@ -434,6 +449,24 @@ class Register():
         for bf in self:
             init |= bf.initial << bf.lsb
         return init
+
+    @property
+    def access(self):
+        """Register access mode, based on bitfields."""
+        accesses = list(set([bf.access for bf in self.bfields]))
+        if len(accesses) == 1:
+            return accesses[0]
+        else:
+            return 'rw'
+
+    def _validate(self):
+        """Last checks of the register before use."""
+        # complementary checks
+        if self.complementary:
+            if self.access == 'rw':
+                raise ValueError("Register %s is broken. "
+                                 "Complementary register must have all bitfields only with 'ro' or 'wo' attributes!" %
+                                 self.name)
 
 
 class RegisterMap():
@@ -556,6 +589,9 @@ class RegisterMap():
         if self.config['regmap']['address_increment_mode'].value == 'none':
             raise ValueError("Register '%s' with no address is not allowed"
                              " when address auto increment is disabled!" % (reg.name))
+        if reg.complementary:
+            raise ValueError("Register '%s' with no address is not allowed"
+                             " when complmentary attribute is active!" % (reg.name))
 
         prev_addr = self.regs[-1].address
 
@@ -566,7 +602,7 @@ class RegisterMap():
 
         reg.address = prev_addr + addr_step
 
-    def _addr_check(self, reg):
+    def _addr_check_alignment(self, reg):
         """Check address alignment."""
         if self.config['regmap']['address_alignment_mode'].value == 'data_width':
             align_val = self.config['data_width'].value // 8
@@ -578,6 +614,20 @@ class RegisterMap():
         if (reg.address % align_val) != 0:
             raise ValueError("Register '%s' with address '%d' is not %d bytes alligned!" %
                              (reg.name, reg.address, align_val))
+
+    def _addr_check_conflicts(self, reg):
+        addresses = [reg.address for reg in self]
+        if reg.address in addresses:
+            conflict_reg = self[addresses.index(reg.address)]
+            if conflict_reg.complementary and reg.complementary:
+                if addresses.count(reg.address) > 1:
+                    raise ValueError("Complementary register '%s' with address '%d'"
+                                     " conflicts with other complementary pair with the same address!" %
+                                     (reg.name, reg.address))
+            else:
+                raise ValueError("Register '%s' with address '%d'"
+                                 " conflicts with register '%s' with the same address!" %
+                                 (reg.name, reg.address, conflict_reg.name))
 
     @property
     def regs(self):
@@ -607,14 +657,9 @@ class RegisterMap():
             if reg.address is None:
                 self._addr_apply(reg)
             # check address alignment
-            self._addr_check(reg)
+            self._addr_check_alignment(reg)
             # check address conflicts
-            addresses = [reg.address for reg in self]
-            if reg.address in addresses:
-                conflict_reg = self[addresses.index(reg.address)].name
-                raise ValueError("Register '%s' with address '%d'"
-                                 " conflicts with register '%s' with the same address!" %
-                                 (reg.name, reg.address, conflict_reg))
+            self._addr_check_conflicts(reg)
             # if we here - all is ok and register can be added
             try:
                 # find position to insert register and not to break ascending order of addresses
@@ -623,3 +668,14 @@ class RegisterMap():
             except StopIteration:
                 # when registers list is empty or all addresses are less than the current one
                 self._regs.append(reg)
+
+    def _validate(self):
+        """Last checks of the register map before use."""
+        for reg in self.regs:
+            reg._validate()
+            # complementary checks
+            if reg.complementary:
+                other_regs = [(reg_.address, reg_.complementary) for reg_ in self.regs if reg_.name != reg.name]
+                if (reg.address, reg.complementary) not in other_regs:
+                    raise ValueError("Register %s is broken. "
+                                     "Not able to find complementary pair!" % self.name)

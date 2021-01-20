@@ -490,3 +490,62 @@ class TestRegisterMap:
         rmap = RegisterMap()
         with pytest.raises(ValueError):
             rmap.add_regs(reg)
+
+    def test_compl_wr(self):
+        """Wait exception when there is at least one RW field in complementary register"""
+        reg = Register('reg_a', 'Register A', 0x4, complementary=True)
+        reg.add_bfields([
+            BitField('bf_a', 'Bit field A', lsb=0, width=16, access='rw'),
+        ])
+        rmap = RegisterMap()
+        rmap.add_regs(reg)
+        with pytest.raises(ValueError):
+            rmap._validate()
+
+    def test_compl_mixed(self):
+        """Wait exception when there are 'wo' and 'ro' fields inside complementary register"""
+        reg = Register('reg_a', 'Register A', 0x4, complementary=True)
+        reg.add_bfields([
+            BitField('bf_a', 'Bit field A', lsb=0, width=16, access='ro'),
+            BitField('bf_b', 'Bit field B', lsb=16, width=16, access='wo'),
+        ])
+        rmap = RegisterMap()
+        rmap.add_regs(reg)
+        with pytest.raises(ValueError):
+            rmap._validate()
+
+    def test_compl_orphan(self):
+        """Wait exception when no complementary pair found after validation"""
+        reg = Register('reg_a', 'Register A', 0x4, complementary=True)
+        reg.add_bfields([
+            BitField('bf_a', 'Bit field A', lsb=0, width=16, access='ro'),
+        ])
+        rmap = RegisterMap()
+        rmap.add_regs(reg)
+        with pytest.raises(ValueError):
+            rmap._validate()
+
+    def test_compl_no_addr(self):
+        """Address of a complementary registers must be assigned explicitly"""
+        reg = Register('reg_a', 'Register A', complementary=True)
+        rmap = RegisterMap()
+        rmap.config['regmap']['address_increment_mode'].value = 'data_width'
+        rmap.add_regs(Register('reg_a', 'Register A', 0x0))
+        with pytest.raises(ValueError):
+            rmap.add_regs(Register('reg_b', 'Register B', complementary=True))
+
+    def test_compl_multiple(self):
+        """Wait exception when more then 2 complementary registers are assigned to the one address."""
+        rmap = RegisterMap()
+        rmap.add_regs(Register('rega_w', 'Register A write part', 0x0, complementary=True))
+        rmap.add_regs(Register('rega_r', 'Register A read part', 0x0, complementary=True))
+        with pytest.raises(ValueError):
+            rmap.add_regs(Register('rega_rr', 'Register A one more read part', 0x0, complementary=True))
+
+    def test_compl(self):
+        """Add complementary pair to register map."""
+        rmap = RegisterMap()
+        rmap.add_regs([
+            Register('rega_w', 'Register A write part', 0x0, complementary=True),
+            Register('rega_r', 'Register A read part', 0x0, complementary=True),
+        ])

@@ -30,6 +30,11 @@ logic csr_status_err_upd = 0;
 logic [11:0] csr_status_cap_in = 0;
 logic csr_status_cap_upd = 0;
 
+logic csr_intstat_ch0_in = 0;
+logic csr_intstat_ch1_in = 0;
+logic csr_intclr_ch0_out;
+logic csr_intclr_ch1_out;
+
 regs dut (
     // System
     .clk (clk),
@@ -66,6 +71,12 @@ regs dut (
     .csr_status_err_upd (csr_status_err_upd),
     .csr_status_cap_in (csr_status_cap_in),
     .csr_status_cap_upd (csr_status_cap_upd),
+    // CSR: INTSTAT
+    .csr_intstat_ch0_in (csr_intstat_ch0_in),
+    .csr_intstat_ch1_in (csr_intstat_ch1_in),
+    // CSR: INTCLR
+    .csr_intclr_ch0_out (csr_intclr_ch0_out),
+    .csr_intclr_ch1_out (csr_intclr_ch1_out),
     // Local Bus
     .lb_waddr   (lb_waddr),
     .lb_wdata   (lb_wdata),

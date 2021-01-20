@@ -194,15 +194,16 @@ Register
 
 Register related attributes:
 
-================== ======= =================================================================
+================== ======= ============================================================================================================
 Attribute          Default Description
-================== ======= =================================================================
+================== ======= ============================================================================================================
 ``name``           ""      Register name
 ``description``    ""      Register description
 ``address``        0       Register address
 ``access_strobes`` False   Enable pulse generation on special outputs on every read or write
+``complementary``  False   Enable complementary mode: two opposite registers (with RO or WO fields only) can be assigned to one address
 ``bfields``        []      Array with register bit fields
-================== ======= =================================================================
+================== ======= ============================================================================================================
 
 .. note::
     Name and description can be ommited if register is made from the only one bit field. Name and description of that field will be used instead of register's ones.

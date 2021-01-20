@@ -224,19 +224,22 @@ module {{ config['name'].value }} #(
 // CSR:
 // [{{ '0x%x' % reg.address }}] - {{ reg.name }} - {{ reg.description }}
 //------------------------------------------------------------------------------
+    {% if not (reg.complementary and reg.access == 'wo') %}
 wire {{ range_decl(config['data_width'].value - 1) }} {{ sig_csr_rdata(reg) }};
-{# fill unused bits with zeros #}
-    {% set tmp.last_bit = 0 %}
-    {% for bf in reg %}
-        {% if bf.lsb > tmp.last_bit %}
-assign {{ sig_csr_rdata(reg) }}{{ range(bf.lsb - 1, tmp.last_bit) }} = {{ zeros(bf.lsb - tmp.last_bit) }};
-        {% endif %}
-        {% set tmp.last_bit = bf.msb + 1 %}
-    {% endfor %}
-    {% if config['data_width'].value - 1 > tmp.last_bit %}
-assign {{ sig_csr_rdata(reg) }}{{ range(config['data_width'].value - 1, tmp.last_bit) }} = {{ zeros(config['data_width'].value - tmp.last_bit) }};
-    {% endif %}
 
+{# fill unused bits with zeros #}
+        {% set tmp.last_bit = 0 %}
+        {% for bf in reg %}
+            {% if bf.lsb > tmp.last_bit %}
+assign {{ sig_csr_rdata(reg) }}{{ range(bf.lsb - 1, tmp.last_bit) }} = {{ zeros(bf.lsb - tmp.last_bit) }};
+            {% endif %}
+            {% set tmp.last_bit = bf.msb + 1 %}
+        {% endfor %}
+        {% if config['data_width'].value - 1 > tmp.last_bit %}
+assign {{ sig_csr_rdata(reg) }}{{ range(config['data_width'].value - 1, tmp.last_bit) }} = {{ zeros(config['data_width'].value - tmp.last_bit) }};
+        {% endif %}
+
+    {% endif %}
 wire {{ sig_csr_wen(reg) }};
 wire {{ sig_csr_ren(reg) }};
 
@@ -265,7 +268,9 @@ reg {{ range_decl( bf.width - 1, bf.is_vector()) }} {{ sig_bf_in_ff(reg, bf) }} 
 reg {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_in_ff(reg, bf) }};
             {% endif %}
         {% endif %}
-        {% if bf.access == 'wo' %}
+        {% if reg.complementary and bf.access == 'wo' %}
+            {#- no assign #}
+        {% elif bf.access == 'wo' %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ zeros(bf.width) }};
         {% elif bf.access == 'ro' and 'const' in bf.modifiers %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ literal(bf.initial, bf.width) }};
@@ -310,7 +315,9 @@ reg {{ range_decl(config['data_width'].value - 1) }} lb_rdata_ff;
 )}} if (lb_ren) begin
         case (lb_raddr)
 {% for reg in rmap %}
+    {% if not (reg.complementary and reg.access == 'wo') %}
             {{ literal(reg.address, config['address_width'].value) }}: lb_rdata_ff <= {{ sig_csr_rdata(reg) }};
+    {% endif %}
 {% endfor %}
             default: lb_rdata_ff <= {{ literal(config['regmap']['read_filler'].value, config['data_width'].value) }};
         endcase
