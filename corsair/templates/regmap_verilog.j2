@@ -245,8 +245,10 @@ wire {{ sig_csr_ren(reg) }};
 
 assign {{ sig_csr_wen(reg) }} = lb_wen && (lb_waddr == {{ literal(reg.address, config['address_width'].value) }});
 assign {{ sig_csr_ren(reg) }} = lb_ren && (lb_raddr == {{ literal(reg.address, config['address_width'].value) }});
+    {% if reg.access_strobes %}
 assign {{ port_csr_wstrb(reg) }} = lb_wready && {{ sig_csr_wen(reg) }};
 assign {{ port_csr_rstrb(reg) }} = lb_rvalid && {{ sig_csr_ren(reg) }};
+    {% endif %}
 {# generate bit fields #}
     {% for bf in reg %}
 //---------------------
