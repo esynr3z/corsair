@@ -71,7 +71,11 @@ always @(posedge clk or negedge rst) begin
 {#- 'always' part with write strobes #}
 {% macro always_write(sig, reg, bf) %}
     {% if 'w' in bf.access %}
+    {% if reg.write_lock %}
+ if (!{{ port_csr_wlock(reg) }} && {{ sig_csr_wen(reg) }}) begin
+    {% else %}
  if ({{ sig_csr_wen(reg) }}) begin
+    {% endif %}
         {% for num, val in bf.byte_strobes.items() %}
             {% if 'w1tc' in bf.modifiers %}
         if (lb_wstrb[{{ num }}] && lb_wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }})
@@ -162,6 +166,11 @@ csr_{{ reg.name.lower() }}_rstrb
 csr_{{ reg.name.lower() }}_wstrb
 {%- endmacro %}
 
+{#- port: register write lock signal #}
+{% macro port_csr_wlock(reg) %}
+csr_{{ reg.name.lower() }}_wlock
+{%- endmacro %}
+
 {#- signal: register read enable #}
 {% macro sig_csr_ren(reg) %}
 csr_{{ reg.name.lower() }}_ren
@@ -194,6 +203,9 @@ module {{ config['name'].value }} #(
     {% if reg.access_strobes %}
     output {{ port_csr_rstrb(reg) }},
     output {{ port_csr_wstrb(reg) }},
+    {% endif %}
+    {% if reg.write_lock %}
+    input {{ port_csr_wlock(reg) }},
     {% endif %}
     {% for bf in reg %}
         {% if 'const' not in bf.modifiers and (bf.access == 'ro' or 'hwu' in bf.modifiers) %}

@@ -4,6 +4,7 @@ logic [15:0] csr_lenb_val_out;
 
 logic csr_cnt_rstrb;
 logic csr_cnt_wstrb;
+logic csr_cnt_wlock = 0;
 logic [11:0] csr_cnt_eva_out;
 logic [11:0] csr_cnt_eva_in = 0;
 logic csr_cnt_eva_upd = 0;
@@ -21,6 +22,7 @@ logic csr_ctl_mode_out;
 logic csr_ctl_mode_in = 0;
 logic csr_ctl_mode_upd = 0;
 
+logic csr_start_wlock = 0;
 logic csr_start_en_out;
 logic [15:0] csr_start_key_out;
 
@@ -46,6 +48,7 @@ regs dut (
     // CSR: CNT
     .csr_cnt_rstrb (csr_cnt_rstrb),
     .csr_cnt_wstrb (csr_cnt_wstrb),
+    .csr_cnt_wlock (csr_cnt_wlock),
     .csr_cnt_eva_out     (csr_cnt_eva_out),
     .csr_cnt_eva_in (csr_cnt_eva_in),
     .csr_cnt_eva_upd (csr_cnt_eva_upd),
@@ -63,6 +66,7 @@ regs dut (
     .csr_ctl_mode_in (csr_ctl_mode_in),
     .csr_ctl_mode_upd (csr_ctl_mode_upd),
     // CSR: START
+    .csr_start_wlock    (csr_start_wlock),
     .csr_start_en_out   (csr_start_en_out),
     .csr_start_key_out  (csr_start_key_out),
     // CSR: STATUS

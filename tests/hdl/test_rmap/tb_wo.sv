@@ -75,12 +75,28 @@ task test_self_clear;
         errors++;
 endtask
 
+task test_write_lock;
+    $display("%t, Start write lock tests!", $time);
+    // test START register
+    addr = 'h30;
+    data = 'hdeadbeef;
+    mst.write(addr, data);
+    @(posedge clk);
+    csr_start_wlock = 1'b1;
+    data = 'hc0de5432;
+    mst.write(addr, data);
+    @(posedge clk);
+    if (csr_start_key_out != 'hdead)
+        errors++;
+endtask
+
 initial begin : main
     wait(!rst);
     repeat(5) @(posedge clk);
 
     test_basic();
     test_self_clear();
+    test_write_lock();
 
     repeat(5) @(posedge clk);
     if (errors)

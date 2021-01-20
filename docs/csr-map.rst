@@ -202,6 +202,7 @@ Attribute          Default Description
 ``address``        0       Register address
 ``access_strobes`` False   Enable pulse generation on special outputs on every read or write
 ``complementary``  False   Enable complementary mode: two opposite registers (with RO or WO fields only) can be assigned to one address
+``write_lock``     False   Enable write lock: when special signal is asserted, register will ignore all write transactions
 ``bfields``        []      Array with register bit fields
 ================== ======= ============================================================================================================
 

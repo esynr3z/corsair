@@ -549,3 +549,14 @@ class TestRegisterMap:
             Register('rega_w', 'Register A write part', 0x0, complementary=True),
             Register('rega_r', 'Register A read part', 0x0, complementary=True),
         ])
+
+    def test_wlock_ro(self):
+        """Exception when write_lock is active in register with no write bitfields."""
+        reg = Register('rega', 'Register A', 0x0, write_lock=True)
+        reg.add_bfields([
+            BitField('bf_a', 'Bit field A', lsb=0, width=16, access='ro'),
+        ])
+        rmap = RegisterMap()
+        rmap.add_regs(reg)
+        with pytest.raises(ValueError):
+            rmap._validate()

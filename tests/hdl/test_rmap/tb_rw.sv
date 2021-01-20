@@ -253,6 +253,20 @@ task test_access_strobes;
     join
 endtask
 
+task test_write_lock;
+    $display("%t, Start write lock tests!", $time);
+    // test CNT register
+    addr = 'h10;
+    data = 12'h777;
+    mst.write(addr, data);
+    csr_cnt_wlock = 1'b1;
+    data = 12'h666;
+    mst.write(addr, data);
+    mst.read(addr, data);
+    if (data != 12'h777)
+        errors++;
+endtask
+
 initial begin : main
     wait(!rst);
     repeat(5) @(posedge clk);
@@ -261,6 +275,7 @@ initial begin : main
     test_ext_upd();
     test_write1();
     test_access_strobes();
+    test_write_lock();
 
     repeat(5) @(posedge clk);
     if (errors)

@@ -37,6 +37,7 @@ def gen_rtl(tmpdir, bridge):
     # CSR CNT
     csr_cnt = corsair.Register('CNT', 'Counter for some events', 0x10)
     csr_cnt.access_strobes = True
+    csr_cnt.write_lock = True
     csr_cnt.add_bfields([
         corsair.BitField('EVA', 'Some event A counter',
                          lsb=0, width=12, initial=0x000, access='rw', modifiers=['hwu']),
@@ -57,6 +58,7 @@ def gen_rtl(tmpdir, bridge):
 
     # CSR START
     csr_start = corsair.Register('START', 'Start some process', 0x30)
+    csr_start.write_lock = True
     csr_start.add_bfields([
         corsair.BitField('EN', 'Start some process A',
                          lsb=0, width=1, access='wo', modifiers=['sc']),

@@ -260,7 +260,8 @@ class Register():
         bf_a
         bf_b
     """
-    def __init__(self, name='', description='', address=None, access_strobes=False, complementary=False):
+    def __init__(self, name='', description='', address=None,
+                 access_strobes=False, complementary=False, write_lock=False):
         self._bfields = []
 
         self.name = name
@@ -268,6 +269,7 @@ class Register():
         self.address = address
         self.access_strobes = access_strobes
         self.complementary = complementary
+        self.write_lock = write_lock
 
     def __eq__(self, other):
         if self.__class__ != other.__class__:
@@ -304,6 +306,7 @@ class Register():
             'address': self.address,
             'access_strobes': self.access_strobes,
             'complementary': self.complementary,
+            'write_lock': self.write_lock,
             'bfields': [bf.as_dict() for bf in self.bfields]
         }
 
@@ -393,6 +396,19 @@ class Register():
                              "but '%s' provided for '%s' field!" % (type(value), self.name))
 
     @property
+    def write_lock(self):
+        """Enable write_lock mode for the register."""
+        return self._write_lock
+
+    @write_lock.setter
+    def write_lock(self, value):
+        if isinstance(value, bool):
+            self._write_lock = value
+        else:
+            raise ValueError("Write lock mode attribute has to be 'bool', "
+                             "but '%s' provided for '%s' field!" % (type(value), self.name))
+
+    @property
     def names(self):
         """Return all bit field names"""
         return [bf.name for bf in self]
@@ -466,6 +482,12 @@ class Register():
             if self.access == 'rw':
                 raise ValueError("Register %s is broken. "
                                  "Complementary register must have all bitfields only with 'ro' or 'wo' attributes!" %
+                                 self.name)
+        # write lock checks
+        if self.write_lock:
+            if 'w' not in self.access:
+                raise ValueError("Register %s is broken. "
+                                 "There is no bitfields with write access, but write_lock is enabled!" %
                                  self.name)
 
 
