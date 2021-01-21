@@ -104,6 +104,21 @@ def gen_rtl(tmpdir, bridge):
                          lsb=1, width=1, access='wo', modifiers=['sc'])])
     rmap.add_regs(csr_intclr)
 
+    # CSR FIFORW
+    csr_fiforw = corsair.Register('FIFORW', 'Read/Write FIFO', 0x60)
+    csr_fiforw.add_bfields(corsair.BitField('DATA', 'Data', lsb=0, width=24, access='rw', modifiers=['fifo']))
+    rmap.add_regs(csr_fiforw)
+
+    # CSR FIFORO
+    csr_fiforo = corsair.Register('FIFORO', 'Read only FIFO', 0x64)
+    csr_fiforo.add_bfields(corsair.BitField('DATA', 'Data', lsb=0, width=24, access='ro', modifiers=['fifo']))
+    rmap.add_regs(csr_fiforo)
+
+    # CSR FIFOWO
+    csr_fifowo = corsair.Register('FIFOWO', 'Write only FIFO', 0x68)
+    csr_fifowo.add_bfields(corsair.BitField('DATA', 'Data', lsb=0, width=24, access='wo', modifiers=['fifo']))
+    rmap.add_regs(csr_fifowo)
+
     regmap_path = path_join(tmpdir, 'regs.v')
     corsair.HdlWriter()(regmap_path, rmap)
 
@@ -122,7 +137,7 @@ def bridge(request):
     return request.param
 
 
-@pytest.fixture(params=['tb_rw', 'tb_wo', 'tb_ro', 'tb_compl'])
+@pytest.fixture(params=['tb_rw', 'tb_wo', 'tb_ro', 'tb_compl', 'tb_fifo'])
 def tb(request):
     return request.param
 

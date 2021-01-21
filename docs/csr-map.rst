@@ -248,6 +248,7 @@ Options for ``modifiers``:
 "rtc"         Read To Clear. Current value will be cleared next tick after read.
 "const"       Constant. Reset value is hardcoded as only value can be read.
 "hwu"         Hardware Update. Register value can be updated from outside the map with hardware.
+"fifo"        FIFO memory. Access to a register will be transformed to transaction to an external FIFO.
 ============= ===========================================================================================
 
 
@@ -265,10 +266,14 @@ How ``modifiers`` can be combined with ``access``:
 |            | ["hwu", "w1ts"]   |
 |            +-------------------+
 |            | ["hwu", "w1tt"]   |
+|            +-------------------+
+|            | ["fifo"]          |
 +------------+-------------------+
 | "wo"       | [] (no modifiers) |
 |            +-------------------+
 |            | ["sc"]            |
+|            +-------------------+
+|            | ["fifo"]          |
 +------------+-------------------+
 | "ro"       | [] (no modifiers) |
 |            +-------------------+
@@ -277,4 +282,6 @@ How ``modifiers`` can be combined with ``access``:
 |            | ["hwu"]           |
 |            +-------------------+
 |            | ["hwu", "rtc"]    |
+|            +-------------------+
+|            | ["fifo"]          |
 +------------+-------------------+

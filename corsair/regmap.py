@@ -170,6 +170,7 @@ class BitField():
             'rtc',
             'const',
             'hwu',
+            'fifo',
         ]
         for v in value:
             if v not in allowlist:
@@ -183,16 +184,19 @@ class BitField():
                 ['hwu', 'w1tc'],
                 ['hwu', 'w1ts'],
                 ['hwu', 'w1tt'],
+                ['fifo'],
             ],
             'wo': [
                 [],
                 ['sc'],
+                ['fifo'],
             ],
             'ro': [
                 [],
                 ['const'],
                 ['hwu'],
                 ['hwu', 'rtc'],
+                ['fifo'],
             ],
         }
         if value not in allowlist_comb[self.access]:

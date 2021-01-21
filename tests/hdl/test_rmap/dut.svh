@@ -37,6 +37,21 @@ logic csr_intstat_ch1_in = 0;
 logic csr_intclr_ch0_out;
 logic csr_intclr_ch1_out;
 
+logic [23:0] csr_fiforw_data_in = 0;
+logic csr_fiforw_data_rvalid = 0;
+logic csr_fiforw_data_ren;
+logic [23:0] csr_fiforw_data_out;
+logic csr_fiforw_data_wready = 0;
+logic csr_fiforw_data_wen;
+
+logic [23:0] csr_fiforo_data_in = 0;
+logic csr_fiforo_data_rvalid = 0;
+logic csr_fiforo_data_ren;
+
+logic [23:0] csr_fifowo_data_out;
+logic csr_fifowo_data_wready = 0;
+logic csr_fifowo_data_wen;
+
 regs dut (
     // System
     .clk (clk),
@@ -81,6 +96,21 @@ regs dut (
     // CSR: INTCLR
     .csr_intclr_ch0_out (csr_intclr_ch0_out),
     .csr_intclr_ch1_out (csr_intclr_ch1_out),
+    // CSR: FIFORW
+    .csr_fiforw_data_in (csr_fiforw_data_in),
+    .csr_fiforw_data_rvalid (csr_fiforw_data_rvalid),
+    .csr_fiforw_data_ren (csr_fiforw_data_ren),
+    .csr_fiforw_data_out (csr_fiforw_data_out),
+    .csr_fiforw_data_wready (csr_fiforw_data_wready),
+    .csr_fiforw_data_wen (csr_fiforw_data_wen),
+    // CSR: FIFORO
+    .csr_fiforo_data_in (csr_fiforo_data_in),
+    .csr_fiforo_data_rvalid (csr_fiforo_data_rvalid),
+    .csr_fiforo_data_ren (csr_fiforo_data_ren),
+    // CSR: FIFOWO
+    .csr_fifowo_data_out (csr_fifowo_data_out),
+    .csr_fifowo_data_wready (csr_fifowo_data_wready),
+    .csr_fifowo_data_wen (csr_fifowo_data_wen),
     // Local Bus
     .lb_waddr   (lb_waddr),
     .lb_wdata   (lb_wdata),
