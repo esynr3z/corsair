@@ -68,16 +68,19 @@ interface axilite #(
     @(posedge clk);
     AWVALID <= 1'b1;
     AWADDR  <= addr;
-    @(posedge clk iff AWREADY == 1'b1);
+    wait(AWREADY == 1'b1);
+    @(posedge clk);
     AWVALID <= 1'b0;
 
     WVALID <= 1'b1;
     WDATA  <= data;
     WSTRB  <= strb;
-    @(posedge clk iff WREADY == 1'b1);
+    wait(WREADY == 1'b1);
+    @(posedge clk);
     WVALID <= 1'b0;
 
-    @(posedge clk iff BVALID == 1'b1);
+    wait(BVALID == 1'b1);
+    @(posedge clk);
     BREADY <= 1'b1;
     @(posedge clk);
     BREADY <= 1'b0;
@@ -87,10 +90,12 @@ interface axilite #(
     
     ARVALID <= 1'b1;
     ARADDR  <= addr;
-    @(posedge clk iff ARREADY == 1'b1);
+    wait(ARREADY == 1'b1);
+    @(posedge clk);
     ARVALID <= 1'b0;
 
-    @(posedge clk iff RVALID == 1'b1);
+    wait(RVALID == 1'b1);
+    @(posedge clk);
     RREADY <= 1'b1;
     data   <= RDATA;
     @(posedge clk);

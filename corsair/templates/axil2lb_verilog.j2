@@ -48,12 +48,17 @@ module  {{ module_name }} #(
     reg [ADDR_W-1:0] raddr_int;
     reg [DATA_W-1:0] wdata_int;
     reg [STRB_W-1:0] strb_int;
-    reg awflag;
-    reg wflag;
-    reg arflag;
+    reg              awflag;
+    reg              wflag;
+    reg              arflag;
+
+    reg              AXIL_BVALID_int;
+    reg [DATA_W-1:0] AXIL_RDATA_int;
+    reg              AXIL_RVALID_int;
     
     assign AXIL_AWREADY = ~awflag;
     assign AXIL_WREADY  = ~wflag;
+    assign AXIL_BVALID  = AXIL_BVALID_int;
     assign waddr        = waddr_int;
     assign wdata        = wdata_int;
     assign wstrb        = strb_int;
@@ -82,36 +87,39 @@ module  {{ module_name }} #(
                 wflag     <= 1'b0;
             end
 
-            if (AXIL_BVALID == 1'b1 && AXIL_BREADY == 1'b1) begin
-                AXIL_BVALID <= 1'b0;
+            if (AXIL_BVALID_int == 1'b1 && AXIL_BREADY == 1'b1) begin
+                AXIL_BVALID_int <= 1'b0;
             end else if ((AXIL_WVALID == 1'b1 && awflag == 1'b1) || (AXIL_AWVALID == 1'b1 && wflag == 1'b1) || (wflag == 1'b1 && awflag == 1'b1)) begin
-                AXIL_BVALID <= wready;
+                AXIL_BVALID_int <= wready;
             end
         end
     end
 
-    assign raddr = raddr_int;
-    assign ren = value;
+    assign AXIL_ARREADY = ~arflag;
+    assign AXIL_RDATA   = AXIL_RDATA_int;
+    assign AXIL_RVALID  = AXIL_RVALID_int;
+    assign raddr        = raddr_int;
+    assign ren          = arflag;
 
     always @(posedge clk or posedge reset) begin
         if (reset == 1'b1) begin
-            raddr_int   <= 'd0;
-            arflag      <= 1'b0;
-            AXIL_RDATA  <= 'd0;
-            AXIL_RVALID <= 1'b0;
+            raddr_int       <= 'd0;
+            arflag          <= 1'b0;
+            AXIL_RDATA_int  <= 'd0;
+            AXIL_RVALID_int <= 1'b0;
         end else begin
             if (AXIL_ARVALID == 1'b1 && arflag == 1'b0) begin
                 arflag    <= 1'b1;
                 raddr_int <= AXIL_ARADDR;
-            end else if (AXIL_RVALID == 1'b1 && AXIL_RREADY == 1'b1) begin
+            end else if (AXIL_RVALID_int == 1'b1 && AXIL_RREADY == 1'b1) begin
                 arflag    <= 1'b0;
             end
 
-            if (rvalid == 1'b1 && AXIL_RVALID == 1'b0) begin
-                AXIL_RDATA  <= rdata;
-                AXIL_RVALID <= 1'b1;
-            end else if (AXIL_RVALID == 1'b1 && AXIL_RREADY == 1'b1) begin
-                AXIL_RVALID <= 1'b0;
+            if (rvalid == 1'b1 && AXIL_RVALID_int == 1'b0) begin
+                AXIL_RDATA_int  <= rdata;
+                AXIL_RVALID_int <= 1'b1;
+            end else if (AXIL_RVALID_int == 1'b1 && AXIL_RREADY == 1'b1) begin
+                AXIL_RVALID_int <= 1'b0;
             end
         end
     end

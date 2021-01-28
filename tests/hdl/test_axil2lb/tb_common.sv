@@ -29,6 +29,10 @@ logic [ADDR_W-1:0] lb_raddr;
 logic              lb_ren;
 
 axil2lb dut (
+    // CLK
+    .clk   (clk),
+    // Reset
+    .reset (rst),
     // APB
     .AXIL_AWADDR  (axil_mst.AWADDR),
     .AXIL_AWPROT  (axil_mst.AWPROT),
@@ -105,6 +109,11 @@ task handle_read(
     lb_rdata  <= 0;
     lb_rvalid <= 1'b0;
 endtask
+
+initial begin : test_timeout
+    #50us;
+    $finish;
+end
 
 initial begin : main
     logic [ADDR_W-1:0] addr;
