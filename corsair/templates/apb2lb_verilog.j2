@@ -4,8 +4,8 @@
 //
 
 module {{ module_name }} #(
-    parameter ADDR_W = {{ addr_width }},
-    parameter DATA_W = {{ data_width }},
+    parameter ADDR_W = {{ config['address_width'].value }},
+    parameter DATA_W = {{ config['data_width'].value }},
     parameter STRB_W = DATA_W / 8
 )(
     // APB
