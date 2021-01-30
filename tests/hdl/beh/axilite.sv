@@ -8,56 +8,56 @@ interface axilite #(
   // synthesis translate_on
 );
 
-  logic [ADDR_W-1:0] AWADDR;
-  logic [2:0]        AWPROT;
-  logic              AWVALID;
-  logic              AWREADY;
+  logic [ADDR_W-1:0] awaddr;
+  logic [2:0]        awprot;
+  logic              awvalid;
+  logic              awready;
 
-  logic [DATA_W-1:0] WDATA;
-  logic [STRB_W-1:0] WSTRB;
-  logic              WVALID;
-  logic              WREADY;
+  logic [DATA_W-1:0] wdata;
+  logic [STRB_W-1:0] wstrb;
+  logic              wvalid;
+  logic              wready;
 
-  logic [1:0]        BRESP;
-  logic              BVALID;
-  logic              BREADY;
+  logic [1:0]        bresp;
+  logic              bvalid;
+  logic              bready;
 
-  logic [ADDR_W-1:0] ARADDR;
-  logic [2:0]        ARPROT;
-  logic              ARVALID;
-  logic              ARREADY;
+  logic [ADDR_W-1:0] araddr;
+  logic [2:0]        arprot;
+  logic              arvalid;
+  logic              arready;
 
-  logic [DATA_W-1:0] RDATA;
-  logic [1:0]        RRESP;
-  logic              RVALID;
-  logic              RREADY;
+  logic [DATA_W-1:0] rdata;
+  logic [1:0]        rresp;
+  logic              rvalid;
+  logic              rready;
 
 
   modport out (
-    input AWREADY, WREADY, BRESP, BVALID, ARREADY, RDATA, RRESP, RVALID,
-    output AWADDR, AWPROT, AWVALID, WDATA, WSTRB, WVALID, BREADY, ARADDR, ARPROT, ARVALID, RREADY
+    input awready, wready, bresp, bvalid, arready, rdata, rresp, rvalid,
+    output awaddr, awprot, awvalid, wdata, wstrb, wvalid, bready, araddr, arprot, arvalid, rready
   );
   
   modport in (
-    input AWADDR, AWPROT, AWVALID, WDATA, WSTRB, WVALID, BREADY, ARADDR, ARPROT, ARVALID, RREADY,
-    output AWREADY, WREADY, BRESP, BVALID, ARREADY, RDATA, RRESP, RVALID
+    input awaddr, awprot, awvalid, wdata, wstrb, wvalid, bready, araddr, arprot, arvalid, rready,
+    output awready, wready, bresp, bvalid, arready, rdata, rresp, rvalid
   );
 
 
   // synthesis translate_off
 
   task master_init;
-    AWADDR  <= 'b0;
-    AWPROT  <= 'b0;
-    AWVALID <= 'b0;
-    WDATA   <= 'b0;
-    WSTRB   <= 'b0;
-    WVALID  <= 'b0;
-    BREADY  <= 'b0;
-    ARADDR  <= 'b0;
-    ARPROT  <= 'b0;
-    ARVALID <= 'b0;
-    RREADY  <= 'b0;
+    awaddr  <= 'b0;
+    awprot  <= 'b0;
+    awvalid <= 'b0;
+    wdata   <= 'b0;
+    wstrb   <= 'b0;
+    wvalid  <= 'b0;
+    bready  <= 'b0;
+    araddr  <= 'b0;
+    arprot  <= 'b0;
+    arvalid <= 'b0;
+    rready  <= 'b0;
   endtask
 
   task write(
@@ -66,40 +66,40 @@ interface axilite #(
     logic [STRB_W-1:0] strb = {STRB_W{1'b1}}
   );
     @(posedge clk);
-    AWVALID <= 1'b1;
-    AWADDR  <= addr;
-    wait(AWREADY == 1'b1);
+    awvalid <= 1'b1;
+    awaddr  <= addr;
+    wait(awready == 1'b1);
     @(posedge clk);
-    AWVALID <= 1'b0;
+    awvalid <= 1'b0;
 
-    WVALID <= 1'b1;
-    WDATA  <= data;
-    WSTRB  <= strb;
-    wait(WREADY == 1'b1);
+    wvalid <= 1'b1;
+    wdata  <= data;
+    wstrb  <= strb;
+    wait(wready == 1'b1);
     @(posedge clk);
-    WVALID <= 1'b0;
+    wvalid <= 1'b0;
 
-    wait(BVALID == 1'b1);
+    wait(bvalid == 1'b1);
     @(posedge clk);
-    BREADY <= 1'b1;
+    bready <= 1'b1;
     @(posedge clk);
-    BREADY <= 1'b0;
+    bready <= 1'b0;
   endtask
 
   task read(logic [ADDR_W-1:0] addr, output logic [DATA_W-1:0] data);
     
-    ARVALID <= 1'b1;
-    ARADDR  <= addr;
-    wait(ARREADY == 1'b1);
+    arvalid <= 1'b1;
+    araddr  <= addr;
+    wait(arready == 1'b1);
     @(posedge clk);
-    ARVALID <= 1'b0;
+    arvalid <= 1'b0;
 
-    wait(RVALID == 1'b1);
+    wait(rvalid == 1'b1);
     @(posedge clk);
-    RREADY <= 1'b1;
-    data   <= RDATA;
+    rready <= 1'b1;
+    data   <= rdata;
     @(posedge clk);
-    RREADY <= 1'b0;
+    rready <= 1'b0;
   endtask
 
   // synthesis translate_on

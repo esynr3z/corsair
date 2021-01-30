@@ -1,5 +1,4 @@
 // Created with Corsair v{{ corsair_ver }}
-// CSR map file: {{ csr_name }} v{{ csr_ver }}
 //
 // AXI-Lite to Local Bus bridge
 //
@@ -14,26 +13,26 @@ module  {{ module_name }} #(
     input               rst,
     {% endif %}
     // AXI
-    input  [ADDR_W-1:0] AXIL_AWADDR,
-    input  [2:0]        AXIL_AWPROT,
-    input               AXIL_AWVALID,
-    output              AXIL_AWREADY,
-    input  [DATA_W-1:0] AXIL_WDATA,
-    input  [STRB_W-1:0] AXIL_WSTRB,
-    input               AXIL_WVALID,
-    output              AXIL_WREADY,
-    output [1:0]        AXIL_BRESP,
-    output              AXIL_BVALID,
-    input               AXIL_BREADY,
+    input  [ADDR_W-1:0] axil_awaddr,
+    input  [2:0]        axil_awprot,
+    input               axil_awvalid,
+    output              axil_awready,
+    input  [DATA_W-1:0] axil_wdata,
+    input  [STRB_W-1:0] axil_wstrb,
+    input               axil_wvalid,
+    output              axil_wready,
+    output [1:0]        axil_bresp,
+    output              axil_bvalid,
+    input               axil_bready,
 
-    input  [ADDR_W-1:0] AXIL_ARADDR,
-    input  [2:0]        AXIL_ARPROT,
-    input               AXIL_ARVALID,
-    output              AXIL_ARREADY,
-    output [DATA_W-1:0] AXIL_RDATA,
-    output [1:0]        AXIL_RRESP,
-    output              AXIL_RVALID,
-    input               AXIL_RREADY,
+    input  [ADDR_W-1:0] axil_araddr,
+    input  [2:0]        axil_arprot,
+    input               axil_arvalid,
+    output              axil_arready,
+    output [DATA_W-1:0] axil_rdata,
+    output [1:0]        axil_rresp,
+    output              axil_rvalid,
+    input               axil_rready,
 
     // Local Bus
     input               wready,
@@ -54,13 +53,13 @@ module  {{ module_name }} #(
     reg              wflag;
     reg              arflag;
 
-    reg              AXIL_BVALID_int;
-    reg [DATA_W-1:0] AXIL_RDATA_int;
-    reg              AXIL_RVALID_int;
+    reg              axil_bvalid_int;
+    reg [DATA_W-1:0] axil_rdata_int;
+    reg              axil_rvalid_int;
     
-    assign AXIL_AWREADY = ~awflag;
-    assign AXIL_WREADY  = ~wflag;
-    assign AXIL_BVALID  = AXIL_BVALID_int;
+    assign axil_awready = ~awflag;
+    assign axil_wready  = ~wflag;
+    assign axil_bvalid  = axil_bvalid_int;
     assign waddr        = waddr_int;
     assign wdata        = wdata_int;
     assign wstrb        = strb_int;
@@ -83,32 +82,32 @@ module  {{ module_name }} #(
             awflag    <= 1'b0;
             wflag     <= 1'b0;
         end else begin
-            if (AXIL_AWVALID == 1'b1 && awflag == 1'b0) begin
+            if (axil_awvalid == 1'b1 && awflag == 1'b0) begin
                 awflag    <= 1'b1;
-                waddr_int <= AXIL_AWADDR;
+                waddr_int <= axil_awaddr;
             end else if (wen == 1'b1 && wready == 1'b1) begin
                 awflag    <= 1'b0;
             end
 
-            if (AXIL_WVALID == 1'b1 && wflag == 1'b0) begin
+            if (axil_wvalid == 1'b1 && wflag == 1'b0) begin
                 wflag     <= 1'b1;
-                wdata_int <= AXIL_WDATA;
-                strb_int  <= AXIL_WSTRB;
+                wdata_int <= axil_wdata;
+                strb_int  <= axil_wstrb;
             end else if (wen == 1'b1 && wready == 1'b1) begin
                 wflag     <= 1'b0;
             end
 
-            if (AXIL_BVALID_int == 1'b1 && AXIL_BREADY == 1'b1) begin
-                AXIL_BVALID_int <= 1'b0;
-            end else if ((AXIL_WVALID == 1'b1 && awflag == 1'b1) || (AXIL_AWVALID == 1'b1 && wflag == 1'b1) || (wflag == 1'b1 && awflag == 1'b1)) begin
-                AXIL_BVALID_int <= wready;
+            if (axil_bvalid_int == 1'b1 && axil_bready == 1'b1) begin
+                axil_bvalid_int <= 1'b0;
+            end else if ((axil_wvalid == 1'b1 && awflag == 1'b1) || (axil_awvalid == 1'b1 && wflag == 1'b1) || (wflag == 1'b1 && awflag == 1'b1)) begin
+                axil_bvalid_int <= wready;
             end
         end
     end
 
-    assign AXIL_ARREADY = ~arflag;
-    assign AXIL_RDATA   = AXIL_RDATA_int;
-    assign AXIL_RVALID  = AXIL_RVALID_int;
+    assign axil_arready = ~arflag;
+    assign axil_rdata   = axil_rdata_int;
+    assign axil_rvalid  = axil_rvalid_int;
     assign raddr        = raddr_int;
     assign ren          = arflag;
     
@@ -120,21 +119,21 @@ module  {{ module_name }} #(
         if (rst == 1'b{{ rst_active }}) begin
             raddr_int       <= 'd0;
             arflag          <= 1'b0;
-            AXIL_RDATA_int  <= 'd0;
-            AXIL_RVALID_int <= 1'b0;
+            axil_rdata_int  <= 'd0;
+            axil_rvalid_int <= 1'b0;
         end else begin
-            if (AXIL_ARVALID == 1'b1 && arflag == 1'b0) begin
+            if (axil_arvalid == 1'b1 && arflag == 1'b0) begin
                 arflag    <= 1'b1;
-                raddr_int <= AXIL_ARADDR;
-            end else if (AXIL_RVALID_int == 1'b1 && AXIL_RREADY == 1'b1) begin
+                raddr_int <= axil_araddr;
+            end else if (axil_rvalid_int == 1'b1 && axil_rready == 1'b1) begin
                 arflag    <= 1'b0;
             end
 
-            if (rvalid == 1'b1 && AXIL_RVALID_int == 1'b0) begin
-                AXIL_RDATA_int  <= rdata;
-                AXIL_RVALID_int <= 1'b1;
-            end else if (AXIL_RVALID_int == 1'b1 && AXIL_RREADY == 1'b1) begin
-                AXIL_RVALID_int <= 1'b0;
+            if (rvalid == 1'b1 && axil_rvalid_int == 1'b0) begin
+                axil_rdata_int  <= rdata;
+                axil_rvalid_int <= 1'b1;
+            end else if (axil_rvalid_int == 1'b1 && axil_rready == 1'b1) begin
+                axil_rvalid_int <= 1'b0;
             end
         end
     end
