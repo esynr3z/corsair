@@ -5,8 +5,8 @@
 //
 
 module  {{ module_name }} #(
-    parameter ADDR_W = {{ addr_width }},
-    parameter DATA_W = {{ data_width }},
+    parameter ADDR_W = {{ config['address_width'].value }},
+    parameter DATA_W = {{ config['data_width'].value }},
     parameter STRB_W = DATA_W / 8
 )(
     input               clk,
@@ -68,9 +68,10 @@ module  {{ module_name }} #(
     
     {% set rst_type = config['register_reset'].value%}
     always @(posedge clk
-    {%- if rst_type == 'async_pos' %} or posedge reset)
-    {%- elif rst_type == 'async_neg' %} or negedge reset){% endif %} begin
-        if (reset == 1'b1) begin
+    {%- if rst_type == 'async_pos' %} or posedge rst)
+    {%- elif rst_type == 'async_neg' %} or negedge rst)
+    {%- else -%} ) {%- endif %} begin
+        if (rst == 1'b1) begin
             waddr_int <= 'd0;
             wdata_int <= 'd0;
             strb_int  <= 'd0;
@@ -105,9 +106,13 @@ module  {{ module_name }} #(
     assign AXIL_RVALID  = AXIL_RVALID_int;
     assign raddr        = raddr_int;
     assign ren          = arflag;
-
-    always @(posedge clk or posedge reset) begin
-        if (reset == 1'b1) begin
+    
+    {% set rst_type = config['register_reset'].value%}
+    always @(posedge clk
+    {%- if rst_type == 'async_pos' %} or posedge rst)
+    {%- elif rst_type == 'async_neg' %} or negedge rst)
+    {%- else -%} ) {%- endif %} begin
+        if (rst == 1'b1) begin
             raddr_int       <= 'd0;
             arflag          <= 1'b0;
             AXIL_RDATA_int  <= 'd0;
