@@ -6,10 +6,10 @@ module tb;
 logic clk = 1'b0;
 always #5 clk <= ~clk;
 
-logic rst = 1'b1;
+logic rst = `RESET_ACTIVE;
 initial begin
     repeat (5) @(negedge clk);
-    rst <= 1'b0;
+    rst <= !`RESET_ACTIVE;
 end
 
 // DUT
@@ -76,7 +76,7 @@ initial begin : main
     logic [DATA_W-1:0] data;
     logic [STRB_W-1:0] strb;
 
-    wait(!rst);
+    wait(rst == !`RESET_ACTIVE);
 
     // test simple write
     addr = 'h004;
