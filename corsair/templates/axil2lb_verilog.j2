@@ -10,7 +10,9 @@ module  {{ module_name }} #(
     parameter STRB_W = DATA_W / 8
 )(
     input               clk,
-    input               reset,
+    {% if config['register_reset'].value != 'init_only' %}
+    input               rst,
+    {% endif %}
     // AXI
     input  [ADDR_W-1:0] AXIL_AWADDR,
     input  [2:0]        AXIL_AWPROT,
@@ -63,8 +65,11 @@ module  {{ module_name }} #(
     assign wdata        = wdata_int;
     assign wstrb        = strb_int;
     assign wen          = awflag && wflag;
-
-    always @(posedge clk or posedge reset) begin
+    
+    {% set rst_type = config['register_reset'].value%}
+    always @(posedge clk
+    {%- if rst_type == 'async_pos' %} or posedge reset)
+    {%- elif rst_type == 'async_neg' %} or negedge reset){% endif %} begin
         if (reset == 1'b1) begin
             waddr_int <= 'd0;
             wdata_int <= 'd0;

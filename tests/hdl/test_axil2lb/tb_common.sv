@@ -30,9 +30,9 @@ logic              lb_ren;
 
 axil2lb dut (
     // CLK
-    .clk   (clk),
+    .clk (clk),
     // Reset
-    .reset (rst),
+    .rst (rst),
     // APB
     .AXIL_AWADDR  (axil_mst.AWADDR),
     .AXIL_AWPROT  (axil_mst.AWPROT),
