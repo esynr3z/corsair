@@ -6,7 +6,7 @@
 
 import sys
 from attr.setters import convert
-sys.path.append('../..')
+sys.path.insert(0, '../..')
 import pytest
 from sim import Simulator, CliArgs, path_join, parent_dir
 import corsair
