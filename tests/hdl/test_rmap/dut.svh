@@ -1,4 +1,3 @@
-
 logic [31:0] csr_lena_val_out;
 logic [15:0] csr_lenb_val_out;
 
