@@ -2,10 +2,10 @@
 logic clk = 1'b0;
 always #5 clk <= ~clk;
 
-logic rst = 1'b1;
+logic rst = `RESET_ACTIVE;
 initial begin
     repeat (5) @(negedge clk);
-    rst <= 1'b0;
+    rst <= !`RESET_ACTIVE;
 end
 
 // DUT

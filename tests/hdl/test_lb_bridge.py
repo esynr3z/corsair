@@ -57,7 +57,7 @@ def test(tmpdir, bridge, reset, simtool, defines=[], gui=False, pytest_run=True)
         'DUT_DATA_W=%d' % dut_config['data_width'].value,
         'DUT_ADDR_W=%d' % dut_config['address_width'].value,
         'DUT_%s' % bridge.upper(),
-        'RESET_ACTIVE=%s' % ('1\'b1' if reset[-3:] == 'pos' else '1\'b0'),
+        'RESET_ACTIVE=%d' % ('pos' in reset),
     ]
     # run sim
     sim.run()
