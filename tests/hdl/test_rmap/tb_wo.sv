@@ -34,13 +34,15 @@ task test_self_clear;
     // siple write with hardware control
     addr = 'h30;
     data = 1 << 0;
-    mst.write(addr, data);
-    @(posedge clk);
-    if (csr_start_en_out != 1)
-        errors++;
-    @(posedge clk);
-    if (csr_start_en_out != 0)
-        errors++;
+    fork
+        mst.write(addr, data);
+        begin : check
+            wait(csr_start_en_out);
+            repeat(2) @(posedge clk);
+            if (csr_start_en_out != 0)
+                errors++;
+        end
+    join
 endtask
 
 task test_write_lock;

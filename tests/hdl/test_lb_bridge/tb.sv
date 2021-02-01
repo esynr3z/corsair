@@ -69,6 +69,9 @@ task handle_read(
     @(posedge clk);
     lb_rdata  <= 0;
     lb_rvalid <= 1'b0;
+    @(posedge clk);
+    if (lb_ren != 0)
+        errors++;
 endtask
 
 initial begin : main

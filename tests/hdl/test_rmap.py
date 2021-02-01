@@ -132,7 +132,7 @@ def simtool():
     return 'modelsim'
 
 
-@pytest.fixture(params=['apb'])
+@pytest.fixture(params=['apb', 'axil'])
 def bridge(request):
     return request.param
 

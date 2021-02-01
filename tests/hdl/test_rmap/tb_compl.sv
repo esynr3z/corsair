@@ -34,21 +34,25 @@ task test_write;
     // siple write with hardware control
     addr = 'h50;
     data = 1 << 0;
-    mst.write(addr, data);
-    @(posedge clk);
-    if (csr_intclr_ch0_out != 1)
-        errors++;
-    @(posedge clk);
-    if (csr_intclr_ch0_out != 0)
-        errors++;
+    fork
+        mst.write(addr, data);
+        begin : check_ch0
+            wait(csr_intclr_ch0_out);
+            repeat(2) @(posedge clk);
+            if (csr_intclr_ch0_out != 0)
+                errors++;
+        end
+    join
     data = 1 << 1;
-    mst.write(addr, data);
-    @(posedge clk);
-    if (csr_intclr_ch1_out != 1)
-        errors++;
-    @(posedge clk);
-    if (csr_intclr_ch1_out != 0)
-        errors++;
+    fork
+        mst.write(addr, data);
+        begin : check_ch1
+            wait(csr_intclr_ch1_out);
+            repeat(2) @(posedge clk);
+            if (csr_intclr_ch1_out != 0)
+                errors++;
+        end
+    join
 endtask
 
 initial begin : main
