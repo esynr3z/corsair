@@ -139,6 +139,7 @@ def main():
         # output directory
         if args.outdir:
             outdir = Path(args.outdir)
+            outdir.mkdir(parents=True, exist_ok=True)
         elif args.regmap:
             outdir = Path(args.regmap).parent
         elif args.config:
