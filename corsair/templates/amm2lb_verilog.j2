@@ -4,8 +4,54 @@
 // Avalon-MM to Local Bus bridge
 //
 
-module (
-    input wire clk
+module {{ module_name }} #(
+    parameter ADDR_W = {{ config['address_width'].value }},
+    parameter DATA_W = {{ config['data_width'].value }},
+    parameter STRB_W = DATA_W / 8
+)(
+    input clk,
+    input reset,
+    // Avalon-MM
+    input  [ADDR_W-1:0]  address,
+    input                read,
+    output [DATA_W-1:0]  readdata,
+    output               readdatavalid,
+    input  [STRB_W-1:0]  byteenable,
+    input                write,
+    input  [DATA_W-1:0]  writedata,
+    output               waitrequest  ,
+    // Local Bus
+    input                     wready,
+    output       [ADDR_W-1:0] waddr,
+    output       [DATA_W-1:0] wdata,
+    output                    wen,
+    output       [STRB_W-1:0] wstrb,
+    input        [DATA_W-1:0] rdata,
+    input                     rvalid,
+    output       [ADDR_W-1:0] raddr,
+    output logic              ren
 );
+
+  assign waddr = address,
+         raddr = address;
+
+  assign waitrequest   = ~wready;
+  assign readdatavalid = rvalid;
+
+  assign wdata    = writedata,
+         readdata = rdata;
+
+  assign wen = write;
+
+  assign wstrb = byteenable;
+
+  always_ff @(posedge clk)
+    begin
+      if (read)
+        ren <= 1'b1;
+      else
+        if (rvalid)
+          ren <= 1'b0;
+    end
 
 endmodule
