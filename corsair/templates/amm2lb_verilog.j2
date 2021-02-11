@@ -1,5 +1,4 @@
 // Created with Corsair v{{ corsair_ver }}
-// CSR map file: {{ csr_name }} v{{ csr_ver }}
 //
 // Avalon-MM to Local Bus bridge
 //
@@ -19,7 +18,7 @@ module {{ module_name }} #(
     input  [STRB_W-1:0]  byteenable,
     input                write,
     input  [DATA_W-1:0]  writedata,
-    output               waitrequest  ,
+    output               waitrequest,
     // Local Bus
     input                     wready,
     output       [ADDR_W-1:0] waddr,
@@ -29,7 +28,7 @@ module {{ module_name }} #(
     input        [DATA_W-1:0] rdata,
     input                     rvalid,
     output       [ADDR_W-1:0] raddr,
-    output logic              ren
+    output reg                ren
 );
 
   assign waddr = address,
@@ -45,7 +44,7 @@ module {{ module_name }} #(
 
   assign wstrb = byteenable;
 
-  always_ff @(posedge clk)
+  always @(posedge clk)
     begin
       if (read)
         ren <= 1'b1;
