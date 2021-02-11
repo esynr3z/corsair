@@ -107,8 +107,7 @@ task test_ext_upd;
     data = 'h06660fff;
     fork
         begin
-            @(posedge clk);
-            @(posedge clk);
+            wait(lb_wen);
             csr_cnt_evb_upd = 1;
             csr_cnt_evb_in = 'h777;
             @(posedge clk);

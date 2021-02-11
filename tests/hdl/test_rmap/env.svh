@@ -31,6 +31,8 @@ logic              lb_ren;
     `include "bridge_apb2lb.svh"
 `elsif BRIDGE_AXIL
     `include "bridge_axil2lb.svh"
+  `elsif BRIDGE_AMM
+    `include "bridge_amm2lb.svh"
 `else
     $error("Unknown bridge!");
 `endif
