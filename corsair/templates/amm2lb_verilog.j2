@@ -54,9 +54,9 @@ module {{ module_name }} #(
   {%- if rst_type == 'async_pos' %} or posedge reset)
   {%- elif rst_type == 'async_neg' %} or negedge reset)
   {%- else -%} ) {%- endif %} begin
-    if (reset == 1'b1{{ rst_active }})
-      ren <= '0;
-    else 
+    if (reset == 1'b{{ rst_active }})
+      ren <= 1'b0;
+    else
     begin
       if (read)
         ren <= 1'b1;
