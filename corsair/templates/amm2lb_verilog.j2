@@ -44,7 +44,19 @@ module {{ module_name }} #(
 
   assign wstrb = byteenable;
 
-  always @(posedge clk)
+  {% set rst_type = config['register_reset'].value%}
+  {%- if rst_type == 'async_pos' or rst_type == 'sync_pos' %}
+      {% set rst_active = 1%}
+  {%- elif rst_type == 'async_neg' or rst_type == 'sync_neg' %}
+      {% set rst_active = 0%}
+  {%- endif %}
+  always @(posedge clk
+  {%- if rst_type == 'async_pos' %} or posedge reset)
+  {%- elif rst_type == 'async_neg' %} or negedge reset)
+  {%- else -%} ) {%- endif %} begin
+    if (reset == 1'b1{{ rst_active }})
+      ren <= '0;
+    else 
     begin
       if (read)
         ren <= 1'b1;
@@ -52,5 +64,6 @@ module {{ module_name }} #(
         if (rvalid)
           ren <= 1'b0;
     end
+  end
 
 endmodule
