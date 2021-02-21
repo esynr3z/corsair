@@ -1,4 +1,16 @@
-## 0.3.0 (unreleased)
+## 0.4.0 (unreleased)
+
+## 0.3.0 (2021-02-21)
+
+* Fix Markdown table row endings.
+* Add 'Reserved' bitfields to Markdown.
+* Fix installation guides.
+* Implement access_strobes attribute for register.
+* Implement complementary registers.
+* Implement write_lock attribute for register.
+* Implement FIFO bitfield modifier.
+* Implement AXI-Lite to Local Bus bridge on Verilog.
+* Implement Avalon-MM to Local Bus bridge on Verilog.
 
 ## 0.2.0 (2021-01-08)
 
