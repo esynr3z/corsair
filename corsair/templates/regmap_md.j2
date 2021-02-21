@@ -1,10 +1,10 @@
 {# MACRO #}
-{#- bit field range #}
-{% macro range(bf) %}
-    {% if bf.width == 1 %}
-{{ bf.msb }}
+{#- generic range #}
+{% macro range(msb, lsb) %}
+    {% if msb == lsb %}
+{{ msb }}
     {%- else %}
-{{ bf.msb }}:{{ bf.lsb }}
+{{ msb }}:{{ lsb }}
     {%- endif %}
 {%- endmacro %}
 
@@ -64,8 +64,15 @@ Reset value: {{ literal(reg.initial, config['data_width'].value) }}
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
+    {% set tmp.reserved_msb = config['data_width'].value - 1 %}
     {% for bf in reg.bfields[::-1] %}
-{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % (bf.name, range(bf), mode(bf), literal(bf.initial, bf.width), bf.description) }}
+        {% if tmp.reserved_msb > bf.msb %}
+            {% set tmp.reserved_lsb = bf.msb + 1 %}
+            {% set tmp.reserved_width = tmp.reserved_msb - tmp.reserved_lsb + 1 %}
+{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % ('-', range(tmp.reserved_msb, tmp.reserved_lsb), '-', literal(0, tmp.reserved_width), 'Reserved') }}
+        {% endif %}
+{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % (bf.name, range(bf.msb, bf.lsb), mode(bf), literal(bf.initial, bf.width), bf.description) }}
+        {% set tmp.reserved_msb = bf.lsb - 1 %}
     {% endfor %}
 
 Back to [Register map](#register-map).
