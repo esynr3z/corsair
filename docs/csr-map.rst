@@ -89,7 +89,6 @@ Choice of:
 "sync_neg"           Synchronous active low reset
 "async_pos"          Asynchronous active high reset
 "async_neg"          Asynchronous active low reset
-"init_only"          No register reset. Declaration with initialization will be used.
 ==================== ================================================================
 
 **Default value**: "sync_pos".

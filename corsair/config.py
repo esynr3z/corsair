@@ -289,6 +289,6 @@ class Configuration(ParameterGroup):
             Parameter(name='version', value='1.0')]
         )
 
-        reg_rst_allowlist = ['sync_pos', 'sync_neg', 'async_pos', 'async_neg', 'init_only']
+        reg_rst_allowlist = ['sync_pos', 'sync_neg', 'async_pos', 'async_neg']
         self.add_params(Parameter(name='register_reset', value='sync_pos',
                                   validator=lambda val: val in reg_rst_allowlist))

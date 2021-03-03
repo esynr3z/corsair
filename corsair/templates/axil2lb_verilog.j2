@@ -9,9 +9,7 @@ module  {{ module_name }} #(
     parameter STRB_W = DATA_W / 8
 )(
     input               clk,
-    {% if config['register_reset'].value != 'init_only' %}
     input               rst,
-    {% endif %}
     // AXI
     input  [ADDR_W-1:0] axil_awaddr,
     input  [2:0]        axil_awprot,

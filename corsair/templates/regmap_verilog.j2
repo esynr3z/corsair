@@ -47,25 +47,21 @@
 {#- 'always' header with reset logic #}
 {% macro always_begin(sig='', width=1, init=0) %}
     {% set rst_type = config['register_reset'].value%}
-    {% if rst_type == 'init_only' %}
-always @(posedge clk) begin
-    {% else %}
-        {% if rst_type == 'sync_pos' %}
+    {% if rst_type == 'sync_pos' %}
 always @(posedge clk) begin
     if (rst) begin
-        {% elif rst_type == 'sync_neg' %}
+    {% elif rst_type == 'sync_neg' %}
 always @(posedge clk) begin
     if (!rst) begin
-        {% elif rst_type == 'async_pos' %}
+    {% elif rst_type == 'async_pos' %}
 always @(posedge clk or posedge rst) begin
     if (rst) begin
-        {% elif rst_type == 'async_neg' %}
+    {% elif rst_type == 'async_neg' %}
 always @(posedge clk or negedge rst) begin
     if (!rst) begin
-        {% endif %}
+    {% endif %}
         {{ sig }} <= {{ literal(init, width) }};
     end else
-    {%- endif %}
 {%- endmacro %}
 
 {#- 'always' part with write strobes #}
@@ -220,9 +216,7 @@ module {{ config['name'].value }} #(
 )(
     // System
     input clk,
-{% if config['register_reset'].value != 'init_only' %}
     input rst,
-{% endif %}
 {% for reg in rmap %}
     // CSR: {{ reg.name }}
     {% if reg.access_strobes %}
@@ -306,18 +300,10 @@ assign {{ port_csr_rstrb(reg) }} = lb_rvalid && {{ sig_csr_ren(reg) }};
 // {{ bf.access }}{{ ', ' + ', '.join(bf.modifiers) if bf.modifiers else '' }}
 //---------------------
         {% if 'w' in bf.access and 'fifo' not in bf.modifiers %}
-            {% if config['register_reset'].value == 'init_only' %}
-reg {{ range_decl( bf.width - 1, bf.is_vector()) }} {{ sig_bf_out_ff(reg, bf) }} = {{ literal(bf.initial, bf.width) }};
-            {% else %}
 reg {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_out_ff(reg, bf) }};
-            {% endif %}
         {% endif %}
         {% if 'ro' == bf.access and 'hwu' in bf.modifiers %}
-            {% if config['register_reset'].value == 'init_only' %}
-reg {{ range_decl( bf.width - 1, bf.is_vector()) }} {{ sig_bf_in_ff(reg, bf) }} = {{ literal(bf.initial, bf.width) }};
-            {% else %}
 reg {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_in_ff(reg, bf) }};
-            {% endif %}
         {% endif %}
         {% if reg.complementary and bf.access == 'wo' %}
             {#- no assign #}
