@@ -33,6 +33,8 @@ logic              lb_ren;
     `include "dut_axil2lb.svh"
 `elsif DUT_AMM
     `include "dut_amm2lb.svh"
+`elsif DUT_SPI
+    `include "dut_spi2lb.svh"
 `else
     $error("Unknown bridge!");
 `endif
@@ -84,7 +86,7 @@ initial begin : main
     wait(rst == !`RESET_ACTIVE);
 
     // test simple write
-    addr = 'h004;
+    addr = 'h80000004;
     data = 'hdeadbeef;
     fork
         mst.write(addr, data);
@@ -108,7 +110,7 @@ initial begin : main
         validate_write(addr, data, {STRB_W{1'b1}});
         begin
             lb_wready <= 1'b0;
-            repeat (5) @(posedge clk);
+            repeat (800) @(posedge clk);
             lb_wready <= 1'b1;
         end
     join
@@ -139,7 +141,7 @@ initial begin : main
 end
 
 initial begin : timeout
-    #5000;
+    #50us;
     $display("!@# TEST FAILED - TIMEOUT #@!");
     $finish;
 end

@@ -162,6 +162,7 @@ Options for ``type``:
 "amm"    Avalon-MM interface
 "apb"    APB4 interface
 "axil"   AXI4-Lite interface
+"spi"    SPI interface
 "none"   For Local Bus directly use
 ======== ==========================
 
@@ -176,6 +177,7 @@ Allowed combinations of the parameters:
 "amm"    8, 16, ..., 1024 (power of 2) 1 - 64
 "apb"    8, 16, 32                     1 - 32
 "axil"   32, 64                        32, 64
+"spi"    8, 16, 32                     8, 16, 32
 "none"   8, 16, ... (any power of 2)   1 - 64
 ======== ============================= =================
 

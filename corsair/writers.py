@@ -143,15 +143,20 @@ class LbBridgeWriter(_Jinja2Writer):
     def __call__(self, path, config):
         """Create bridge to Local Bus in Verilog."""
 
-        if config['lb_bridge']['type'].value == 'axil':
+        bridge_type = config['lb_bridge']['type'].value
+        if bridge_type == 'axil':
             j2_template = 'axil2lb_verilog.j2'
-        elif config['lb_bridge']['type'].value == 'apb':
+        elif bridge_type == 'apb':
             j2_template = 'apb2lb_verilog.j2'
-        elif config['lb_bridge']['type'].value == 'amm':
+        elif bridge_type == 'amm':
             j2_template = 'amm2lb_verilog.j2'
-        else:
+        elif bridge_type == 'spi':
+            j2_template = 'spi2lb_verilog.j2'
+        elif bridge_type == 'none':
             print("Local Bus is selected for the CSR interface. Bridge will not be generated.")
             return
+        else:
+            raise ValueError("No template for the '%s' bridge type!" % (bridge_type))
 
         print("Write '%s' file with LbBridgeWriter:" % path)
         print("  Prepare data ... ", end='')
