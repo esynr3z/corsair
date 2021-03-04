@@ -77,7 +77,7 @@ initial begin : main
 end
 
 initial begin : timeout
-    #5000;
+    #500us;
     $display("!@# TEST FAILED - TIMEOUT #@!");
     $finish;
 end

@@ -251,7 +251,7 @@ class Configuration(ParameterGroup):
 
         # group lb_bridge
         self.add_params(ParameterGroup('lb_bridge'))
-        lb_bridge_type_allowed = ['amm', 'apb', 'axil', 'none']
+        lb_bridge_type_allowed = ['amm', 'apb', 'axil', 'spi', 'none']
         self['lb_bridge'].add_params(
             Parameter(name='type', value='none', validator=lambda val: val in lb_bridge_type_allowed)
         )
@@ -264,6 +264,7 @@ class Configuration(ParameterGroup):
             'amm': [8, 16, 32, 64, 128, 256, 512, 1024],
             'apb': [8, 16, 32],
             'axil': [32, 64],
+            'spi': [8, 16, 32],
             'none': [8, 16, 32, 64, 128, 256, 512, 1024]
         }
         self.add_params(Parameter(
@@ -276,6 +277,7 @@ class Configuration(ParameterGroup):
             'amm': range(1, 65),
             'apb': range(1, 33),
             'axil': [32, 64],
+            'spi': [8, 16, 32],
             'none': range(1, 65)
         }
         self.add_params(Parameter(
