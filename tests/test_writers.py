@@ -8,6 +8,7 @@ import pytest
 from corsair import RegisterMapReader, ConfigurationReader
 from corsair import RegisterMapWriter, ConfigurationWriter, LbBridgeWriter
 from corsair import HdlWriter, DocsWriter
+from corsair import PyFtdiDriverWriter, PyRegisterMapWriter
 from corsair import Configuration, RegisterMap
 
 
@@ -121,3 +122,49 @@ class TestDocsWriter:
             raw_str = ''.join(f.readlines())
         assert '## Register map' in raw_str
         assert 'Back to [Register map](#register-map).' in raw_str
+
+
+class TestPyFtdiDriverWriter:
+    """Class 'PyFtdiDriverWriter' testing."""
+
+    def _read_rmap(self, path):
+        reader = RegisterMapReader()
+        rmap = reader(path)
+
+    def test_write(self, tmpdir):
+        """Test of creating python driver file."""
+        rmap_path = 'tests/data/map.json'
+        py_path = str(tmpdir.join('fpga.py'))
+        print('rmap_path:', rmap_path)
+        print('py_path:', py_path)
+        # read regmap
+        rmap = RegisterMapReader()(rmap_path)
+        # write output file
+        PyFtdiDriverWriter()(py_path, rmap.config)
+        # read file and verify
+        with open(py_path, 'r') as f:
+            raw_str = ''.join(f.readlines())
+        assert 'class Fpga:' in raw_str
+
+
+class TestPyRegisterMapWriter:
+    """Class 'PyRegisterMapWriter' testing."""
+
+    def _read_rmap(self, path):
+        reader = RegisterMapReader()
+        rmap = reader(path)
+
+    def test_write(self, tmpdir):
+        """Test of creating python regmap file."""
+        rmap_path = 'tests/data/map.json'
+        py_path = str(tmpdir.join('regs.py'))
+        print('rmap_path:', rmap_path)
+        print('py_path:', py_path)
+        # read regmap
+        rmap = RegisterMapReader()(rmap_path)
+        # write output file
+        PyRegisterMapWriter()(py_path, rmap)
+        # read file and verify
+        with open(py_path, 'r') as f:
+            raw_str = ''.join(f.readlines())
+        assert 'class RegMap:' in raw_str
