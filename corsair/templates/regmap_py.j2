@@ -1,0 +1,96 @@
+{# MACRO #}
+{#- value in hex format #}
+{% macro literal(val, width) %}
+{{ "0x%0{w}x".format(w=width // 4) % val }}
+{%- endmacro %}
+
+{#- register address #}
+{% macro reg_addr(reg) %}
+{{ reg.name.upper() }}_ADDR
+{%- endmacro %}
+
+{#- bitfield position #}
+{% macro bf_pos(reg, bf) %}
+{{ reg.name.upper() }}_{{ bf.name.upper() }}_POS
+{%- endmacro %}
+
+{#- bitfield mask #}
+{% macro bf_msk(reg, bf) %}
+{{ reg.name.upper() }}_{{ bf.name.upper() }}_MSK
+{%- endmacro %}
+
+{#- TEMPLATE #}
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+""" Created with Corsair v{{ corsair_ver }}
+
+Control/status register map.
+"""
+
+__VERSION__ = '{{ config['version'].value }}'
+{% for reg in rmap %}
+
+
+class _Reg{{ reg.name.capitalize() }}:
+    def __init__(self, rmap):
+        self._rmap = rmap
+    {% for bf in reg %}
+
+    @property
+    def {{ bf.name.lower() }}(self):
+        """{{ bf.description }}"""
+        {% if 'r' not in bf.access %}
+        return 0
+        {% else %}
+        rdata = self._rmap._if.read(self._rmap.{{ reg_addr(reg) }})
+        return (rdata >> self._rmap.{{ bf_pos(reg, bf) }}) & self._rmap.{{ bf_msk(reg, bf) }}
+        {% endif %}
+        {% if 'w' in bf.access %}
+
+    @{{ bf.name.lower() }}.setter
+    def {{ bf.name.lower() }}(self, val):
+        rdata = self._rmap._if.read(self._rmap.{{ reg_addr(reg) }})
+        rdata = rdata & (~(self._rmap.{{ bf_msk(reg, bf) }} << self._rmap.{{ bf_pos(reg, bf) }}))
+        rdata = rdata | (val << self._rmap.{{ bf_pos(reg, bf) }})
+        self._rmap._if.write({{ reg_addr(reg) }}, rdata)
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
+
+class RegMap:
+    """Control/Status register map"""
+{% for reg in rmap %}
+
+    # {{ reg.name.upper() }} - {{ reg.description }}
+    {{ reg_addr(reg) }} = {{ literal(reg.address, config['address_width'].value) }}
+    {% for bf in reg %}
+    {{ bf_pos(reg, bf) }} = {{ bf.lsb }}
+    {{ bf_msk(reg, bf) }} = {{ literal(2 ** bf.width - 1, bf.width) }}
+    {% endfor %}
+{% endfor %}
+
+    def __init__(self, interface):
+        self._if = interface
+{% for reg in rmap %}
+
+    @property
+    def {{ reg.name.lower() }}(self):
+        """{{ reg.description }}"""
+    {% if 'r' not in reg.access %}
+        return 0
+    {% else %}
+        return self._if.read({{ reg_addr(reg) }})
+    {% endif %}
+    {% if 'w' in reg.access %}
+
+    @{{ reg.name.lower() }}.setter
+    def {{ reg.name.lower() }}(self, val):
+        self._if.write({{ reg_addr(reg) }}, val)
+    {% endif %}
+
+    @property
+    def {{ reg.name.lower() }}_bf(self):
+        return _Reg{{ reg.name.capitalize() }}(self)
+{% endfor %}

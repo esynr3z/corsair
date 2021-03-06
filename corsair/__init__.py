@@ -36,4 +36,6 @@ from .writers import (
     LbBridgeWriter,
     HdlWriter,
     DocsWriter,
+    PyFtdiDriverWriter,
+    PyRegisterMapWriter,
 )

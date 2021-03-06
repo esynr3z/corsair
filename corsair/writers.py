@@ -266,3 +266,69 @@ class DocsWriter(_Jinja2Writer):
             if (bits - 1) > bit_pos:
                 reg_wd["reg"].append({"bits": bits - bit_pos - 1})
             wavedrom.render(json.dumps(reg_wd)).saveas(str(imgdir / ("%s.svg" % reg.name.lower())))
+
+
+class PyFtdiDriverWriter(_Jinja2Writer):
+    """Create pyftdi-based Python file with SPI driver for FPGA.
+
+    Examples:
+        >>> from corsair import RegisterMap, PyFtdiDriverWriter
+        >>> config = Configuration()
+        >>> writer = PyFtdiDriverWriter()
+        >>> writer('/tmp/fpga.py', config)
+        Write '/tmp/fpga.py' file with PyFtdiDriverWriter:
+          Prepare data ... OK
+          Load template ... OK
+          Render text ... OK
+          Save data to file ... OK
+    """
+    def __call__(self, path, config):
+        """Creat SPI driver in Python."""
+        j2_template = 'ftdi_drv_py.j2'
+
+        print("Write '%s' file with PyFtdiDriverWriter:" % path)
+        print("  Prepare data ... ", end='')
+
+        j2_vars = {}
+
+        j2_vars['corsair_ver'] = __version__
+        j2_vars['config'] = config
+
+        print("OK")
+
+        self._render_to_file(j2_template, j2_vars, path)
+
+
+class PyRegisterMapWriter(_Jinja2Writer):
+    """Create Python file to access register map via some interface.
+
+    Examples:
+        >>> from corsair import RegisterMap, PyRegisterMapWriter
+        >>> rmap = RegisterMap()
+        >>> writer = PyRegisterMapWriter()
+        >>> writer('/tmp/regs.py', rmap)
+        Write '/tmp/regs.py' file with PyRegisterMapWriter:
+          Prepare data ... OK
+          Load template ... OK
+          Render text ... OK
+          Save data to file ... OK
+    """
+    def __call__(self, path, rmap):
+        """Create accessible register map in Python."""
+        j2_template = 'regmap_py.j2'
+
+        print("Write '%s' file with PyRegisterMapWriter:" % path)
+        print("  Prepare data ... ", end='')
+        rmap._validate()
+
+        j2_vars = {}
+
+        j2_vars['corsair_ver'] = __version__
+        if not rmap.config['name'].value:
+            rmap.config['name'].value = Path(path).stem
+        j2_vars['rmap'] = rmap
+        j2_vars['config'] = rmap.config
+
+        print("OK")
+
+        self._render_to_file(j2_template, j2_vars, path)
