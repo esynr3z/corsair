@@ -272,7 +272,7 @@ class PyFtdiDriverWriter(_Jinja2Writer):
     """Create pyftdi-based Python file with SPI driver for FPGA.
 
     Examples:
-        >>> from corsair import RegisterMap, PyFtdiDriverWriter
+        >>> from corsair import Configuration, PyFtdiDriverWriter
         >>> config = Configuration()
         >>> writer = PyFtdiDriverWriter()
         >>> writer('/tmp/fpga.py', config)
