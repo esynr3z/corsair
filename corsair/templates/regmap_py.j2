@@ -81,13 +81,13 @@ class RegMap:
     {% if 'r' not in reg.access %}
         return 0
     {% else %}
-        return self._if.read({{ reg_addr(reg) }})
+        return self._if.read(self.{{ reg_addr(reg) }})
     {% endif %}
     {% if 'w' in reg.access %}
 
     @{{ reg.name.lower() }}.setter
     def {{ reg.name.lower() }}(self, val):
-        self._if.write({{ reg_addr(reg) }}, val)
+        self._if.write(self.{{ reg_addr(reg) }}, val)
     {% endif %}
 
     @property

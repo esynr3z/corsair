@@ -29,17 +29,18 @@ class FtdiSpi:
     STRB_W = DATA_W // 8
     STRB_MSK = 2 ** STRB_W - 1
 
-    def __init__(self, ftdi_url, spi_freq=1E6):
+    def __init__(self, ftdi_url, cs=0, spi_freq=1E6):
         """Configure the FTDI interface.
 
         Keyword arguments:
          ftdi_url -- device url, which can be obtained by ftdi_show_devices()
+         cs -- chip select number: A*BUS3 = 0, A*BUS4 = 1, ...
          freq -- SPI frequency in Hz
         """
         # Configure SPI master
-        self._spi_ctrl = pyftdi.spi.SpiController()
+        self._spi_ctrl = pyftdi.spi.SpiController(cs_count=cs+1)
         self._spi_ctrl.configure(ftdi_url)
-        self._spi_port = self._spi_ctrl.get_port(cs=0, freq=spi_freq, mode=0)
+        self._spi_port = self._spi_ctrl.get_port(cs=cs, freq=spi_freq, mode=0)
 
     def _int_to_bytes(self, i, length=1):
         return int.to_bytes(i, length=length, byteorder='big', signed=False)
@@ -64,15 +65,14 @@ class FtdiSpi:
 
 
 class Fpga:
-    def __init__(self, rmap, spi):
+    def __init__(self, rmap):
         """Initialize FPGA driver.
 
         Keyword arguments:
          rmap -- Register Map created with PyRegisterMapWriter
-         spi -- FtdiSpi object
         """
-        self.spi = spi
         self.rmap = rmap
+        self.spi = rmap._if
 
     def disconnect(self):
         """Disconnect from FTDI and close all open ports"""
