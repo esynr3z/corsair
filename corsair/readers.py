@@ -64,7 +64,7 @@ class RegisterMapReader(_DictReader):
         print("  Read registers ... ", end='')
         rmap = RegisterMap(config=config)
         for data_reg in data['regmap']:
-            data_reg_filtered = {k: v for k, v in data_reg.items() if k in ['name', 'description', 'address']}
+            data_reg_filtered = {k: v for k, v in data_reg.items() if k != 'bfields'}
             reg = Register(**data_reg_filtered)
             for data_bf in data_reg['bfields']:
                 reg.add_bfields(BitField(**data_bf))
