@@ -252,8 +252,9 @@ class Configuration(ParameterGroup):
         # group lb_bridge
         self.add_params(ParameterGroup('lb_bridge'))
         lb_bridge_type_allowed = ['amm', 'apb', 'axil', 'spi', 'none']
-        self['lb_bridge'].add_params(
-            Parameter(name='type', value='none', validator=lambda val: val in lb_bridge_type_allowed)
+        self['lb_bridge'].add_params([
+            Parameter(name='type', value='none', validator=lambda val: val in lb_bridge_type_allowed),
+            Parameter(name='py_driver', value=False, validator=lambda val: val in [True, False])]
         )
 
         # group docs

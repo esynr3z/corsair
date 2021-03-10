@@ -168,6 +168,12 @@ def main():
             lb_bridge_name = '%s2lb_%s.v' % (config['lb_bridge']['type'].value, outname)
             lb_bridge_path = str(outdir / lb_bridge_name)
             corsair.LbBridgeWriter()(lb_bridge_path, config)
+            if config['lb_bridge']['py_driver'].value:
+                if config['lb_bridge']['type'].value in ['spi']:
+                    corsair.PyFtdiDriverWriter()(str(outdir / ('drv_%s.py' % outname)), config)
+                    corsair.PyRegisterMapWriter()(str(outdir / ('%s.py' % outname)), rmap)
+                else:
+                    print("No python drivers are available for the selected bridge type.")
 
     # create docs
     if args.docs:
