@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Test of an access to FPGA register map
+""" Demonstration of an access to FPGA register map
 """
 
 from time import sleep
