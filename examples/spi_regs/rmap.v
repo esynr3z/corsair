@@ -13,11 +13,6 @@ module rmap #(
     output  csr_ledctrl_ren_out,
     output  csr_ledctrl_gen_out,
     output  csr_ledctrl_ben_out,
-    // CSR: RDFIFO
-    input [11:0] csr_rdfifo_data_in,
-    input csr_rdfifo_data_rvalid,
-    output csr_rdfifo_data_ren,
-    output  csr_rdfifo_flush_out,
     // Local Bus
     input  [ADDR_W-1:0] lb_waddr,
     input  [DATA_W-1:0] lb_wdata,
@@ -98,55 +93,6 @@ always @(posedge clk) begin
 end
 
 //------------------------------------------------------------------------------
-// CSR:
-// [0x4] - RDFIFO - Read FIFO
-//------------------------------------------------------------------------------
-wire [15:0] csr_rdfifo_rdata;
-
-assign csr_rdfifo_rdata[14:12] = 3'h0;
-
-wire csr_rdfifo_wen;
-assign csr_rdfifo_wen = lb_wen && (lb_waddr == 8'h4);
-wire csr_rdfifo_ren;
-assign csr_rdfifo_ren = lb_ren && (lb_raddr == 8'h4);
-
-//---------------------
-// Bit field:
-// RDFIFO[11:0] - DATA - Data to read. Data value will increment every time after read.
-// ro, fifo
-//---------------------
-assign csr_rdfifo_rdata[11:0] = csr_rdfifo_data_in;
-assign csr_rdfifo_data_ren = csr_rdfifo_ren;
-
-reg csr_rdfifo_data_rvalid_ff;
-always @(posedge clk) begin
-    if (rst) begin
-        csr_rdfifo_data_rvalid_ff <= 1'b0;
-    end else begin
-        csr_rdfifo_data_rvalid_ff <= csr_rdfifo_data_rvalid;
-    end
-end
-//---------------------
-// Bit field:
-// RDFIFO[15] - FLUSH - Flush fifo data
-// wo, sc
-//---------------------
-reg  csr_rdfifo_flush_out_ff;
-assign csr_rdfifo_rdata[15] = 1'b0;
-assign csr_rdfifo_flush_out = csr_rdfifo_flush_out_ff;
-
-always @(posedge clk) begin
-    if (rst) begin
-        csr_rdfifo_flush_out_ff <= 1'b0;
-    end else if (csr_rdfifo_wen) begin
-        if (lb_wstrb[1])
-            csr_rdfifo_flush_out_ff <= lb_wdata[15];
-    end else begin
-        csr_rdfifo_flush_out_ff <= 1'b0;
-    end
-end
-
-//------------------------------------------------------------------------------
 // Write ready
 //------------------------------------------------------------------------------
 assign lb_wready = 1'b1;
@@ -161,7 +107,6 @@ always @(posedge clk) begin
     end else if (lb_ren) begin
         case (lb_raddr)
             8'h0: lb_rdata_ff <= csr_ledctrl_rdata;
-            8'h4: lb_rdata_ff <= csr_rdfifo_rdata;
             default: lb_rdata_ff <= 16'hdead;
         endcase
     end else begin
@@ -184,14 +129,6 @@ always @(posedge clk) begin
     end
 end
 
-reg lb_rvalid_drv;
-always @(*) begin
-    if (csr_rdfifo_ren)
-        lb_rvalid_drv = csr_rdfifo_data_rvalid_ff;
-    else
-        lb_rvalid_drv = lb_rvalid_ff;
-end
-
-assign lb_rvalid = lb_rvalid_drv;
+assign lb_rvalid = lb_rvalid_ff;
 
 endmodule

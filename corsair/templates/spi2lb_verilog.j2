@@ -6,13 +6,13 @@
     {% if rst_type == 'sync_pos' %}
 always @(posedge clk) begin
     if (rst) begin
-    {% elif rst_type == 'sync_neg' %}
+    {%- elif rst_type == 'sync_neg' %}
 always @(posedge clk) begin
     if (!rst) begin
-    {% elif rst_type == 'async_pos' %}
+    {%- elif rst_type == 'async_pos' %}
 always @(posedge clk or posedge rst) begin
     if (rst) begin
-    {% elif rst_type == 'async_neg' %}
+    {%- elif rst_type == 'async_neg' %}
 always @(posedge clk or negedge rst) begin
     if (!rst) begin
     {%- endif %}
@@ -50,9 +50,9 @@ module {{ module_name }} #(
     output reg [DATA_W-1:0] lb_wdata,
     output reg              lb_wen,
     output reg [STRB_W-1:0] lb_wstrb,
-    input  [DATA_W-1:0]     lb_rdata,
+    input      [DATA_W-1:0] lb_rdata,
     input                   lb_rvalid,
-    output reg [ADDR_W-1:0] lb_raddr,
+    output     [ADDR_W-1:0] lb_raddr,
     output reg              lb_ren
 );
 
@@ -60,11 +60,11 @@ module {{ module_name }} #(
 // Inputs syncronization
 //------------------------------------------------------------------------------
 reg [1:0] cs_n_ff;
-wire      cs_n_sync;
+wire      cs;
 reg [1:0] mosi_ff;
-wire      mosi_sync;
+wire      mo;
 reg [2:0] sck_ff;
-wire      sck_posedge, sck_negedge;
+wire      sck_rise, sck_fall;
 
 // MOSI syncronization chain
 {{ always_rst_begin() }}
@@ -74,28 +74,28 @@ wire      sck_posedge, sck_negedge;
     end
 end
 
-assign mosi_sync = mosi_ff[1];
+assign mo = mosi_ff[1];
 
 // CSn syncronization chain
 {{ always_rst_begin() }}
-        cs_n_ff <= '0;
+        cs_n_ff <= 0;
     end else begin
         cs_n_ff <= {cs_n_ff[0], spi_cs_n};
     end
 end
 
-assign cs_n_sync = cs_n_ff[1];
+assign cs = ~cs_n_ff[1];
 
 // SCK syncronization and edge extraction
 {{ always_rst_begin() }}
-        sck_ff <= '0;
+        sck_ff <= 0;
     end else begin
         sck_ff <= {sck_ff[1:0], spi_sck};
     end
 end
 
-assign sck_posedge = (~sck_ff[2]) & ( sck_ff[1]);
-assign sck_negedge = ( sck_ff[2]) & (~sck_ff[1]);
+assign sck_rise = (~sck_ff[2]) & ( sck_ff[1]);
+assign sck_fall = ( sck_ff[2]) & (~sck_ff[1]);
 
 //------------------------------------------------------------------------------
 // SPI slave FSM
@@ -106,7 +106,7 @@ localparam CTRL_W    = 8;
 // FSM states
 localparam IDLE_S        = 0;
 localparam RECV_MODE_S   = 1;
-localparam RECV_STRB_S  = 2;
+localparam RECV_STRB_S   = 2;
 localparam RECV_ADDR_S   = 3;
 localparam WAIT_TA_S     = 4;
 localparam RECV_DATA_S   = 5;
@@ -124,10 +124,10 @@ reg              lb_ren_next;
 
 reg spi_miso_next;
 
-reg [DATA_W-1:0]    dout_shifter, dout_shifter_next;
-reg                 mode_wr, mode_wr_next;
-reg [BIT_CNT_W-1:0] bit_cnt, bit_cnt_next;
-reg                 force_tran, force_tran_next;
+reg [DATA_W-1:0]   dout_shifter, dout_shifter_next;
+reg                mode_wr, mode_wr_next;
+reg [BIT_CNT_W:0]  bit_cnt, bit_cnt_next;
+reg                force_tran, force_tran_next;
 
 {{ always_rst_begin() }}
         fsm_state <= IDLE_S;
@@ -153,44 +153,48 @@ always @(*) begin
             // wait cs_n assertion
             spi_miso_next = 1'b0;
             bit_cnt_next  = ADDR_W - 1;
-            if (!cs_n_sync)
+            if (cs)
                 fsm_next = RECV_ADDR_S;
         end
 
         RECV_ADDR_S : begin
             // receive address
-            if (sck_posedge) begin
-                lb_waddr_next = {lb_waddr[ADDR_W-2:0], mosi_sync};
+            if (sck_rise) begin
+                lb_waddr_next = {lb_waddr[ADDR_W-2:0], mo};
                 if (bit_cnt == 0) begin
                     bit_cnt_next = 0;
                     fsm_next     = RECV_MODE_S;
                 end else begin
                     bit_cnt_next = bit_cnt - 1;
                 end
-            end
+            end else if (!cs) // or finish packet
+                fsm_next = WAIT_FINISH_S;
         end
 
         RECV_MODE_S : begin
             // receive transaction mode: write (1) or read (0)
-            if (sck_posedge) begin
-                mode_wr_next = mosi_sync;
-                lb_ren_next  = ~mosi_sync;
+            if (sck_rise) begin
+                mode_wr_next = mo;
+                lb_ren_next  = ~mo;
                 bit_cnt_next = CTRL_W - 2;
                 fsm_next     = RECV_STRB_S;
-            end
+            end else if (!cs) // or finish packet
+                fsm_next = WAIT_FINISH_S;
         end
 
         RECV_STRB_S : begin
             // receive byte strobe bits for write
-            if (sck_posedge) begin
-                lb_wstrb_next = {lb_wstrb[STRB_W-2:0], mosi_sync};
+            if (sck_rise) begin
+                lb_wstrb_next = {lb_wstrb[STRB_W-2:0], mo};
                 if (bit_cnt == 0) begin
                     bit_cnt_next = DATA_W - 1;
                     fsm_next     = mode_wr ? RECV_DATA_S : WAIT_TA_S;
                 end else begin
                     bit_cnt_next = bit_cnt - 1;
                 end
-            end
+            end  else if (!cs) // or finish packet
+                fsm_next = WAIT_FINISH_S;
+
             // and prepare data for reading at the same time
             if (lb_rvalid && lb_ren) begin
                 dout_shifter_next = lb_rdata;
@@ -200,29 +204,31 @@ always @(*) begin
 
         WAIT_TA_S : begin
             // wait turnaround to start
-            if (sck_negedge) begin
+            if (sck_fall) begin
                 force_tran_next = 1'b1;
                 fsm_next        = TRAN_DATA_S;
-            end
+            end else if (!cs) // or finish packet
+                fsm_next = WAIT_FINISH_S;
         end
 
         RECV_DATA_S : begin
             // receive data bit by bit at every sck posedge
-            if (sck_posedge) begin
-                lb_wdata_next = {lb_wdata[DATA_W-2:0], mosi_sync};
+            if (sck_rise) begin
+                lb_wdata_next = {lb_wdata[DATA_W-2:0], mo};
                 if (bit_cnt == 0) begin
                     lb_wen_next  = 1'b1;
                     fsm_next     = WAIT_FINISH_S;
                 end else begin
                     bit_cnt_next = bit_cnt - 1;
                 end
-            end
+            end else if (!cs) // or finish packet
+                fsm_next = WAIT_FINISH_S;
         end
 
         TRAN_DATA_S : begin
             force_tran_next   = 1'b0;
             // transmit data bit by bit at every sck negedge
-            if (sck_negedge || force_tran) begin
+            if (sck_fall || force_tran) begin
                 spi_miso_next     = dout_shifter[DATA_W-1];
                 dout_shifter_next = {dout_shifter[DATA_W-2:0], 1'b0};
                 if (bit_cnt == 0) begin
@@ -230,17 +236,23 @@ always @(*) begin
                 end else begin
                     bit_cnt_next = bit_cnt - 1;
                 end
-            end
+            end else if (!cs) // or finish packet
+                fsm_next = WAIT_FINISH_S;
         end
 
         WAIT_FINISH_S : begin
-            // wait write done
-            if (mode_wr && lb_wready && lb_wen) begin
+            // finish write transaction if any
+            if (lb_wready && lb_wen) begin
                 lb_wen_next = 1'b0;
             end
-            // and then just wait when cs_n will be deassered
-            if (!lb_wen && cs_n_sync)
+            // finish read transaction if any
+            if (lb_rvalid && lb_ren) begin
+                lb_ren_next = 1'b0;
+            end
+            // and then just wait when it will be safe to go to idle
+            if ((!lb_wen) && (!lb_ren) && (!cs)) begin
                 fsm_next = IDLE_S;
+            end
         end
     endcase
 end

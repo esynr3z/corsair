@@ -24,7 +24,6 @@ Register map v1.0.
 | Name                     | Address    | Description |
 | :---                     | :---       | :---        |
 | [LEDCTRL](#ledctrl)      | 0x00       | LED control register | |
-| [RDFIFO](#rdfifo)        | 0x04       | Read FIFO | |
 
 ## LEDCTRL
 
@@ -44,23 +43,5 @@ Reset value: 0x0000
 | GEN              | 4      | rw              | 0x0        | Enable green led |
 | -                | 3:1    | -               | 0x0        | Reserved |
 | REN              | 0      | rw              | 0x0        | Enable red led |
-
-Back to [Register map](#register-map).
-
-## RDFIFO
-
-Read FIFO
-
-Address offset: 0x04
-
-Reset value: 0x0000
-
-![](rmap_img/rdfifo.svg)
-
-| Name             | Bits   | Mode            | Reset      | Description |
-| :---             | :---   | :---            | :---       | :---        |
-| FLUSH            | 15     | wo, sc          | 0x0        | Flush fifo data |
-| -                | 14:12  | -               | 0x0        | Reserved |
-| DATA             | 11:0   | ro, fifo        | 0x000      | Data to read. Data value will increment every time after read. |
 
 Back to [Register map](#register-map).
