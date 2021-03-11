@@ -1,0 +1,77 @@
+{
+    "config": {
+        "regmap": {
+            "read_filler": "0xdead"
+        },
+        "lb_bridge": {
+            "type": "spi",
+            "py_driver": true
+        },
+        "data_width": 16,
+        "address_width": 8,
+        "name": "rmap",
+        "version": "1.0",
+        "register_reset": "sync_pos"
+    },
+    "regmap": [
+        {
+            "name": "LEDCTRL",
+            "description": "LED control register",
+            "address": 0,
+            "bfields": [
+                {
+                    "name": "REN",
+                    "description": "Enable red led",
+                    "initial": 0,
+                    "width": 1,
+                    "lsb": 0,
+                    "access": "rw",
+                    "modifiers": []
+                },
+                {
+                    "name": "GEN",
+                    "description": "Enable green led",
+                    "initial": 0,
+                    "width": 1,
+                    "lsb": 4,
+                    "access": "rw",
+                    "modifiers": []
+                },
+                {
+                    "name": "BEN",
+                    "description": "Enable blue led",
+                    "initial": 0,
+                    "width": 1,
+                    "lsb": 8,
+                    "access": "rw",
+                    "modifiers": []
+                }
+            ]
+        },
+        {
+            "name": "RDFIFO",
+            "description": "Read FIFO",
+            "address": 4,
+            "bfields": [
+                {
+                    "name": "FLUSH",
+                    "description": "Flush fifo data",
+                    "initial": 0,
+                    "width": 1,
+                    "lsb": 15,
+                    "access": "wo",
+                    "modifiers": ["sc"]
+                },
+                {
+                    "name": "DATA",
+                    "description": "Data to read. Data value will increment every time after read.",
+                    "initial": 0,
+                    "width": 12,
+                    "lsb": 0,
+                    "access": "ro",
+                    "modifiers": ["fifo"]
+                }
+            ]
+        }
+    ]
+}

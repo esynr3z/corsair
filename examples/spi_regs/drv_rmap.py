@@ -1,8 +1,7 @@
-{#- TEMPLATE #}
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" Created with Corsair v{{ corsair_ver }}
+""" Created with Corsair vgit-latest
 
 Python driver to access FPGA register map via SPI.
 """
@@ -16,8 +15,8 @@ def ftdi_show_devices():
 
 
 class FtdiSpi:
-    ADDR_W = {{ config['address_width'].value }}
-    DATA_W = {{ config['data_width'].value }}
+    ADDR_W = 8
+    DATA_W = 16
     CTRL_W = 8
 
     ADDR_MSK = 2 ** ADDR_W - 1
@@ -81,4 +80,3 @@ class Fpga:
 
 if __name__ == "__main__":
     ftdi_show_devices()
-

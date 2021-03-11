@@ -1,0 +1,10 @@
+# SPI
+set_io -nowarn spi_mosi 14 # input
+set_io -nowarn spi_miso 17 # output
+set_io -nowarn spi_sck 15 # input
+set_io -nowarn spi_cs_n 16 # input
+
+# RGB LED
+set_io -nowarn led_g 41 # output
+set_io -nowarn led_b 40 # output
+set_io -nowarn led_r 39 # output
