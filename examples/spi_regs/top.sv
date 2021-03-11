@@ -65,33 +65,6 @@ SB_RGB_DRV #(
 );
 
 //------------------------------------------------------------------------------
-// Data control for "FIFO"
-// Actually, not FIFO, just imitation with simple counter
-//------------------------------------------------------------------------------
-logic [11:0] fifo_rdata;
-logic        fifo_rvalid;
-logic        fifo_ren;
-logic        fifo_flush;
-
-always_ff @(posedge clk) begin
-    if (rst)
-        fifo_rvalid <= 0;
-    else if (fifo_ren && fifo_rvalid)
-         fifo_rvalid <= 0;
-    else if (fifo_ren)
-         fifo_rvalid <= 1;
-end
-
-always_ff @(posedge clk) begin
-    if (rst)
-        fifo_rdata  <= 0;
-    else if (fifo_flush)
-        fifo_rdata <= 0;
-    else if (fifo_ren && fifo_rvalid)
-        fifo_rdata <= fifo_rdata + 1;
-end
-
-//------------------------------------------------------------------------------
 // CSR map
 //------------------------------------------------------------------------------
 localparam DATA_W = 16;
@@ -117,7 +90,7 @@ spi2lb_rmap #(
     .rst (rst),
     // SPI
     .spi_sck  (spi_sck),
-    .spi_cs_n (1'b0),
+    .spi_cs_n (spi_cs_n),
     .spi_mosi (spi_mosi),
     .spi_miso (spi_miso),
     // Local Bus
@@ -143,11 +116,6 @@ rmap #(
     .csr_ledctrl_ren_out (led_r_en),
     .csr_ledctrl_gen_out (led_g_en),
     .csr_ledctrl_ben_out (led_b_en),
-    // CSR: RDFIFO
-    .csr_rdfifo_data_in     (fifo_rdata),
-    .csr_rdfifo_data_rvalid (fifo_rvalid),
-    .csr_rdfifo_data_ren    (fifo_ren),
-    .csr_rdfifo_flush_out   (fifo_flush),
     // Local Bus
     .lb_waddr  (lb_waddr),
     .lb_wdata  (lb_wdata),

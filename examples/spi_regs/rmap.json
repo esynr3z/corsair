@@ -47,31 +47,6 @@
                     "modifiers": []
                 }
             ]
-        },
-        {
-            "name": "RDFIFO",
-            "description": "Read FIFO",
-            "address": 4,
-            "bfields": [
-                {
-                    "name": "FLUSH",
-                    "description": "Flush fifo data",
-                    "initial": 0,
-                    "width": 1,
-                    "lsb": 15,
-                    "access": "wo",
-                    "modifiers": ["sc"]
-                },
-                {
-                    "name": "DATA",
-                    "description": "Data to read. Data value will increment every time after read.",
-                    "initial": 0,
-                    "width": 12,
-                    "lsb": 0,
-                    "access": "ro",
-                    "modifiers": ["fifo"]
-                }
-            ]
         }
     ]
 }

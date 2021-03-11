@@ -53,7 +53,7 @@ class _Reg{{ reg.name.capitalize() }}:
         rdata = self._rmap._if.read(self._rmap.{{ reg_addr(reg) }})
         rdata = rdata & (~(self._rmap.{{ bf_msk(reg, bf) }} << self._rmap.{{ bf_pos(reg, bf) }}))
         rdata = rdata | (val << self._rmap.{{ bf_pos(reg, bf) }})
-        self._rmap._if.write({{ reg_addr(reg) }}, rdata)
+        self._rmap._if.write(self._rmap.{{ reg_addr(reg) }}, rdata)
         {% endif %}
     {% endfor %}
 {% endfor %}
