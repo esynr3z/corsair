@@ -32,7 +32,15 @@ Please follow to :ref:`Workflow <workflow>` and :ref:`CSR description file <csr-
 
    workflow.rst
    csr-map.rst
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Buses and bridges
+
    local-bus.rst
+   apb2lb.rst
+   axil2lb.rst
+   amm2lb.rst
    spi2lb.rst
 
 .. toctree::
