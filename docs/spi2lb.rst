@@ -7,7 +7,7 @@ SPI to Local Bus bridge
 Special bridge that can be useful for some core-less projects.
 Just put all the design's control and status information into a register map, add this bridge and rule your FPGA from PC / MCU / other FPGA.
 
-Example of a such design can be found in the main `repository <https://github.com/esynr3z/corsair/tree/master/corsair/examples/spi_regs>`_.
+Example of a such design can be found in the main `repository <https://github.com/esynr3z/corsair/tree/master/examples/spi_regs>`_.
 
 Signals
 =======
