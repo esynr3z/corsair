@@ -31,6 +31,7 @@ from .readers import (
 )
 
 from .writers import (
+    Jinja2Writer,
     RegisterMapWriter,
     ConfigurationWriter,
     LbBridgeWriter,

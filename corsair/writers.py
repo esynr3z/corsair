@@ -94,10 +94,10 @@ class ConfigurationWriter(_DictWriter):
         self._save_file(path, data)
 
 
-class _Jinja2Writer():
+class Jinja2Writer():
     """Basic class for rendering Jinja2 templates."""
 
-    def _render_to_file(self, template, vars, path):
+    def render_to_file(self, template, vars, path):
         """Render text with Jinja2 and save it to file
 
         Args:
@@ -122,7 +122,7 @@ class _Jinja2Writer():
         print("OK")
 
 
-class LbBridgeWriter(_Jinja2Writer):
+class LbBridgeWriter(Jinja2Writer):
     """Create HDL file with bridge to Local Bus.
 
     Examples:
@@ -169,10 +169,10 @@ class LbBridgeWriter(_Jinja2Writer):
 
         print("OK")
 
-        self._render_to_file(j2_template, j2_vars, path)
+        self.render_to_file(j2_template, j2_vars, path)
 
 
-class HdlWriter(_Jinja2Writer):
+class HdlWriter(Jinja2Writer):
     """Create HDL file with register map.
 
     Examples:
@@ -204,10 +204,10 @@ class HdlWriter(_Jinja2Writer):
 
         print("OK")
 
-        self._render_to_file(j2_template, j2_vars, path)
+        self.render_to_file(j2_template, j2_vars, path)
 
 
-class DocsWriter(_Jinja2Writer):
+class DocsWriter(Jinja2Writer):
     """Create documentation for a register map.
 
     Examples:
@@ -240,7 +240,7 @@ class DocsWriter(_Jinja2Writer):
 
         print("OK")
 
-        self._render_to_file(j2_template, j2_vars, path)
+        self.render_to_file(j2_template, j2_vars, path)
 
         print("  Draw images ... ", end='')
         self._draw_regs(Path(path).parent, rmap)
@@ -268,7 +268,7 @@ class DocsWriter(_Jinja2Writer):
             wavedrom.render(json.dumps(reg_wd)).saveas(str(imgdir / ("%s.svg" % reg.name.lower())))
 
 
-class PyFtdiDriverWriter(_Jinja2Writer):
+class PyFtdiDriverWriter(Jinja2Writer):
     """Create pyftdi-based Python file with SPI driver for FPGA.
 
     Examples:
@@ -296,10 +296,10 @@ class PyFtdiDriverWriter(_Jinja2Writer):
 
         print("OK")
 
-        self._render_to_file(j2_template, j2_vars, path)
+        self.render_to_file(j2_template, j2_vars, path)
 
 
-class PyRegisterMapWriter(_Jinja2Writer):
+class PyRegisterMapWriter(Jinja2Writer):
     """Create Python file to access register map via some interface.
 
     Examples:
@@ -331,4 +331,4 @@ class PyRegisterMapWriter(_Jinja2Writer):
 
         print("OK")
 
-        self._render_to_file(j2_template, j2_vars, path)
+        self.render_to_file(j2_template, j2_vars, path)
