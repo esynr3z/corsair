@@ -25,15 +25,36 @@ LbBridgeWriter
    :show-inheritance:
 
 HdlWriter
---------------
+----------
 .. autoclass:: corsair.HdlWriter
    :members:
    :undoc-members:
    :show-inheritance:
 
 DocsWriter
---------------
+-----------
 .. autoclass:: corsair.DocsWriter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+PyFtdiDriverWriter
+------------------
+.. autoclass:: corsair.PyFtdiDriverWriter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+PyRegisterMapWriter
+-------------------
+.. autoclass:: corsair.PyRegisterMapWriter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Jinja2Writer
+------------
+.. autoclass:: corsair.Jinja2Writer
    :members:
    :undoc-members:
    :show-inheritance:
