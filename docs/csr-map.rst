@@ -148,11 +148,12 @@ lb_bridge
 
 Group of parameters related to interface bridge to Local Bus HDL module.
 
-================= ======= =========================================
-Parameter         Default Description
-================= ======= =========================================
-``type``          "none"  Interface type. One of the options below.
-================= ======= =========================================
+================= ========= =========================================
+Parameter         Default   Description
+================= ========= =========================================
+``type``          "none"    Interface type. One of the options below.
+``py_driver``     ``false`` Generate Python drivers for the bridge. Valid only when ``type`` is "spi".
+================= ========= =========================================
 
 Options for ``type``:
 

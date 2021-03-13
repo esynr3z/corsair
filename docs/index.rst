@@ -33,6 +33,7 @@ Please follow to :ref:`Workflow <workflow>` and :ref:`CSR description file <csr-
    workflow.rst
    csr-map.rst
    local-bus.rst
+   spi2lb.rst
 
 .. toctree::
    :maxdepth: 2
