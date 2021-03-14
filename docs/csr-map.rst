@@ -56,7 +56,10 @@ List of default parameters and groups (relative to configuration root):
     * address_alignment_value
 * lb_bridge
     * type
+    * py_driver
 * docs
+    * register_images
+    * print_conventions
 
 name
 ----
@@ -182,6 +185,17 @@ Allowed combinations of the parameters:
 "none"   8, 16, ... (any power of 2)   1 - 64
 ======== ============================= =================
 
+docs
+----
+
+Group of parameters related to documentation generation.
+
+===================== ========= =======================================================================
+Parameter             Default   Description
+===================== ========= =======================================================================
+``register_images``   ``true``  Generate graphic representation of register's bitfields
+``print_conventions`` ``true``  Print bitfields conventions for ``access`` and ``modifiers`` attributes
+===================== ========= =======================================================================
 
 Register map
 ============

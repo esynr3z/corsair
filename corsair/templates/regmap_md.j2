@@ -28,6 +28,7 @@ Created with [Corsair](https://github.com/esynr3z/corsair) v{{ corsair_ver }}.
 
 Register map v{{ config['version'].value }}.
 
+{% if config['docs']['print_conventions'].value %}
 ## Conventions
 
 | Name  | Type     | Description |
@@ -42,6 +43,7 @@ Register map v{{ config['version'].value }}.
 | rtc   | modifier | Read To Clear. Current value will be cleared next tick after read. |
 | const | modifier | Constant. Reset value is hardcoded as only value can be read. |
 | hwu   | modifier | Hardware Update. Register value can be updated from outside the map with hardware. |
+{% endif %}
 
 ## Register map
 
@@ -60,7 +62,9 @@ Address offset: {{ literal(reg.address, config['address_width'].value) }}
 
 Reset value: {{ literal(reg.initial, config['data_width'].value) }}
 
+{% if config['docs']['register_images'].value %}
 ![]({{ config['name'].value }}_img/{{ reg.name.lower()}}.svg)
+{% endif %}
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |

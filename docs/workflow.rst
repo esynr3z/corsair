@@ -40,7 +40,7 @@ All generated register maps support only Local Bus interface to make code genera
     :alt: Local Bus architecture
     :align: center
 
-Follow to :ref:`Local Bus specification <csr-map>` for a details.
+Follow to :ref:`Local Bus specification <local-bus>` for a details.
 
 Import (Python)
 ===============
@@ -63,7 +63,7 @@ Corsair can be imported to your Python module to enable creation of a custom wor
 
     # do your custom processing
     rmap_custom_processig(rmap)
-    
+
 More information can be found in the API section:
 
 * :ref:`Configuration <config-api>`

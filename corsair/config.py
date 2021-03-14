@@ -259,6 +259,10 @@ class Configuration(ParameterGroup):
 
         # group docs
         self.add_params(ParameterGroup('docs'))
+        self['docs'].add_params([
+            Parameter(name='register_images', value=True, validator=lambda val: val in [True, False]),
+            Parameter(name='print_conventions', value=True, validator=lambda val: val in [True, False])]
+        )
 
         # common params
         data_width_allowed = {

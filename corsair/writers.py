@@ -242,9 +242,10 @@ class DocsWriter(Jinja2Writer):
 
         self.render_to_file(j2_template, j2_vars, path)
 
-        print("  Draw images ... ", end='')
-        self._draw_regs(Path(path).parent, rmap)
-        print("OK")
+        if rmap.config['docs']['register_images'].value:
+            print("  Draw images ... ", end='')
+            self._draw_regs(Path(path).parent, rmap)
+            print("OK")
 
     def _draw_regs(self, outdir, rmap):
         imgdir = outdir / ('%s_img' % rmap.config['name'].value)
