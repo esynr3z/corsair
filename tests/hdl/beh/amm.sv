@@ -10,7 +10,7 @@ interface amm #(
 );
 
   logic [ADDR_W-1:0] address      ;
-  logic              read_s       ;
+  logic              read_s = 0   ;
   logic [DATA_W-1:0] readdata     ;
   logic              readdatavalid;
   logic [STRB_W-1:0] byteenable   ;

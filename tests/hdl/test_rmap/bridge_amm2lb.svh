@@ -1,6 +1,6 @@
 amm2lb amm2lb (
   .clk          (clk              ),
-  .reset        (reset            ),
+  .reset        (rst              ),
   // Avalon-MM
   .address      (mst.address      ),
   .read         (mst.read_s       ),
