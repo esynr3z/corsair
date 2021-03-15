@@ -43,6 +43,7 @@ Register map v{{ config['version'].value }}.
 | rtc   | modifier | Read To Clear. Current value will be cleared next tick after read. |
 | const | modifier | Constant. Reset value is hardcoded as only value can be read. |
 | hwu   | modifier | Hardware Update. Register value can be updated from outside the map with hardware. |
+| fifo  | modifier | FIFO memory. Access to a register will be transformed to transaction to an external FIFO. |
 {% endif %}
 
 ## Register map
