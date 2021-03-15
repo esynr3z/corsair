@@ -97,7 +97,7 @@ class ConfigurationWriter(_DictWriter):
 class Jinja2Writer():
     """Basic class for rendering Jinja2 templates."""
 
-    def render_to_file(self, template, vars, path):
+    def render_to_file(self, template, vars, path, templates_path=None):
         """Render text with Jinja2 and save it to file
 
         Args:
@@ -106,7 +106,8 @@ class Jinja2Writer():
             path : path to output file
         """
         print("  Load template ... ", end='')
-        templates_path = str(Path(__file__).parent / 'templates')
+        if not templates_path:
+            templates_path = str(Path(__file__).parent / 'templates')
         j2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath=templates_path),
                                     trim_blocks=True, lstrip_blocks=True)
         j2_template = j2_env.get_template(template)
