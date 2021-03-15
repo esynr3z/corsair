@@ -1,0 +1,10 @@
+Some custom parameter value: test
+
+Name,Address,Access,Description
+LEN,0,rw,Length of pulse
+CNT,4,rw,Counter value
+START,8,wo,Start processes
+STAT,16,ro,Status
+CTL,32,rw,Control
+FLAG,36,rw,Flags
+VERSION,64,ro,Current version

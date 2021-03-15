@@ -1,0 +1,6 @@
+Some custom parameter value: {{ config['custom_param'].value }}
+
+Name,Address,Access,Description
+{% for reg in rmap %}
+{{ reg.name }},{{ reg.address }},{{ reg.access }},{{ reg.description }}
+{% endfor %}
