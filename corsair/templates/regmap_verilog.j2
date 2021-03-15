@@ -197,6 +197,11 @@ csr_{{ reg.name.lower() }}_wlock
 csr_{{ reg.name.lower() }}_ren
 {%- endmacro %}
 
+{#- signal: register read enable registered #}
+{% macro sig_csr_ren_ff(reg) %}
+csr_{{ reg.name.lower() }}_ren_ff
+{%- endmacro %}
+
 {#- signal: register write enable #}
 {% macro sig_csr_wen(reg) %}
 csr_{{ reg.name.lower() }}_wen
@@ -286,6 +291,15 @@ assign {{ sig_csr_wen(reg) }} = lb_wen && (lb_waddr == {{ literal(reg.address, c
     {% if 'r' in reg.access %}
 wire {{ sig_csr_ren(reg) }};
 assign {{ sig_csr_ren(reg) }} = lb_ren && (lb_raddr == {{ literal(reg.address, config['address_width'].value) }});
+        {% if 'fifo' in reg.modifiers %}
+
+reg {{ sig_csr_ren_ff(reg) }};
+{{ always_begin(sig=sig_csr_ren_ff(reg)
+)}} begin
+        {{ sig_csr_ren_ff(reg) }} <= {{ sig_csr_ren(reg) }};
+    end
+end
+        {% endif %}
     {% endif %}
     {% if reg.access_strobes %}
 assign {{ port_csr_wstrb(reg) }} = lb_wready && {{ sig_csr_wen(reg) }};
@@ -326,7 +340,7 @@ assign {{ port_bf_out(reg, bf) }} = lb_wdata{{ range(bf.msb, bf.lsb) }};
 assign {{ port_bf_out(reg, bf) }} = {{ sig_bf_out_ff(reg, bf) }};
         {% endif %}
         {% if 'r' in bf.access and 'fifo' in bf.modifiers %}
-assign {{ port_bf_ren(reg, bf) }} = {{ sig_csr_ren(reg) }};
+assign {{ port_bf_ren(reg, bf) }} = {{ sig_csr_ren(reg) }} & (~{{ sig_csr_ren_ff(reg) }});
         {% endif %}
         {% if 'w' in bf.access and 'fifo' in bf.modifiers %}
 assign {{ port_bf_wen(reg, bf) }} = {{ sig_csr_wen(reg) }};

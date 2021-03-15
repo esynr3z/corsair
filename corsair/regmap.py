@@ -479,6 +479,12 @@ class Register():
         else:
             return 'rw'
 
+    @property
+    def modifiers(self):
+        """All unique bitfield's modifiers inside register."""
+        modifiers = list(set([mod for bf in self.bfields for mod in bf.modifiers]))
+        return modifiers
+
     def _validate(self):
         """Last checks of the register before use."""
         # complementary checks

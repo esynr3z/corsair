@@ -69,7 +69,7 @@ task test_ro;
         end
         for (int i=0; i<5; i++) begin
             wait (csr_fiforo_data_ren);
-            repeat (i) @(posedge clk);
+            repeat (i+1) @(posedge clk);
             csr_fiforo_data_in <= fifo.pop_back();
             csr_fiforo_data_rvalid <= 1'b1;
             @(posedge clk);
@@ -107,7 +107,7 @@ task test_rw;
         end
         for (int i=0; i<5; i++) begin
             wait (csr_fiforw_data_ren);
-            repeat (i) @(posedge clk);
+            repeat (i+1) @(posedge clk);
             csr_fiforw_data_in <= fifo.pop_back();
             csr_fiforw_data_rvalid <= 1'b1;
             @(posedge clk);
