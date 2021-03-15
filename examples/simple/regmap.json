@@ -1,0 +1,198 @@
+{
+    "config": {
+        "name":"regs",
+        "version":"1.42",
+        "data_width": 32,
+        "address_width": 12,
+        "register_reset": "sync_pos",
+        "regmap": {
+            "read_filler": "0xDEADBEEF",
+            "address_increment_mode": "none",
+            "address_increment_value": 4,
+            "address_alignment_mode": "data_width",
+            "address_alignment_value": 4
+        },
+        "lb_bridge": {
+            "type": "axil"
+        }
+    },
+    "regmap" : [
+        {
+            "address": "0x000",
+            "bfields": [
+                {
+                    "name": "LEN",
+                    "description": "Length of pulse",
+                    "initial": "0x0",
+                    "width": 32,
+                    "lsb": 0,
+                    "access":"rw"
+                }
+            ]
+        },
+        {
+            "address": "0x004",
+            "access_strobes": true,
+            "bfields": [
+                {
+                    "name": "CNT",
+                    "description": "Counter value",
+                    "initial": "0x0",
+                    "width": 16,
+                    "lsb": 0,
+                    "access": "rw",
+                    "modifiers": [
+                        "hwu"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "START",
+            "description": "Start processes",
+            "address": "0x008",
+            "bfields": [
+                {
+                    "name": "STA",
+                    "description": "Start process A",
+                    "width": 1,
+                    "lsb": 0,
+                    "access": "wo",
+                    "modifiers": [
+                        "sc"
+                    ]
+                },
+                {
+                    "name": "STB",
+                    "description": "Start process B",
+                    "width": 1,
+                    "lsb": 8,
+                    "access": "wo",
+                    "modifiers": [
+                        "sc"
+                    ]
+                },
+                {
+                    "name": "STC",
+                    "description": "Start process C",
+                    "width": 1,
+                    "lsb": 16,
+                    "access": "wo",
+                    "modifiers": [
+                        "sc"
+                    ]
+                },
+                {
+                    "name": "KEY",
+                    "description": "Secret key to start process",
+                    "width": 8,
+                    "lsb": 24,
+                    "access": "wo"
+                }
+            ]
+        },
+        {
+            "name": "STAT",
+            "description": "Status",
+            "address": "0x010",
+            "bfields": [
+                {
+                    "name": "DIR",
+                    "description": "Current direction",
+                    "width": 1,
+                    "lsb": 0,
+                    "access": "ro"
+                },
+                {
+                    "name": "STATE",
+                    "description": "Current state",
+                    "width": 3,
+                    "lsb": 3,
+                    "access": "ro",
+                    "modifiers": [
+                        "hwu"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "CTL",
+            "description": "Control",
+            "address": "0x020",
+            "bfields": [
+                {
+                    "name": "ENA",
+                    "description": "Enable A",
+                    "width": 1,
+                    "lsb": 1,
+                    "access": "rw"
+                },
+                {
+                    "name": "INITB",
+                    "description": "Initial value for B",
+                    "width": 8,
+                    "lsb": 8,
+                    "access": "rw"
+                }
+            ]
+        },
+        {
+            "name": "FLAG",
+            "description": "Flags",
+            "address": "0x024",
+            "bfields": [
+                {
+                    "name": "EVA",
+                    "description": "Event A",
+                    "width": 1,
+                    "lsb": 0,
+                    "access": "rw",
+                    "modifiers": [
+                        "hwu",
+                        "w1tc"
+                    ]
+                },
+                {
+                    "name": "EVB",
+                    "description": "Event B",
+                    "width": 1,
+                    "lsb": 2,
+                    "access": "ro",
+                    "modifiers": [
+                        "hwu",
+                        "rtc"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "VERSION",
+            "description": "Current version",
+            "address": "0x040",
+            "bfields": [
+                {
+                    "name": "MINOR",
+                    "description": "Minor version",
+                    "initial": "0x23",
+                    "width": 8,
+                    "lsb": 0,
+                    "access": "ro",
+                    "modifiers": [
+                        "const"
+                    ]
+                },
+                {
+                    "name": "MAJOR",
+                    "description": "Major version",
+                    "initial": "0x02",
+                    "width": 8,
+                    "lsb": 16,
+                    "access": "ro",
+                    "modifiers": [
+                        "const"
+                    ]
+                }
+            ]
+        }
+    ]
+}
