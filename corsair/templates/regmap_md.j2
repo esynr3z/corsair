@@ -50,7 +50,7 @@ Register map v{{ config['version'].value }}.
 | Name                     | Address    | Description |
 | :---                     | :---       | :---        |
 {% for reg in rmap %}
-{{ "| %-24s | %-10s | %s |" % ("[%s](#%s)" % (reg.name, reg.name.lower()), literal(reg.address, config['address_width'].value), reg.description) }} |
+{{ "| %-24s | %-10s | %s" % ("[%s](#%s)" % (reg.name, reg.name.lower()), literal(reg.address, config['address_width'].value), reg.description) }} |
 {% endfor %}
 {% for reg in rmap %}
 
