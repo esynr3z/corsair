@@ -45,6 +45,9 @@ from corsair import *
 # to inline SVG with wafeforms (JS script enabled by default)
 wavedrom_html_jsinline = False
 
+# build-time image generation through wavedrompy
+render_using_wavedrompy = True
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
