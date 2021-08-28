@@ -28,6 +28,3 @@ jobs:
     - name: Test package
       run: |
         pytest -v -n auto
-    - name: Test docstrings
-      run: |
-        pytest -v --doctest-modules corsair
