@@ -1,9 +1,9 @@
-============
-Contributing
-============
+=================
+Developer's guide
+=================
 
 Installation
-------------
+============
 
 .. note::
     Depending on your system, Python executable might be ``python`` or ``python3``.
@@ -31,7 +31,7 @@ Or install it:
 
 
 Code style
-----------
+==========
 
 `PEP 8 Speaks <https://github.com/OrkoHunter/pep8speaks/>`_ is added to automatically review Python code style over Pull Requests.
 
@@ -44,25 +44,22 @@ Linter settings:
 You can also install `PEP8 Git Commit Hook <https://gist.github.com/esynr3z/206e164023a794eb0c96d827de31bd49>`_ and code style will be checked before any commit.
 
 Testing
--------
+=======
 
 Install PyTest:
 
 ::
 
-    python3 -m pip install -U pytest
+    python3 -m pip install -U pytest pytest-xdist
 
-Install Icarus Verilog for some tests (e.g. for Ubuntu):
+HDL tests use Modelsim, so make sure that Modelsim is installed and visible in PATH.
 
-::
 
-    sudo apt install iverilog
-
-Run tests from the root folder:
+Run tests from the root folder on all available cores:
 
 ::
 
-    pytest -v
+    pytest -v -n auto
 
 Run tests for docstrings:
 
@@ -71,13 +68,13 @@ Run tests for docstrings:
     pytest --doctest-modules corsair
 
 Documentation
--------------
+=============
 
 Install Sphinx and extensions:
 
 ::
 
-    python3 -m pip install -U sphinx sphinx_rtd_theme m2r2 sphinxcontrib-wavedrom
+    python3 -m pip install -r docs/requirements.txt
 
 Run from ``docs`` folder to build the documentation:
 

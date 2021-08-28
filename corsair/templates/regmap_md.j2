@@ -10,48 +10,46 @@
 
 {#- bit field mode #}
 {% macro mode(bf) %}
-{{ bf.access }}{{ ', ' + ', '.join(bf.modifiers) if bf.modifiers else '' }}
+{{ bf.access }}
 {%- endmacro %}
 
 {#- value in hex format #}
-{% macro literal(initial, width) %}
-{{ "0x%0{w}x".format(w=width // 4) % initial }}
+{% macro literal(reset, width) %}
+{{ "0x%0{w}x".format(w=width // 4) % reset }}
 {%- endmacro %}
 
 {#- TEMPLATE NAMESPACE #}
 {% set tmp = namespace() %}
 
 {#- TEMPLATE #}
-# {{ config['name'].value }}
+# {{ title }}
 
 Created with [Corsair](https://github.com/esynr3z/corsair) v{{ corsair_ver }}.
 
-Register map v{{ config['version'].value }}.
-
-{% if config['docs']['print_conventions'].value %}
+{% if print_conventions %}
 ## Conventions
 
-| Name  | Type     | Description |
-| :---  | :---     | :---        |
-| rw    | access   | Read or Write |
-| ro    | access   | Read Only. Write has no effect. |
-| wo    | access   | Write Only. Zeros are read. |
-| sc    | modifier | Self Clear. Write 0 - no effect, write 1 - next tick self clear. |
-| w1tc  | modifier | Write 1 To Clear. Write 0 - no effect, write 1 - current value will be cleared (all zeros). |
-| w1ts  | modifier | Write 1 To Set. Write 0 - no effect, write 1 - current value will be set (all ones). |
-| w1tt  | modifier | Write 1 To Toggle. Write 0 - no effect, write 1 - current value will be inversed. |
-| rtc   | modifier | Read To Clear. Current value will be cleared next tick after read. |
-| const | modifier | Constant. Reset value is hardcoded as only value can be read. |
-| hwu   | modifier | Hardware Update. Register value can be updated from outside the map with hardware. |
-| fifo  | modifier | FIFO memory. Access to a register will be transformed to transaction to an external FIFO. |
+| Access mode | Description               |
+| :---------- | :------------------------ |
+| rw          | Read and Write            |
+| rw1c        | Read and Write 1 to Clear |
+| rw1s        | Read and Write 1 to Set   |
+| ro          | Read Only                 |
+| roc         | Read Only to Clear        |
+| roll        | Read Only / Latch Low     |
+| rolh        | Read Only / Latch High    |
+| wo          | Write only                |
+| wosc        | Write Only / Self Clear   |
 {% endif %}
 
-## Register map
+## Register map summary
+
+Base address: {{ "0x%08x" % config['base_address'] }}
 
 | Name                     | Address    | Description |
 | :---                     | :---       | :---        |
 {% for reg in rmap %}
-{{ "| %-24s | %-10s | %s" % ("[%s](#%s)" % (reg.name, reg.name.lower()), literal(reg.address, config['address_width'].value), reg.description) }} |
+{{ "| %-24s | %-10s | %s" % ("[%s](#%s)" % (reg.name, reg.name.lower()), literal(reg.address, config['address_width']), reg.description) }} |
 {% endfor %}
 {% for reg in rmap %}
 
@@ -59,26 +57,38 @@ Register map v{{ config['version'].value }}.
 
 {{ reg.description }}
 
-Address offset: {{ literal(reg.address, config['address_width'].value) }}
+Address offset: {{ literal(reg.address, config['address_width']) }}
 
-Reset value: {{ literal(reg.initial, config['data_width'].value) }}
+Reset value: {{ literal(reg.reset, config['data_width']) }}
 
-{% if config['docs']['register_images'].value %}
-![]({{ config['name'].value }}_img/{{ reg.name.lower()}}.svg)
+{% if print_images %}
+![{{ reg.name.lower()}}]({{ filename }}_img/{{ reg.name.lower()}}.svg)
 {% endif %}
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
-    {% set tmp.reserved_msb = config['data_width'].value - 1 %}
-    {% for bf in reg.bfields[::-1] %}
+    {% set tmp.reserved_msb = config['data_width'] - 1 %}
+    {% for bf in reg.bitfields[::-1] %}
         {% if tmp.reserved_msb > bf.msb %}
             {% set tmp.reserved_lsb = bf.msb + 1 %}
             {% set tmp.reserved_width = tmp.reserved_msb - tmp.reserved_lsb + 1 %}
 {{ "| %-16s | %-6s | %-15s | %-10s | %s |" % ('-', range(tmp.reserved_msb, tmp.reserved_lsb), '-', literal(0, tmp.reserved_width), 'Reserved') }}
         {% endif %}
-{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % (bf.name, range(bf.msb, bf.lsb), mode(bf), literal(bf.initial, bf.width), bf.description) }}
+{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % (bf.name, range(bf.msb, bf.lsb), mode(bf), literal(bf.reset, bf.width), bf.description) }}
         {% set tmp.reserved_msb = bf.lsb - 1 %}
     {% endfor %}
+    {% for bf in reg %}
+        {% if bf.enums %}
 
-Back to [Register map](#register-map).
+Enumerated values for {{ reg.name }}.{{ bf.name }}.
+
+| Name             | Value   | Description |
+| :---             | :---    | :---        |
+            {% for enum in bf %}
+{{ "| %-16s | %-6s | %s |" % (enum.name, literal(enum.value, bf.width), enum.description) }}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+
+Back to [Register map](#register-map-summary).
 {% endfor %}

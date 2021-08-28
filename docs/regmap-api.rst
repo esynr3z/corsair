@@ -1,25 +1,29 @@
 .. _regmap-api:
 
+============
 Register map
 ============
 
+EnumValue
+=========
+.. autoclass:: corsair.EnumValue
+   :members:
+   :undoc-members:
+
 BitField
---------
+========
 .. autoclass:: corsair.BitField
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Register
---------
+========
 .. autoclass:: corsair.Register
    :members:
    :undoc-members:
-   :show-inheritance:
 
 RegisterMap
------------
+===========
 .. autoclass:: corsair.RegisterMap
    :members:
    :undoc-members:
-   :show-inheritance:

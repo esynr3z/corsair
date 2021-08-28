@@ -4,12 +4,23 @@
 //
 
 module  {{ module_name }} #(
-    parameter ADDR_W = {{ config['address_width'].value }},
-    parameter DATA_W = {{ config['data_width'].value }},
+    parameter ADDR_W = {{ config['address_width'] }},
+    parameter DATA_W = {{ config['data_width'] }},
     parameter STRB_W = DATA_W / 8
 )(
     input               clk,
     input               rst,
+    // Local Bus
+    input               wready,
+    output [ADDR_W-1:0] waddr,
+    output [DATA_W-1:0] wdata,
+    output              wen,
+    output [STRB_W-1:0] wstrb,
+    input  [DATA_W-1:0] rdata,
+    input               rvalid,
+    output [ADDR_W-1:0] raddr,
+    output              ren,
+{% macro axil_core(regmap_embed=False) %}
     // AXI
     input  [ADDR_W-1:0] axil_awaddr,
     input  [2:0]        axil_awprot,
@@ -30,19 +41,19 @@ module  {{ module_name }} #(
     output [DATA_W-1:0] axil_rdata,
     output [1:0]        axil_rresp,
     output              axil_rvalid,
-    input               axil_rready,
-
-    // Local Bus
-    input               wready,
-    output [ADDR_W-1:0] waddr,
-    output [DATA_W-1:0] wdata,
-    output              wen,
-    output [STRB_W-1:0] wstrb,
-    input  [DATA_W-1:0] rdata,
-    input               rvalid,
-    output [ADDR_W-1:0] raddr,
-    output              ren
+    input               axil_rready
 );
+{% if regmap_embed %}
+wire              wready;
+wire [ADDR_W-1:0] waddr;
+wire [DATA_W-1:0] wdata;
+wire              wen;
+wire [STRB_W-1:0] wstrb;
+wire [DATA_W-1:0] rdata;
+wire              rvalid;
+wire [ADDR_W-1:0] raddr;
+wire              ren;
+{% endif %}
     reg [ADDR_W-1:0] waddr_int;
     reg [ADDR_W-1:0] raddr_int;
     reg [DATA_W-1:0] wdata_int;
@@ -55,7 +66,7 @@ module  {{ module_name }} #(
     reg              axil_bvalid_int;
     reg [DATA_W-1:0] axil_rdata_int;
     reg              axil_rvalid_int;
-    
+
     assign axil_awready = ~awflag;
     assign axil_wready  = ~wflag;
     assign axil_bvalid  = axil_bvalid_int;
@@ -63,8 +74,8 @@ module  {{ module_name }} #(
     assign wdata        = wdata_int;
     assign wstrb        = strb_int;
     assign wen          = awflag && wflag;
-    
-    {% set rst_type = config['register_reset'].value%}
+
+    {% set rst_type = config['register_reset'] %}
     {%- if rst_type == 'async_pos' or rst_type == 'sync_pos' %}
         {% set rst_active = 1%}
     {%- elif rst_type == 'async_neg' or rst_type == 'sync_neg' %}
@@ -110,8 +121,8 @@ module  {{ module_name }} #(
     assign axil_rvalid  = axil_rvalid_int;
     assign raddr        = raddr_int;
     assign ren          = arflag && ~rflag;
-    
-    {% set rst_type = config['register_reset'].value%}
+
+    {% set rst_type = config['register_reset'] %}
     always @(posedge clk
     {%- if rst_type == 'async_pos' %} or posedge rst)
     {%- elif rst_type == 'async_neg' %} or negedge rst)
@@ -144,5 +155,6 @@ module  {{ module_name }} #(
             end
         end
     end
-
+{% endmacro %}
+{{ axil_core() }}
 endmodule

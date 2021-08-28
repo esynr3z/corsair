@@ -1,4 +1,19 @@
-## 0.4.0 (unreleased)
+## 1.0.0 (unreleased)
+
+**Reworking the entire project almost from scratch. Lots of breaking changes.**
+
+* New configuration file format (INI)
+* New file generation flow (more clear)
+* Do refactoring of all core modules
+* Add enums
+* Add C header generator
+* Add Verilog header generator
+* Add SystemVerilog package generator
+* Add plenty of examples
+* Rework of documentation
+* Update the tests
+* Many minor tweaks and fixes
+
 
 ## 0.3.0 (2021-02-21)
 

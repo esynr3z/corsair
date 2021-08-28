@@ -1,3 +1,6 @@
+`include "regs.vh"
+import regs_pkg::*;
+
 // Clock and reset
 logic clk = 1'b0;
 always #5 clk <= ~clk;
@@ -9,32 +12,19 @@ initial begin
 end
 
 // DUT
-localparam ADDR_W = `DUT_ADDR_W;
-localparam DATA_W = `DUT_DATA_W;
+localparam ADDR_W = CSR_ADDR_WIDTH;
+localparam DATA_W = CSR_DATA_WIDTH;
 localparam STRB_W = DATA_W / 8;
 
-logic              lb_wready;
-logic [ADDR_W-1:0] lb_waddr;
-logic [DATA_W-1:0] lb_wdata;
-logic              lb_wen;
-logic [STRB_W-1:0] lb_wstrb;
-logic [DATA_W-1:0] lb_rdata;
-logic              lb_rvalid;
-logic [ADDR_W-1:0] lb_raddr;
-logic              lb_ren;
+logic              wready;
+logic [ADDR_W-1:0] waddr;
+logic [DATA_W-1:0] wdata;
+logic              wen;
+logic [STRB_W-1:0] wstrb;
+logic [DATA_W-1:0] rdata;
+logic              rvalid;
+logic [ADDR_W-1:0] raddr;
+logic              ren;
 
 // DUT
 `include "dut.svh"
-
-// Bridge to Local Bus
-`ifdef BRIDGE_APB
-    `include "bridge_apb2lb.svh"
-`elsif BRIDGE_AXIL
-    `include "bridge_axil2lb.svh"
-`elsif BRIDGE_AMM
-    `include "bridge_amm2lb.svh"
-`elsif BRIDGE_SPI
-    `include "bridge_spi2lb.svh"
-`else
-    $error("Unknown bridge!");
-`endif

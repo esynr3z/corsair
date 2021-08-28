@@ -1,301 +1,121 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Configuration module.
+"""Module to operate with Corsair configuration files
 """
 
 from . import utils
+import configparser
 
 
-class Parameter():
-    """Generic parameter.
-
-    Examples:
-
-        Create parameter with check that value never exceed 42:
-
-        >>> print(Parameter('param_name', 42, lambda val: val <= 42))
-        param_name: 42
-
-    Attributes:
-        name: Name of the parameter.
-        validator: Lambda function to perform value validation.
-            Returns True if value check is OK, and False otherwise.
-    """
-    def __init__(self, name, value=None, validator=lambda val: True):
-        self._value = None
-
-        self.name = name
-        self.validator = validator
-        self.value = value
-
-    def __eq__(self, other):
-        if self.__class__ != other.__class__:
-            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
-        else:
-            return (
-                self.as_dict() == other.as_dict() and
-                self.validator == other.validator
-            )
-
-    def __ne__(self, other):
-        if self.__class__ != other.__class__:
-            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
-        else:
-            return not self.__eq__(other)
-
-    def __repr__(self):
-        return 'Parameter(%s, %s)' % (repr(self.name), repr(self.value))
-
-    def __str__(self):
-        return self.as_str()
-
-    def as_str(self, indent=''):
-        """Returns indented parameter's string with name and value."""
-        return indent + '%s: %s' % (self.name, utils.try_int_to_str(self._value))
-
-    def as_dict(self):
-        """Returns dictionary with parameters's name and value."""
-        return {'name': self.name, 'value': self.value}
-
-    @property
-    def value(self):
-        """Value of the parameter.
-
-        Getter:
-            Get current value of the parameter.
-
-        Setter:
-            Set new value of the parameter.
-
-            Raises:
-                ValueError: An error occured if new value fails the check.
-        """
-        return self._value
-
-    @value.setter
-    def value(self, new_value):
-        # store all 0x-like hexademical strings as integers if possible
-        self._value = utils.try_hex_to_dec(new_value)
-        # run validator for the new value
-        self._validate()
-
-    def _validate(self):
-        """Check parameter value correctness."""
-        if self.validator(self.value) is False:
-            raise ValueError('"%s" parameter with "%s" value failed the check!' % (self.name,
-                                                                                   self.value))
+def default_globcfg():
+    """Create a global configuration with parameters by default."""
+    return {
+        "base_address": 0,
+        "data_width": 32,
+        "address_width": 16,
+        "register_reset": "sync_pos",
+        "address_increment": "none",
+        "address_alignment": "data_width",
+        "force_name_case": "none",
+    }
 
 
-class ParameterGroup():
-    """Group of parameters or other groups.
+def read_csrconfig(cfgpath):
+    """Parse Corsair configuration file. Return two dictionaries: global configuration and targets."""
+    # open config file
+    cfg = configparser.ConfigParser()
+    cfg.read_file(open(cfgpath, 'r'))
 
-    Examples:
-
-        Create group and add parameters:
-
-        >>> pg = ParameterGroup('group_a')
-        >>> pg.add_params([Parameter('p1', 42), Parameter('p2', 'abc')])
-        >>> print(pg)
-        group_a:
-          p1: 42
-          p2: abc
-
-        Other way to do the same:
-
-        >>> pg = ParameterGroup('group_a')
-        >>> pg.values = {'p1':42, 'p2':'abc'}
-        >>> print(pg)
-        group_a:
-          p1: 42
-          p2: abc
-
-        Change parameter value:
-
-        >>> pg = ParameterGroup('group_a')
-        >>> pg.add_params(Parameter('p1', 42))
-        >>> pg['p1'].value = 777
-        >>> print(pg['p1'].value)
-        777
-
-    Attributes:
-        name: Name of the group.
-    """
-    def __init__(self, name):
-        self.name = name
-        self._params = {}
-
-    def __eq__(self, other):
-        if self.__class__ != other.__class__:
-            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
-        else:
-            return self.as_dict() == other.as_dict()
-
-    def __ne__(self, other):
-        if self.__class__ != other.__class__:
-            raise TypeError("Failed to compare '%s' with '%s'!" % (repr(self), repr(other)))
-        else:
-            return not self.__eq__(other)
-
-    def __repr__(self):
-        return 'ParameterGroup(%s)' % repr(self.name)
-
-    def __str__(self):
-        return self.as_str()
-
-    def __getitem__(self, key):
+    # parse global config
+    globcfg = default_globcfg()
+    if 'globcfg' in cfg.sections():
+        globcfg.update(dict(cfg['globcfg']))
+        globcfg["base_address"] = utils.str2int(globcfg["base_address"])
+        globcfg["data_width"] = utils.str2int(globcfg["data_width"])
+        globcfg["address_width"] = utils.str2int(globcfg["address_width"])
         try:
-            return self._params[key]
-        except KeyError:
-            raise KeyError("Parameter/Group with a name '%s' doesn't exist!" % key)
+            globcfg["address_increment"] = utils.str2int(globcfg["address_increment"])
+        except ValueError:
+            pass
+        try:
+            globcfg["address_alignment"] = utils.str2int(globcfg["address_alignment"])
+        except ValueError:
+            pass
+        validate_globcfg(globcfg)
 
-    def __setitem__(self, key, value):
-        raise KeyError("Not able to set '%s' item directly in '%s' group!"
-                       " Try use add_params() method." % (key, self.name))
+    # parse targets
+    targets = {}
+    for target_name in [name for name in cfg.sections() if name != 'globcfg']:
+        if 'generator' in dict(cfg[target_name]).keys():
+            targets[target_name] = dict(cfg[target_name])
 
-    def as_str(self, indent=''):
-        """Returns indented string with group members and their values"""
-        new_indent = indent + '  '
-        params = [self[name].as_str(new_indent) for name in self.names]
-        params_str = '\n'.join(params) if params else new_indent + 'empty'
-        return indent + '%s:\n' % self.name + params_str
-
-    def as_dict(self):
-        """Returns dictionary with group's key attributes."""
-        return self.values
-
-    @property
-    def names(self):
-        """Names of all parameters/groups contained."""
-        return self._params.keys()
-
-    @property
-    def params(self):
-        """List with parameters/groups objects contained."""
-        return [param for param in self._params.items()]
-
-    def add_params(self, new_params):
-        """Add parameters.
-
-        Args:
-            new_params : list with parameters/groups or single object
-        """
-        # hack to handle single elements
-        new_params = utils.listify(new_params)
-
-        # add params to dict one by one
-        for p in new_params:
-            if p.name in self._params:
-                raise KeyError("Item with name '%s' is already present in '%s' group!" % (p.name, self.name))
-            self._params[p.name] = p
-
-    @property
-    def values(self):
-        """Dictionary with values of the parameters/groups.
-
-        Getter:
-            Returns dictionary with pairs {name:value} of all parameter/groups of the current group.
-
-        Setter:
-            Sets only parameters/groups specified in the input dictionary,
-            but if parameter/group does not exist, it will create it.
-        """
-        values = {}
-        for name in self.names:
-            if isinstance(self[name], ParameterGroup):
-                values[name] = self[name].values
-            else:
-                values[name] = self[name].value
-        return values
-
-    @values.setter
-    def values(self, new_values):
-        for name in new_values.keys():
-            try:
-                # if parameter/group exists
-                if isinstance(self[name], ParameterGroup):
-                    self[name].values = new_values[name]
-                else:
-                    self[name].value = new_values[name]
-            except KeyError:
-                # else if parameter/group does not exists
-                if isinstance(new_values[name], dict):
-                    self.add_params(ParameterGroup(name=name))
-                    self[name].values = new_values[name]
-                else:
-                    self.add_params(Parameter(name=name, value=new_values[name]))
+    return globcfg, targets
 
 
-class Configuration(ParameterGroup):
-    """Collection of global parameters."""
-    def __init__(self):
-        super().__init__('configuration')
-        self._init_default_params()
+def write_csrconfig(cfgpath, globcfg, targets):
+    """Save Corsair configuration file."""
+    cfg = configparser.ConfigParser()
+    data = {'globcfg': globcfg}
+    data.update(targets)
+    cfg.read_dict(data)
+    cfg.write(open(cfgpath, 'w'))
 
-    def __repr__(self):
-        return 'Configuration()'
 
-    def _init_default_params(self):
-        """Initalize all default params"""
-        # group regmap
-        self.add_params(ParameterGroup('regmap'))
-        self['regmap'].add_params([
-            Parameter(name='read_filler', value=0x0),
-            Parameter(name='address_increment_mode', value='none',
-                      validator=lambda val: val in ['none', 'data_width', 'custom']),
-            Parameter(name='address_increment_value', value=4, validator=lambda val: val >= 1),
-            Parameter(name='address_alignment_mode', value='data_width',
-                      validator=lambda val: val in ['none', 'data_width', 'custom']),
-            Parameter(name='address_alignment_value', value=4, validator=lambda val: val >= 1)
-        ])
+def validate_globcfg(globcfg):
+    """Validate a dictionary with global configuration."""
+    # base_address
+    assert utils.is_non_neg_int(globcfg["base_address"]), \
+        "Wrong value for 'base_address'='%s'. Must be a non negative integer." % globcfg["base_address"]
 
-        # group lb_bridge
-        self.add_params(ParameterGroup('lb_bridge'))
-        lb_bridge_type_allowed = ['amm', 'apb', 'axil', 'spi', 'none']
-        self['lb_bridge'].add_params([
-            Parameter(name='type', value='none', validator=lambda val: val in lb_bridge_type_allowed),
-            Parameter(name='py_driver', value=False, validator=lambda val: val in [True, False])]
-        )
+    # data_width
+    assert utils.is_non_neg_int(globcfg["data_width"]), \
+        "Wrong value for 'data_width'='%s'. Must be a non negative integer." % globcfg["data_width"]
 
-        # group docs
-        self.add_params(ParameterGroup('docs'))
-        self['docs'].add_params([
-            Parameter(name='register_images', value=True, validator=lambda val: val in [True, False]),
-            Parameter(name='print_conventions', value=True, validator=lambda val: val in [True, False])]
-        )
+    # address_width
+    assert utils.is_non_neg_int(globcfg["address_width"]), \
+        "Wrong value for 'address_width'='%s'. Must be a non negative integer." % globcfg["address_width"]
 
-        # common params
-        data_width_allowed = {
-            'amm': [8, 16, 32, 64, 128, 256, 512, 1024],
-            'apb': [8, 16, 32],
-            'axil': [32, 64],
-            'spi': [8, 16, 32],
-            'none': [8, 16, 32, 64, 128, 256, 512, 1024]
-        }
-        self.add_params(Parameter(
-            name='data_width',
-            value=32,
-            validator=lambda val: val in data_width_allowed[self['lb_bridge']['type'].value])
-        )
+    # register_reset
+    register_reset_allowed = ['sync_pos', 'sync_neg', 'async_pos', 'async_neg']
+    assert globcfg["register_reset"] in register_reset_allowed, \
+        "Wrong value for 'register_reset'='%s'. Must be one of this: %s." % (globcfg["address_width"],
+                                                                             register_reset_allowed)
 
-        addr_width_allowed = {
-            'amm': range(1, 65),
-            'apb': range(1, 33),
-            'axil': [32, 64],
-            'spi': [8, 16, 32],
-            'none': range(1, 65)
-        }
-        self.add_params(Parameter(
-            name='address_width',
-            value=32,
-            validator=lambda val: val in addr_width_allowed[self['lb_bridge']['type'].value])
-        )
+    # address_increment
+    address_increment_alowed = ['none', 'data_width']
+    try:
+        is_valid = (globcfg["address_increment"] in address_increment_alowed or
+                    utils.is_non_neg_int(globcfg["address_increment"]))
+    except ValueError:
+        is_valid = False
+    assert is_valid, \
+        "Wrong value for 'address_increment'='%s'. Must be one of this: %s or a non negative integer." % (
+            globcfg["address_increment"], address_increment_alowed)
 
-        self.add_params([
-            Parameter(name='name', value=''),
-            Parameter(name='version', value='1.0')]
-        )
+    # address_alignment
+    address_alignment_alowed = ['none', 'data_width']
+    try:
+        is_valid = (globcfg["address_alignment"] in address_alignment_alowed or
+                    utils.is_non_neg_int(globcfg["address_alignment"]))
+    except ValueError:
+        is_valid = False
+    assert is_valid, \
+        "Wrong value for 'address_alignment'='%s'. Must be one of this: %s or a non negative integer." % (
+            globcfg["address_alignment"], address_alignment_alowed)
 
-        reg_rst_allowlist = ['sync_pos', 'sync_neg', 'async_pos', 'async_neg']
-        self.add_params(Parameter(name='register_reset', value='sync_pos',
-                                  validator=lambda val: val in reg_rst_allowlist))
+    # force_name_case
+    force_name_case_allowed = ['lower', 'upper', 'none']
+    assert globcfg["force_name_case"] in force_name_case_allowed, \
+        "Wrong value for 'force_name_case'='%s'. Must be one of this: %s." % (globcfg["force_name_case"],
+                                                                              force_name_case_allowed)
+
+
+globcfg = default_globcfg()
+
+
+def set_globcfg(globcfg_):
+    """Use specified global configuration for all operations"""
+    global globcfg
+    validate_globcfg(globcfg_)
+    globcfg = globcfg_

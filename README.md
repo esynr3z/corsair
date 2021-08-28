@@ -1,70 +1,72 @@
 # Corsair
 
+![corsair_logo](docs/img/logo.png)
+
 [![Documentation Status](https://readthedocs.org/projects/corsair/badge/?version=latest)](https://corsair.readthedocs.io/en/latest/?badge=latest)
 ![PyTest Status](https://github.com/esynr3z/corsair/workflows/pytest/badge.svg)
 [![PyPI version](https://badge.fury.io/py/corsair.svg)](https://badge.fury.io/py/corsair)
 
-![corsair_arch](https://raw.githubusercontent.com/esynr3z/corsair/master/docs/arch.svg)
 
-Corsair is a tool that makes it easy to organize and support control and status register (CSR) map for any FPGA/ASIC project.
-You just need to create and fill single CSR map description file once and then generate HDL code, headers, documentation and etc.
+Corsair is a tool that makes it easy to create and maintain control and status register (CSR) map for any HDL project. It allows you to describe your register map in a single file and then generate HDL code, headers, documentation and other things. This effectively eliminates any mismatches between hardware, software and documentation of your IP-core.
 
-It is as easy as:
+![corsair_flow](docs/img/corsair_flow.png)
 
-* Create CSR map description file or generate a template with Corsair:
+## Features
 
-```sh
-corsair --template-regmap regs.json
-```
+- Various human-readable input formats: JSON, YAML or plain text table
+- HDL code generation: Verilog module with register map, Verilog header or SystemVerilog package with parameters and definitions
+- Multi-protocol support: APB, AXI-Lite, Avalon-MM
+- Documentation generation in Markdown
+- Generation of software-related files: C header, Python module
+- Extensibility: support of external file generators
+- API: creation of custom workflow with corsair API
 
-* Make changes to ```regs.json```
-* Generate output artifacts:
+Corsair documentation is on the [ReadTheDocs.io](https://corsair.readthedocs.io).
 
-```sh
-corsair -r regs.json --hdl --lb-bridge --docs
-```
+## Install
 
-* You will get:
-  * Register map HDL code
-  * Bridge to some standart interface (e.g. AXI-Lite, depends on configuration)
-  * Document, describing the map
+Depending on your system, Python 3 executable might be `python` or `python3`.
+If there any permissions issues, add `--user` key to the installation scripts.
 
-For more details about ways the tool can be used and how it works please refer the documentation at [Read the docs](https://corsair.readthedocs.io).
-
-## Installation
-
-Depending on your system, Python executable might be ```python``` or ```python3```.
-If there any permissions issues, add ```--user``` key to the installation scripts.
-
-You can install the latest stable release:
+To install the latest stable release:
 
 ```sh
 python3 -m pip install -U corsair
 ```
 
-To install development verision satisfy dependencies first:
+## Quick start
+
+Register map consists of a set of memory mapped registers (also referred as CSRs), and registers are made up of bit fields. To know more about registers, bit fields and their attributes please check the [Register map](https://corsair.readthedocs.io/en/latest/regmap.html) documentation page.
+
+You can create a template for a register map in a format you like (choose onе from `json`, `yaml`, `txt`) :
 
 ```sh
-python3 -m pip install gitpython
+corsair -t yaml
 ```
 
-Then you can use ```pip```:
+This creates two files: one for register map in the format specified `regs.yaml`, and other for configuration - `csrconfig`.
+
+Corsair is configuration-file-oriented tool. By default, it uses INI configuration file `csrconfig`. It specifies all the things needed for generation - input register map file, global parameters and output files (also called targets). Check the [Configuration file](https://corsair.readthedocs.io/en/latest/config.html) page to get more details about `csrconfig` and the [Introduction](https://corsair.readthedocs.io/en/latest/introduction.html) page to get general information about workflow.
+
+`csrconfig` for corsair is as like as `Makefile` for make, or `CMakeLists.txt` for cmake. It acts like build script and it works in the similar way, just run in the directory with `csrconfig` file:
 
 ```sh
-python3 -m pip install -U git+https://github.com/esynr3z/corsair.git
+corsair
 ```
 
-Or alternatively:
+And then all the magic happens.
+
+There are some additional options for overriding working directory, register map or configuration file - to get help simply run
 
 ```sh
-git clone https://github.com/esynr3z/corsair.git
-cd corsair
-python3 setup.py install
+corsair -h
 ```
+
+If you looking for some more examples please check `examples` folder.
 
 ## Development
 
-Corsair is still under development. Please follow the [Developers Guide](https://corsair.readthedocs.io/en/latest/contributing.html).
+Please follow the [Developer's Guide](https://corsair.readthedocs.io/en/latest/contributing.html).
 
 ## License
 

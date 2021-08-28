@@ -59,6 +59,7 @@ def write_memfile(path, data):
 
 class Simulator:
     """Simulator wrapper"""
+
     def __init__(self, name='icarus', gui=True, cwd='work', passed_marker='!@# TEST PASSED #@!'):
         self.gui = gui
         self.passed_marker = passed_marker
@@ -231,6 +232,7 @@ proc rr {{}} {{
 
 class CliArgs:
     """Parse command line parameters for simulation"""
+
     def __init__(self, default_test='test', default_simtool='modelsim', default_gui=True, default_defines=[]):
         self.args_parser = argparse.ArgumentParser()
         self.args_parser.add_argument('-t',

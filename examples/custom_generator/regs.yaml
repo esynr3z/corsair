@@ -1,0 +1,130 @@
+regmap:
+-   name: DATA
+    description: Data register
+    address: 0
+    bitfields:
+    -   name: FIFO
+        description: Write to push value to TX FIFO, read to get data from RX FIFO
+        reset: 0
+        width: 8
+        lsb: 0
+        access: rw
+        hardware: q
+    -   name: FERR
+        description: Frame error flag. Read to clear.
+        reset: 0
+        width: 1
+        lsb: 16
+        access: rolh
+        hardware: i
+    -   name: PERR
+        description: Parity error flag. Read to clear.
+        reset: 0
+        width: 1
+        lsb: 17
+        access: rolh
+        hardware: i
+-   name: STAT
+    description: Status register
+    address: 4
+    bitfields:
+    -   name: BUSY
+        description: Transciever is busy
+        reset: 0
+        width: 1
+        lsb: 0
+        access: ro
+        hardware: ie
+    -   name: RXE
+        description: RX FIFO is empty
+        reset: 0
+        width: 1
+        lsb: 4
+        access: ro
+        hardware: i
+    -   name: TXF
+        description: TX FIFO is full
+        reset: 0
+        width: 1
+        lsb: 5
+        access: ro
+        hardware: i
+-   name: CTRL
+    description: Control register
+    address: 8
+    bitfields:
+    -   name: BAUD
+        description: Baudrate value
+        reset: 0
+        width: 2
+        lsb: 0
+        access: rw
+        hardware: o
+    -   name: TXEN
+        description: Transmitter enable. Can be disabled by hardware on error.
+        reset: 0
+        width: 1
+        lsb: 4
+        access: rw
+        hardware: oie
+    -   name: RXEN
+        description: Receiver enable. Can be disabled by hardware on error.
+        reset: 0
+        width: 1
+        lsb: 5
+        access: rw
+        hardware: oie
+    -   name: TXST
+        description: Force transmission start
+        reset: 0
+        width: 1
+        lsb: 6
+        access: wosc
+        hardware: o
+-   name: LPMODE
+    description: Low power mode control
+    address: 12
+    bitfields:
+    -   name: DIV
+        description: Clock divider in low power mode
+        reset: 0
+        width: 8
+        lsb: 0
+        access: rw
+        hardware: o
+    -   name: EN
+        description: Low power mode enable
+        reset: 0
+        width: 1
+        lsb: 31
+        access: rw
+        hardware: o
+-   name: INTSTAT
+    description: Interrupt status register
+    address: 16
+    bitfields:
+    -   name: TX
+        description: Transmitter interrupt flag. Write 1 to clear.
+        reset: 0
+        width: 1
+        lsb: 0
+        access: rw1c
+        hardware: s
+    -   name: RX
+        description: Receiver interrupt. Write 1 to clear.
+        reset: 0
+        width: 1
+        lsb: 1
+        access: rw1c
+        hardware: s
+-   name: ID
+    description: IP-core ID register
+    address: 4092
+    bitfields:
+    -   name: UID
+        description: Unique ID
+        reset: 3405645414
+        width: 32
+        lsb: 0
+        access: ro
+        hardware: f

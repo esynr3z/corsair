@@ -28,9 +28,7 @@
 Control/status register map.
 """
 
-__VERSION__ = '{{ config['version'].value }}'
 {% for reg in rmap %}
-
 
 class _Reg{{ reg.name.capitalize() }}:
     def __init__(self, rmap):
@@ -56,15 +54,15 @@ class _Reg{{ reg.name.capitalize() }}:
         self._rmap._if.write(self._rmap.{{ reg_addr(reg) }}, rdata)
         {% endif %}
     {% endfor %}
-{% endfor %}
 
+{% endfor %}
 
 class RegMap:
     """Control/Status register map"""
 {% for reg in rmap %}
 
     # {{ reg.name.upper() }} - {{ reg.description }}
-    {{ reg_addr(reg) }} = {{ literal(reg.address, config['address_width'].value) }}
+    {{ reg_addr(reg) }} = {{ literal(reg.address, config['address_width']) }}
     {% for bf in reg %}
     {{ bf_pos(reg, bf) }} = {{ bf.lsb }}
     {{ bf_msk(reg, bf) }} = {{ literal(2 ** bf.width - 1, bf.width) }}

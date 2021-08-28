@@ -1,0 +1,15 @@
+[globcfg]
+data_width = 32
+address_width = 16
+regmap_path = regs.yaml
+
+[v_module]
+path = regs.v
+read_filler = 0
+interface = axil
+generator = Verilog
+
+[csv]
+path = regs.csv
+custom_param = 42
+generator = custom_generator.py::CsvGenerator

@@ -1,0 +1,6 @@
+| Address | Name   | Width | Access | Hardware | Reset      | Description      |
+| ------- | ------ | ----- | ------ | -------- | ---------- | ---------------- |
+| 0x0000  | DATA   | 32    | rw     | ioe      | 0x00000000 | Data register    |
+| 0x0004  | CTRL   | 16    | rw     | o        | 0x00000100 | Control register |
+| 0x0008  | STATUS | 8     | ro     | i        | 0x00000000 | Status register  |
+| 0x0100  | START  | 1     | wosc   | o        | 0x00000000 | Start register   |

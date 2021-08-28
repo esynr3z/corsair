@@ -16,12 +16,10 @@ TEST_DIR = parent_dir(__file__)
 
 
 def gen_bridge(tmpdir, bridge, reset):
-    config = corsair.Configuration()
-    config['lb_bridge']['type'].value = bridge
-    config['register_reset'].value = reset
+    corsair.config.globcfg['register_reset'] = reset
     bridge_path = path_join(tmpdir, '%s2lb.v' % bridge)
-    corsair.LbBridgeWriter()(bridge_path, config)
-    return (bridge_path, config)
+    corsair.generators.LbBridgeVerilog(path=bridge_path, bridge_type=bridge).generate()
+    return bridge_path
 
 
 @pytest.fixture()
@@ -29,7 +27,7 @@ def simtool():
     return 'modelsim'
 
 
-@pytest.fixture(params=['apb', 'axil', 'amm', 'spi'])
+@pytest.fixture(params=['apb', 'axil', 'amm'])
 def bridge(request):
     return request.param
 
@@ -51,11 +49,11 @@ def test(tmpdir, bridge, reset, simtool, defines=[], gui=False, pytest_run=True)
     sim.top = 'tb'
     sim.setup()
     # prepare test
-    dut_src, dut_config = gen_bridge(tmpdir, bridge, reset)
+    dut_src = gen_bridge(tmpdir, bridge, reset)
     sim.sources += [dut_src]
     sim.defines += [
-        'DUT_DATA_W=%d' % dut_config['data_width'].value,
-        'DUT_ADDR_W=%d' % dut_config['address_width'].value,
+        'DUT_DATA_W=%s' % corsair.config.globcfg['data_width'],
+        'DUT_ADDR_W=%s' % corsair.config.globcfg['address_width'],
         'DUT_%s' % bridge.upper(),
         'RESET_ACTIVE=%d' % ('pos' in reset),
     ]

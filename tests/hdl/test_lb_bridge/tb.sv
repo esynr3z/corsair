@@ -17,15 +17,15 @@ localparam ADDR_W = `DUT_ADDR_W;
 localparam DATA_W = `DUT_DATA_W;
 localparam STRB_W = DATA_W / 8;
 
-logic              lb_wready = 1'b1;
-logic [ADDR_W-1:0] lb_waddr;
-logic [DATA_W-1:0] lb_wdata;
-logic              lb_wen;
-logic [STRB_W-1:0] lb_wstrb;
-logic [DATA_W-1:0] lb_rdata = '0;
-logic              lb_rvalid = 1'b0;
-logic [ADDR_W-1:0] lb_raddr;
-logic              lb_ren;
+logic              wready = 1'b1;
+logic [ADDR_W-1:0] waddr;
+logic [DATA_W-1:0] wdata;
+logic              wen;
+logic [STRB_W-1:0] wstrb;
+logic [DATA_W-1:0] rdata = '0;
+logic              rvalid = 1'b0;
+logic [ADDR_W-1:0] raddr;
+logic              ren;
 
 `ifdef DUT_APB
     `include "dut_apb2lb.svh"
@@ -48,13 +48,13 @@ task validate_write(
     input logic [STRB_W-1:0] strb
 );
     @(posedge clk);
-    wait(lb_wen && lb_wready);
+    wait(wen && wready);
     @(posedge clk);
-    if (lb_waddr != addr)
+    if (waddr != addr)
         errors++;
-    if (lb_wdata != data)
+    if (wdata != data)
         errors++;
-    if (lb_wstrb != strb)
+    if (wstrb != strb)
         errors++;
 endtask
 
@@ -63,18 +63,18 @@ task handle_read(
     input  int                waitstates = 1
 );
     @(posedge clk);
-    wait(lb_ren);
+    wait(ren);
     repeat (waitstates) @(posedge clk);
-    lb_rvalid <= 1'b1;
+    rvalid <= 1'b1;
     case (addr)
-        'h008: lb_rdata <= 'hdeadbeef;
-        'h014: lb_rdata <= 'hc0debabe;
+        'h008: rdata <= 'hdeadbeef;
+        'h014: rdata <= 'hc0debabe;
     endcase
     @(posedge clk);
-    lb_rdata  <= 0;
-    lb_rvalid <= 1'b0;
+    rdata  <= 0;
+    rvalid <= 1'b0;
     @(posedge clk);
-    if (lb_ren != 0)
+    if (ren != 0)
         errors++;
 endtask
 
@@ -109,9 +109,9 @@ initial begin : main
         mst.write(addr, data);
         validate_write(addr, data, {STRB_W{1'b1}});
         begin
-            lb_wready <= 1'b0;
+            wready <= 1'b0;
             repeat (800) @(posedge clk);
-            lb_wready <= 1'b1;
+            wready <= 1'b1;
         end
     join
 

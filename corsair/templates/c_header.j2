@@ -1,0 +1,112 @@
+{# MACRO #}
+{% macro data_t() %}
+uint{{ config['data_width'] }}_t
+{%- endmacro %}
+
+{#- register access #}
+{% macro reg_access(reg) %}
+    {% if 'ro' in reg.access %}
+__I
+    {%- elif 'wo' in reg.access %}
+__O
+    {%- else %}
+__IO
+    {%- endif %}
+{%- endmacro %}
+
+{#- module name #}
+{% macro module_name() %}
+    {%- if prefix %}
+{{ prefix }}
+    {%- else %}
+{{ file_name }}
+    {%- endif %}
+{%- endmacro %}
+
+{#- module prefix #}
+{% macro module_prefix() %}
+{{ module_name() }}_
+{%- endmacro %}
+
+{#- register data type #}
+{% macro reg_type(reg) %}
+{{ module_prefix()|lower }}{{ reg.name.lower() }}_t
+{%- endmacro %}
+
+{#- TEMPLATE NAMESPACE #}
+{% set tmp = namespace() %}
+
+{#- TEMPLATE #}
+// Created with Corsair v{{ corsair_ver }}
+#ifndef __{{ file_name.upper() }}_H
+#define __{{ file_name.upper() }}_H
+
+#define __I  volatile const // 'read only' permissions
+#define __O  volatile       // 'write only' permissions
+#define __IO volatile       // 'read / write' permissions
+
+#include "stdint.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define {{ module_prefix()|upper }}BASE_ADDR {{ "0x%x" % config['base_address'] }}
+
+{% for reg in rmap %}
+// {{ reg.name }} - {{ reg.description }}
+#define {{ module_prefix()|upper }}{{ reg.name.upper() }}_ADDR {{ "0x%x" % (reg.address) }}
+#define {{ module_prefix()|upper }}{{ reg.name.upper() }}_RESET {{ "0x%x" % (reg.reset) }}
+typedef struct {
+    {% set tmp.lsb = 0 %}
+    {% for bf in reg %}
+        {% if tmp.lsb != bf.lsb %}
+    {{ data_t() }} :{{ bf.lsb }}; // reserved
+            {% set tmp.lsb = bf.lsb %}
+        {% endif %}
+    {{ data_t() }} {{ bf.name.upper() }} : {{ bf.width }}; // {{ bf.description }}
+    {% endfor %}
+} {{ module_prefix()|lower }}{{ reg.name.lower() }}_t;
+
+    {% for bf in reg %}
+// {{ reg.name }}.{{ bf.name }} - {{ bf.description }}
+#define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_WIDTH {{ bf.width }}
+#define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_LSB {{ bf.lsb }}
+#define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_MASK {{ "0x%x" % (reg.address) }}
+#define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_RESET {{ "0x%x" % (bf.reset) }}
+        {% if bf.enums %}
+typedef enum {
+            {% for enum in bf %}
+    {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_{{ enum.name.upper() }} = {{ "0x%x" % (enum.value) }}, //{{ enum.description }}
+            {% endfor %}
+} {{ module_prefix()|lower }}{{ reg.name.lower() }}_{{ bf.name.lower() }}_t;
+        {% endif %}
+
+    {% endfor %}
+{% endfor %}
+
+// Register map structure
+typedef struct {
+{% set tmp.addr_next = 0 %}
+{% set tmp.reserved_cnt = 0 %}
+{% set tmp.bytes_in_word = config['data_width'] // 8 %}
+{% for reg in rmap %}
+    {% if tmp.addr_next != reg.address %}
+    __IO {{ data_t() }} RESERVED{{ tmp.reserved_cnt }}[{{ (reg.address - tmp.addr_next) // tmp.bytes_in_word }}];
+        {% set tmp.reserved_cnt = tmp.reserved_cnt + 1 %}
+    {% endif %}
+    {% set tmp.addr_next = reg.address + tmp.bytes_in_word %}
+    union {
+        {{ reg_access(reg) }} {{ data_t() }} {{ reg.name.upper() }}; // {{ reg.description }}
+        {{ reg_access(reg) }} {{ module_prefix()|lower }}{{ reg.name.lower() }}_t {{ reg.name.upper() }}_bf; // Bit access for {{ reg.name.upper() }} register
+    };
+{% endfor %}
+} {{ module_prefix()|lower }}t;
+
+#define {{ module_name()|upper }} (({{ module_prefix()|lower }}t*)({{ module_prefix()|upper }}BASE_ADDR))
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __{{ file_name.upper() }}_H */

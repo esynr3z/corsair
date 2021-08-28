@@ -1,0 +1,9 @@
+Some custom parameter value: 42
+
+Name,Address,Access,Description
+DATA,0,rw,Data register
+STAT,4,ro,Status register
+CTRL,8,rw,Control register
+LPMODE,12,rw,Low power mode control
+INTSTAT,16,rw,Interrupt status register
+ID,4092,ro,IP-core ID register

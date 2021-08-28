@@ -1,0 +1,41 @@
+{# MACRO #}
+{% macro module_prefix() %}
+    {%- if prefix %}
+{{ prefix }}_
+    {%- else %}
+{{ file_name }}_
+    {%- endif %}
+{%- endmacro %}
+
+{#- TEMPLATE NAMESPACE #}
+{% set tmp = namespace() %}
+
+{#- TEMPLATE #}
+// Created with Corsair v{{ corsair_ver }}
+
+`ifndef __{{ file_name.upper() }}_VH
+`define __{{ file_name.upper() }}_VH
+
+`define {{ module_prefix()|upper }}BASE_ADDR {{ config['base_address'] }}
+`define {{ module_prefix()|upper }}DATA_WIDTH {{ config['data_width'] }}
+`define {{ module_prefix()|upper }}ADDR_WIDTH {{ config['address_width'] }}
+
+{% for reg in rmap %}
+// {{ reg.name }} - {{ reg.description }}
+`define {{ module_prefix()|upper }}{{ reg.name.upper() }}_ADDR {{ "%d'h%x" % (config['address_width'], reg.address) }}
+`define {{ module_prefix()|upper }}{{ reg.name.upper() }}_RESET {{ "%d'h%x" % (config['data_width'], reg.reset) }}
+
+    {% for bf in reg %}
+// {{ reg.name }}.{{ bf.name }} - {{ bf.description }}
+`define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_WIDTH {{ bf.width }}
+`define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_LSB {{ bf.lsb }}
+`define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_MASK {{ "%d'h%x" % (config['data_width'], reg.address) }}
+`define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_RESET {{ "%d'h%x" % (bf.width, bf.reset) }}
+        {% for enum in bf %}
+`define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_{{ enum.name.upper() }} {{ "%d'h%x" % (bf.width, enum.value) }} //{{ enum.description }}
+        {% endfor %}
+
+    {% endfor %}
+
+{% endfor %}
+`endif // __{{ file_name.upper() }}_VH

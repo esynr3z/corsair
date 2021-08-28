@@ -24,15 +24,15 @@ axil2lb dut (
     .axil_rvalid  (mst.rvalid),
     .axil_rready  (mst.rready),
     // Local Bus
-    .wready  (lb_wready),
-    .waddr   (lb_waddr),
-    .wdata   (lb_wdata),
-    .wen     (lb_wen),
-    .wstrb   (lb_wstrb),
-    .rdata   (lb_rdata),
-    .rvalid  (lb_rvalid),
-    .raddr   (lb_raddr),
-    .ren     (lb_ren)
+    .wready  (wready),
+    .waddr   (waddr),
+    .wdata   (wdata),
+    .wen     (wen),
+    .wstrb   (wstrb),
+    .rdata   (rdata),
+    .rvalid  (rvalid),
+    .raddr   (raddr),
+    .ren     (ren)
 );
 
 // AXI-Lite master

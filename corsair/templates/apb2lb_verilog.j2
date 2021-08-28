@@ -4,20 +4,10 @@
 //
 
 module {{ module_name }} #(
-    parameter ADDR_W = {{ config['address_width'].value }},
-    parameter DATA_W = {{ config['data_width'].value }},
+    parameter ADDR_W = {{ config['address_width'] }},
+    parameter DATA_W = {{ config['data_width'] }},
     parameter STRB_W = DATA_W / 8
 )(
-    // APB
-    input               psel,
-    input  [ADDR_W-1:0] paddr,
-    input               penable,
-    input               pwrite,
-    input  [DATA_W-1:0] pwdata,
-    input  [STRB_W-1:0] pstrb,
-    output [DATA_W-1:0] prdata,
-    output              pready,
-    output              pslverr,
     // Local Bus
     input               wready,
     output [ADDR_W-1:0] waddr,
@@ -27,9 +17,30 @@ module {{ module_name }} #(
     input  [DATA_W-1:0] rdata,
     input               rvalid,
     output [ADDR_W-1:0] raddr,
-    output              ren
+    output              ren,
+{% macro apb_core(regmap_embed=False) %}
+    // APB
+    input               psel,
+    input  [ADDR_W-1:0] paddr,
+    input               penable,
+    input               pwrite,
+    input  [DATA_W-1:0] pwdata,
+    input  [STRB_W-1:0] pstrb,
+    output [DATA_W-1:0] prdata,
+    output              pready,
+    output              pslverr
 );
-
+{% if regmap_embed %}
+wire              wready;
+wire [ADDR_W-1:0] waddr;
+wire [DATA_W-1:0] wdata;
+wire              wen;
+wire [STRB_W-1:0] wstrb;
+wire [DATA_W-1:0] rdata;
+wire              rvalid;
+wire [ADDR_W-1:0] raddr;
+wire              ren;
+{% endif %}
 // APB interface
 assign prdata  = rdata;
 assign pslverr = 1'b0; // always OKAY
@@ -44,5 +55,6 @@ assign wen   = psel & penable & pwrite;
 
 assign raddr = paddr;
 assign ren   = psel & (~pwrite);
-
+{% endmacro %}
+{{ apb_core() }}
 endmodule
