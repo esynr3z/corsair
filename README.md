@@ -36,17 +36,62 @@ python3 -m pip install -U corsair
 
 ## Quick start
 
-Register map consists of a set of memory mapped registers (also referred as CSRs), and registers are made up of bit fields. To know more about registers, bit fields and their attributes please check the [Register map](https://corsair.readthedocs.io/en/latest/regmap.html) documentation page.
-
-You can create a template for a register map in a format you like (choose onе from `json`, `yaml`, `txt`) :
+The best way to start is to create templates. You can create one for a register map in a format you like (choose onе from `json`, `yaml`, `txt`) :
 
 ```sh
 corsair -t yaml
 ```
 
-This creates two files: one for register map in the format specified `regs.yaml`, and other for configuration - `csrconfig`.
+This generates two files: one for register map in the format specified `regs.yaml`, and other for configuration - `csrconfig`.
 
-Corsair is configuration-file-oriented tool. By default, it uses INI configuration file `csrconfig`. It specifies all the things needed for generation - input register map file, global parameters and output files (also called targets). Check the [Configuration file](https://corsair.readthedocs.io/en/latest/config.html) page to get more details about `csrconfig` and the [Introduction](https://corsair.readthedocs.io/en/latest/introduction.html) page to get general information about workflow.
+Register map consists of a collection of memory mapped registers (also referred as CSRs), and registers are made up of bit fields. For example, register map of one register looks like this in YAML:
+
+```yaml
+regmap:
+-   name: CTRL
+    description: Control register
+    address: 8
+    bitfields:
+    -   name: BAUD
+        description: Baudrate value
+        reset: 0
+        width: 2
+        lsb: 0
+        access: rw
+        hardware: o
+        enums:
+        -   name: B9600
+            description: 9600 baud
+            value: 0
+        -   name: B38400
+            description: 38400 baud
+            value: 1
+        -   name: B115200
+            description: 115200 baud
+            value: 2
+```
+
+To know more about registers, bit fields and their attributes please check the [Register map](https://corsair.readthedocs.io/en/latest/regmap.html) documentation page.
+
+Corsair is configuration-file-oriented tool. By default, it uses INI configuration file `csrconfig`. It specifies all the things needed for generation - input register map file, global parameters and output files (also called targets). It may looks like this:
+
+```ini
+[globcfg]
+data_width = 32
+address_width = 16
+register_reset = sync_pos
+
+[v_module]
+path = regs.v
+interface = axil
+generator = Verilog
+
+[c_header]
+path = regs.h
+generator = CHeader
+```
+
+Check the [Configuration file](https://corsair.readthedocs.io/en/latest/config.html) page to get more details about `csrconfig` and the [Introduction](https://corsair.readthedocs.io/en/latest/introduction.html) page to get general information about workflow.
 
 `csrconfig` for corsair is as like as `Makefile` for make, or `CMakeLists.txt` for cmake. It acts like build script and it works in the similar way, just run in the directory with `csrconfig` file:
 
