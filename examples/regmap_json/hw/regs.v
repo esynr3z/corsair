@@ -188,7 +188,6 @@ wire csr_data_ren;
 assign csr_data_ren = ren && (raddr == 16'h4);
 reg csr_data_ren_ff;
 always @(posedge clk) begin
-
     if (rst) begin
         csr_data_ren_ff <= 1'b0;
     end else begin
@@ -209,7 +208,6 @@ assign csr_data_fifo_ren = csr_data_ren & (~csr_data_ren_ff);
 assign csr_data_fifo_wen = csr_data_wen;
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_data_fifo_ff <= 8'h0;
     end else  begin
@@ -225,7 +223,6 @@ end
 
 reg csr_data_fifo_rvalid_ff;
 always @(posedge clk) begin
-
     if (rst) begin
         csr_data_fifo_rvalid_ff <= 1'b0;
     end else begin
@@ -244,7 +241,6 @@ assign csr_data_rdata[16] = csr_data_ferr_ff;
 
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_data_ferr_ff <= 1'b0;
     end else  begin
@@ -268,7 +264,6 @@ assign csr_data_rdata[17] = csr_data_perr_ff;
 
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_data_perr_ff <= 1'b0;
     end else  begin
@@ -296,7 +291,6 @@ wire csr_stat_ren;
 assign csr_stat_ren = ren && (raddr == 16'hc);
 reg csr_stat_ren_ff;
 always @(posedge clk) begin
-
     if (rst) begin
         csr_stat_ren_ff <= 1'b0;
     end else begin
@@ -314,7 +308,6 @@ assign csr_stat_rdata[2] = csr_stat_busy_ff;
 
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_stat_busy_ff <= 1'b0;
     end else  begin
@@ -336,7 +329,6 @@ assign csr_stat_rdata[4] = csr_stat_rxe_ff;
 
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_stat_rxe_ff <= 1'b0;
     end else  begin
@@ -357,7 +349,6 @@ assign csr_stat_rdata[8] = csr_stat_txf_ff;
 
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_stat_txf_ff <= 1'b0;
     end else  begin
@@ -382,7 +373,6 @@ wire csr_ctrl_ren;
 assign csr_ctrl_ren = ren && (raddr == 16'h10);
 reg csr_ctrl_ren_ff;
 always @(posedge clk) begin
-
     if (rst) begin
         csr_ctrl_ren_ff <= 1'b0;
     end else begin
@@ -401,7 +391,6 @@ assign csr_ctrl_rdata[1:0] = csr_ctrl_baud_ff;
 assign csr_ctrl_baud_out = csr_ctrl_baud_ff;
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_ctrl_baud_ff <= 2'h0;
     end else  begin
@@ -428,7 +417,6 @@ assign csr_ctrl_rdata[4] = csr_ctrl_txen_ff;
 assign csr_ctrl_txen_out = csr_ctrl_txen_ff;
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_ctrl_txen_ff <= 1'b0;
     end else  begin
@@ -455,7 +443,6 @@ assign csr_ctrl_rdata[5] = csr_ctrl_rxen_ff;
 assign csr_ctrl_rxen_out = csr_ctrl_rxen_ff;
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_ctrl_rxen_ff <= 1'b0;
     end else  begin
@@ -482,7 +469,6 @@ assign csr_ctrl_rdata[6] = 1'b0;
 assign csr_ctrl_txst_out = csr_ctrl_txst_ff;
 
 always @(posedge clk) begin
-    csr_ctrl_txst_ff <= 1'b0;
     if (rst) begin
         csr_ctrl_txst_ff <= 1'b0;
     end else  begin
@@ -511,7 +497,6 @@ wire csr_lpmode_ren;
 assign csr_lpmode_ren = ren && (raddr == 16'h14);
 reg csr_lpmode_ren_ff;
 always @(posedge clk) begin
-
     if (rst) begin
         csr_lpmode_ren_ff <= 1'b0;
     end else begin
@@ -530,7 +515,6 @@ assign csr_lpmode_rdata[7:0] = csr_lpmode_div_ff;
 assign csr_lpmode_div_out = csr_lpmode_div_ff;
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_lpmode_div_ff <= 8'h0;
     end else  begin
@@ -557,7 +541,6 @@ assign csr_lpmode_rdata[31] = csr_lpmode_en_ff;
 assign csr_lpmode_en_out = csr_lpmode_en_ff;
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_lpmode_en_ff <= 1'b0;
     end else  begin
@@ -586,7 +569,6 @@ wire csr_intstat_ren;
 assign csr_intstat_ren = ren && (raddr == 16'h20);
 reg csr_intstat_ren_ff;
 always @(posedge clk) begin
-
     if (rst) begin
         csr_intstat_ren_ff <= 1'b0;
     end else begin
@@ -604,7 +586,6 @@ assign csr_intstat_rdata[0] = csr_intstat_tx_ff;
 
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_intstat_tx_ff <= 1'b0;
     end else  begin
@@ -632,7 +613,6 @@ assign csr_intstat_rdata[1] = csr_intstat_rx_ff;
 
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_intstat_rx_ff <= 1'b0;
     end else  begin
@@ -660,7 +640,6 @@ wire csr_id_ren;
 assign csr_id_ren = ren && (raddr == 16'h40);
 reg csr_id_ren_ff;
 always @(posedge clk) begin
-
     if (rst) begin
         csr_id_ren_ff <= 1'b0;
     end else begin
@@ -678,7 +657,6 @@ assign csr_id_rdata[31:0] = 32'hcafe0666;
 
 
 always @(posedge clk) begin
-
     if (rst) begin
         csr_id_uid_ff <= 32'hcafe0666;
     end else  begin
@@ -708,7 +686,6 @@ assign wready = wready_drv;
 //------------------------------------------------------------------------------
 reg [31:0] rdata_ff;
 always @(posedge clk) begin
-
     if (rst) begin
         rdata_ff <= 32'h0;
     end else if (ren) begin
@@ -732,7 +709,6 @@ assign rdata = rdata_ff;
 //------------------------------------------------------------------------------
 reg rvalid_ff;
 always @(posedge clk) begin
-
     if (rst) begin
         rvalid_ff <= 1'b0;
     end else if (ren && rvalid) begin

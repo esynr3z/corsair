@@ -52,23 +52,19 @@
 {%- endmacro %}
 
 {#- 'always' header with reset logic #}
-{% macro always_begin(sig='', width=1, init=0, self_clear='') %}
+{% macro always_begin(sig='', width=1, init=0) %}
     {% set rst_type = config['register_reset']%}
     {% if rst_type == 'sync_pos' %}
 always @(posedge clk) begin
-{{ self_clear }}
     if (rst) begin
     {% elif rst_type == 'sync_neg' %}
 always @(posedge clk) begin
-{{ self_clear }}
     if (!rst) begin
     {% elif rst_type == 'async_pos' %}
 always @(posedge clk or posedge rst) begin
-{{ self_clear }}
     if (rst) begin
     {% elif rst_type == 'async_neg' %}
 always @(posedge clk or negedge rst) begin
-{{ self_clear }}
     if (!rst) begin
     {% endif %}
         {{ sig }} <= {{ literal(init, width) }};
@@ -306,7 +302,7 @@ assign {{ port_bf_ren(reg, bf) }} = {{ sig_csr_ren(reg) }} & (~{{ sig_csr_ren_ff
 assign {{ port_bf_wen(reg, bf) }} = {{ sig_csr_wen(reg) }};
         {% endif %}
 
-{{ always_begin(sig=sig_bf_ff(reg, bf), width=bf.width, init=bf.reset, self_clear=self_clear(sig_bf_ff(reg, bf), enable='sc' in bf.access, width=bf.width))
+{{ always_begin(sig=sig_bf_ff(reg, bf), width=bf.width, init=bf.reset)
 }} {% if 'l' in bf.hardware %}if (!{{ port_bf_lock(reg, bf) }}){% endif %} begin
         {% if 's' in bf.hardware %}
         if ({{ port_bf_set(reg, bf) }}) begin
