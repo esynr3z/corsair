@@ -143,6 +143,24 @@ class TestMarkdown:
         assert 'Back to [Register map](#register-map-summary).' in raw_str
 
 
+class TestAsciidoc:
+    """Class 'generators.Asciidoc' testing."""
+
+    def test_adoc(self, tmpdir):
+        """Test of creating asciidoc regmap file."""
+        adoc_path = str(tmpdir.join('regs.adoc'))
+        print('adoc_path:', adoc_path)
+        # create regmap
+        rmap = utils.create_template()
+        # write output file
+        generators.Asciidoc(rmap, adoc_path).generate()
+        # read file and verify
+        with open(adoc_path, 'r') as f:
+            raw_str = ''.join(f.readlines())
+        assert '=== Register map summary' in raw_str
+        assert 'Back to  <<register_map_summary>>' in raw_str
+
+
 class TestPython:
     """Class 'generators.Python' testing."""
 

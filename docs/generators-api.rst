@@ -92,6 +92,14 @@ Markdown
    :inherited-members:
    :show-inheritance:
 
+Asciidoc
+========
+.. autoclass:: corsair.generators.Asciidoc
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :show-inheritance:
+
 Python
 ======
 .. autoclass:: corsair.generators.Python

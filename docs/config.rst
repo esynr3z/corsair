@@ -135,6 +135,7 @@ Generator                Description
 ``CHeader``              Create C header file with register map define
 ``SystemVerilogPackage`` Create SystemVerilog package with register map parameters
 ``Markdown``             Create documentation for a register map in Markdown
+``Asciidoc``             Create documentation for a register map in AsciiDoc
 ``Python``               Create Python file with register map
 ======================== ================================================================
 
@@ -239,6 +240,19 @@ Parameter             Default          Description
 ``image_dir``         ``regs_img``     Path to directory where all images will be saved
 ``print_conventions`` ``True``         Enable generating table with register access modes explained
 ===================== ================ ================================================================
+
+Asciidoc
+--------
+===================== ================ ================================================================
+Parameter             Default          Description
+===================== ================ ================================================================
+``path``              ``regs.md``      Path to the output file
+``title``             ``Register map`` Document title
+``print_images``      ``True``         Enable generating images for bit fields of a register
+``image_dir``         ``regs_img``     Path to directory where all images will be saved
+``print_conventions`` ``True``         Enable generating table with register access modes explained
+===================== ================ ================================================================
+
 
 Python
 ------

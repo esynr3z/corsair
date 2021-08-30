@@ -35,7 +35,7 @@ Address offset: 0x0000
 
 Reset value: 0x00000000
 
-![data](regs_img/data.svg)
+![data](md_img/data.svg)
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
@@ -51,7 +51,7 @@ Address offset: 0x0004
 
 Reset value: 0x00000100
 
-![ctrl](regs_img/ctrl.svg)
+![ctrl](md_img/ctrl.svg)
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
@@ -68,7 +68,7 @@ Address offset: 0x0008
 
 Reset value: 0x00000000
 
-![status](regs_img/status.svg)
+![status](md_img/status.svg)
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |
@@ -85,7 +85,7 @@ Address offset: 0x0100
 
 Reset value: 0x00000000
 
-![start](regs_img/start.svg)
+![start](md_img/start.svg)
 
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |

@@ -33,11 +33,19 @@ path = sw/regs.h
 prefix = CSR
 generator = CHeader
 
-[doc]
+[md_doc]
 path = doc/regs.md
 title = Register map
 print_images = True
-image_dir = regs_img
+image_dir = md_img
 print_conventions = True
 generator = Markdown
+
+[asciidoc_doc]
+path = doc/regs.adoc
+title = Register map
+print_images = True
+image_dir = adoc_img
+print_conventions = True
+generator = Asciidoc
 

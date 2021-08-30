@@ -16,7 +16,7 @@ Corsair is a tool that makes it easy to create and maintain control and status r
 - Various human-readable input formats: JSON, YAML or plain text table
 - HDL code generation: Verilog module with register map, Verilog header or SystemVerilog package with parameters and definitions
 - Multi-protocol support: APB, AXI-Lite, Avalon-MM
-- Documentation generation in Markdown
+- Documentation generation: Markdown, AsciiDoc
 - Generation of software-related files: C header, Python module
 - Extensibility: support of external file generators
 - API: creation of custom workflow with corsair API
@@ -93,7 +93,7 @@ generator = CHeader
 
 Check the [Configuration file](https://corsair.readthedocs.io/en/latest/config.html) page to get more details about `csrconfig` and the [Introduction](https://corsair.readthedocs.io/en/latest/introduction.html) page to get general information about workflow.
 
-`csrconfig` for corsair is as like as `Makefile` for make, or `CMakeLists.txt` for cmake. It acts like build script and it works in the similar way, just run in the directory with `csrconfig` file:
+`csrconfig` also acts like a build script for corsair, so just run in the directory with `csrconfig` file:
 
 ```sh
 corsair
