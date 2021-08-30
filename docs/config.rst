@@ -146,6 +146,7 @@ Generator                Description
 ======================== ================================================================
 ``Generator``            Base generator class
 ``Jinja2``               Basic class for rendering Jinja2 templates
+``Wavedrom``             Basic class for rendering register images with wavedrom
 ``LbBridgeVerilog``      Create HDL file with bridge to Local Bus
 ======================== ================================================================
 

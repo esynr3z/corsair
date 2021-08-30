@@ -20,6 +20,14 @@ Jinja2
    :inherited-members:
    :show-inheritance:
 
+Wavedrom
+========
+.. autoclass:: corsair.generators.Wavedrom
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :show-inheritance:
+
 Json
 ====
 .. autoclass:: corsair.generators.Json

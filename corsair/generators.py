@@ -93,6 +93,30 @@ class Jinja2():
             f.write(rendered_text)
 
 
+class Wavedrom():
+    """Basic class for rendering register images with wavedrom"""
+
+    def draw_regs(self, imgdir, rmap):
+        imgdir.mkdir(exist_ok=True)
+
+        bits = config.globcfg['data_width']
+        lanes = bits // 16 if bits > 16 else 1
+        for reg in rmap:
+            reg_wd = {"reg": [],
+                      "options": {"bits": bits, "lanes": lanes}}
+            bit_pos = -1
+            for bf in reg:
+                if bit_pos == -1 and bf.lsb > 0:
+                    reg_wd["reg"].append({"bits": bf.lsb})
+                elif bf.lsb - bit_pos > 1:
+                    reg_wd["reg"].append({"bits": bf.lsb - bit_pos - 1})
+                reg_wd["reg"].append({"name": bf.name, "attr": bf.access, "bits": bf.width})
+                bit_pos = bf.msb
+            if (bits - 1) > bit_pos:
+                reg_wd["reg"].append({"bits": bits - bit_pos - 1})
+            wavedrom.render(json.dumps(reg_wd)).saveas(str(imgdir / ("%s.svg" % reg.name.lower())))
+
+
 class Json(Generator):
     """Dump register map to a JSON file.
 
@@ -379,7 +403,7 @@ class LbBridgeVerilog(Generator, Jinja2):
         self.render_to_file(j2_template, j2_vars, self.path)
 
 
-class Markdown(Generator, Jinja2):
+class Markdown(Generator, Jinja2, Wavedrom):
     """Create documentation for a register map in Markdown.
 
     :param rmap: Register map object
@@ -423,28 +447,7 @@ class Markdown(Generator, Jinja2):
         self.render_to_file(j2_template, j2_vars, self.path)
         # draw register images
         if self.print_images:
-            self._draw_regs(Path(self.path).parent, self.rmap)
-
-    def _draw_regs(self, outdir, rmap):
-        imgdir = outdir / self.image_dir
-        imgdir.mkdir(exist_ok=True)
-
-        bits = config.globcfg['data_width']
-        lanes = bits // 16 if bits > 16 else 1
-        for reg in rmap:
-            reg_wd = {"reg": [],
-                      "options": {"bits": bits, "lanes": lanes}}
-            bit_pos = -1
-            for bf in reg:
-                if bit_pos == -1 and bf.lsb > 0:
-                    reg_wd["reg"].append({"bits": bf.lsb})
-                elif bf.lsb - bit_pos > 1:
-                    reg_wd["reg"].append({"bits": bf.lsb - bit_pos - 1})
-                reg_wd["reg"].append({"name": bf.name, "attr": bf.access, "bits": bf.width})
-                bit_pos = bf.msb
-            if (bits - 1) > bit_pos:
-                reg_wd["reg"].append({"bits": bits - bit_pos - 1})
-            wavedrom.render(json.dumps(reg_wd)).saveas(str(imgdir / ("%s.svg" % reg.name.lower())))
+            self.draw_regs(Path(self.path).parent / self.image_dir, self.rmap)
 
 
 class Python(Generator, Jinja2):
