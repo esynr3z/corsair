@@ -16,9 +16,9 @@ Features
 ========
 
 * Various human-readable input formats: JSON, YAML or plain text table
-* HDL code generation: Verilog module with register map, Verilog header or SystemVerilog package with parameters and definitions
+* HDL code generation: Verilog or VHDL module with register map, Verilog header or SystemVerilog package with parameters and definitions
 * Multi-protocol support: APB, AXI-Lite, Avalon-MM
-* Documentation generation in Markdown
+* Documentation generation: Markdown, AsciiDoc
 * Generation of software-related files: C header, Python module
 * Extensibility: support of external file generators
 * API: creation of custom workflow with corsair API
