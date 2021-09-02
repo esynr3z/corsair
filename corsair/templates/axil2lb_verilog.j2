@@ -74,6 +74,7 @@ wire              ren;
     assign wdata        = wdata_int;
     assign wstrb        = strb_int;
     assign wen          = awflag && wflag;
+    assign axil_bresp   = 'd0; // always okay
 
     {% set rst_type = config['register_reset'] %}
     {%- if rst_type == 'async_pos' or rst_type == 'sync_pos' %}
@@ -121,6 +122,7 @@ wire              ren;
     assign axil_rvalid  = axil_rvalid_int;
     assign raddr        = raddr_int;
     assign ren          = arflag && ~rflag;
+    assign axil_rresp   = 'd0; // always okay
 
     {% set rst_type = config['register_reset'] %}
     always @(posedge clk

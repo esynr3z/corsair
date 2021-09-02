@@ -40,6 +40,7 @@ axil_rready  1     input     Read data channel: read ready
 Implementation details:
 
 * AXI4-Lite slave
+* ``*resp`` signals are tied to 0 - always ``OKAY``
 * ``*prot`` signals are not handled
 
 Protocol
