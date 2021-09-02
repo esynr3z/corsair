@@ -60,7 +60,7 @@ def write_memfile(path, data):
 class Simulator:
     """Simulator wrapper"""
 
-    def __init__(self, name='icarus', gui=True, cwd='work', passed_marker='!@# TEST PASSED #@!'):
+    def __init__(self, name='modelsim', gui=True, cwd='work', passed_marker='!@# TEST PASSED #@!'):
         self.gui = gui
         self.passed_marker = passed_marker
 
@@ -136,7 +136,7 @@ class Simulator:
                     'tool': 'vlog',
                     'args': '-suppress 2902 %s %s -sv -timescale 1ns/1ps %s' % (defines, incdirs, src)
                 }]
-            elif ext == 'vhd':
+            elif ext in ['.vhd', '.vhdl']:
                 scr_compile += [{
                     'tool': 'vcom',
                     'args': '-93 %s\n' % src
