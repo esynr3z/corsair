@@ -1,0 +1,77 @@
+{#- Many thanks to github.com/smirnovich for providing the VHDL code for this template #}
+
+-- Created with Corsair v{{ corsair_ver }}
+--
+-- APB to Local Bus bridge
+--
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity {{ module_name }} is
+generic(
+    ADDR_W : integer := {{ config['address_width'] }};
+    DATA_W : integer := {{ config['data_width'] }};
+    STRB_W : integer := {{ config['data_width'] // 8 }}
+);
+port(
+    -- Local Bus
+    wready : in  std_logic;
+    waddr  : out std_logic_vector(ADDR_W-1 downto 0);
+    wdata  : out std_logic_vector(DATA_W-1 downto 0);
+    wen    : out std_logic;
+    wstrb  : out std_logic_vector(STRB_W-1 downto 0);
+    rdata  : in  std_logic_vector(DATA_W-1 downto 0);
+    rvalid : in  std_logic;
+    raddr  : out std_logic_vector(ADDR_W-1 downto 0);
+    ren    : out std_logic;
+    {% macro apb_ports() %}
+    -- APB
+    psel    : in  std_logic;
+    paddr   : in  std_logic_vector(ADDR_W-1 downto 0);
+    penable : in  std_logic;
+    pwrite  : in  std_logic;
+    pwdata  : in  std_logic_vector(DATA_W-1 downto 0);
+    pstrb   : in  std_logic_vector(STRB_W-1 downto 0);
+    prdata  : out std_logic_vector(DATA_W-1 downto 0);
+    pready  : out std_logic;
+    pslverr : out std_logic
+    {% endmacro %}
+    {{ apb_ports() }}
+);
+end {{ module_name }};
+architecture arch_imp of {{ module_name }} is
+{% macro apb_signals(regmap_embed=False) %}
+    {% if regmap_embed %}
+signal wready : std_logic;
+signal waddr  : std_logic_vector(ADDR_W-1 downto 0);
+signal wdata  : std_logic_vector(DATA_W-1 downto 0);
+signal wen    : std_logic;
+signal wstrb  : std_logic_vector(STRB_W-1 downto 0);
+signal rdata  : std_logic_vector(DATA_W-1 downto 0);
+signal rvalid : std_logic;
+signal raddr  : std_logic_vector(ADDR_W-1 downto 0);
+signal ren    : std_logic;
+    {% endif %}
+{% endmacro %}
+{{ apb_signals() }}
+begin
+{% macro apb_core() %}
+-- APB interface
+prdata  <= rdata;
+pslverr <= '1'; -- always OKAY
+pready  <= wready when (psel='1' and penable='1' and pwrite='1') else
+           rvalid when (psel='1' and pwrite='0' and penable='1') else
+           '1';
+
+-- Local Bus interface
+waddr <= paddr;
+wdata <= pwdata;
+wstrb <= pstrb;
+wen   <= psel and penable and pwrite;
+
+raddr <= paddr;
+ren   <= psel and (not pwrite);
+{% endmacro %}
+{{ apb_core() }}
+end arch_imp;

@@ -1,0 +1,195 @@
+{#- Many thanks to github.com/smirnovich for providing the VHDL code for this template #}
+
+{#- 'process' header with reset logic #}
+{% macro process_begin(sig=['test'], init=["'0'"]) %}
+    {% set rst_type = config['register_reset']%}
+    {% if rst_type == 'sync_pos' %}
+process (clk) begin
+if rising_edge(clk) then
+if (rst = '1') then
+    {% for s, i in zip(sig, init) %}
+    {{s}} <= {{i}};
+    {% endfor -%}
+else
+    {%- elif rst_type == 'sync_neg' %}
+process (clk) begin
+if rising_edge(clk) then
+if (rst = '0') then
+    {% for s, i in zip(sig, init) %}
+    {{s}} <= {{i}};
+    {% endfor -%}
+else
+    {%- elif rst_type == 'async_pos' %}
+process (clk, rst) begin
+if (rst = '1') then
+    {% for s, i in zip(sig, init) %}
+    {{s}} <= {{i}};
+    {% endfor -%}
+elsif rising_edge(clk) then
+    {%- elif rst_type == 'async_neg' %}
+process (clk, rst) begin
+if (rst = '0') then
+    {% for s, i in zip(sig, init) %}
+    {{s}} <= {{i}};
+    {% endfor -%}
+elsif rising_edge(clk) then
+    {%- endif %}
+{%- endmacro %}
+
+{#- 'process' footer #}
+{% macro process_end() %}
+    {% if 'async' in config['register_reset'] %}
+end if;
+end process;
+    {% else %}
+end if;
+end if;
+end process;
+    {% endif %}
+{%- endmacro %}
+
+-- Created with Corsair v{{ corsair_ver }}
+--
+-- AXI-Lite to Local Bus bridge
+--
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity {{ module_name }} is
+generic(
+    ADDR_W : integer := {{ config['address_width'] }};
+    DATA_W : integer := {{ config['data_width'] }};
+    STRB_W : integer := {{ config['data_width'] // 8 }}
+);
+port(
+    clk    : in std_logic;
+    rst    : in std_logic;
+    -- Local Bus
+    wready : in  std_logic;
+    waddr  : out std_logic_vector(ADDR_W-1 downto 0);
+    wdata  : out std_logic_vector(DATA_W-1 downto 0);
+    wen    : out std_logic;
+    wstrb  : out std_logic_vector(STRB_W-1 downto 0);
+    rdata  : in  std_logic_vector(DATA_W-1 downto 0);
+    rvalid : in  std_logic;
+    raddr  : out std_logic_vector(ADDR_W-1 downto 0);
+    ren    : out std_logic;
+    {% macro axil_ports() %}
+    -- AXI-Lite
+    axil_awaddr   : in  std_logic_vector(ADDR_W-1 downto 0);
+    axil_awprot   : in  std_logic_vector(2 downto 0);
+    axil_awvalid  : in  std_logic;
+    axil_awready  : out std_logic;
+    axil_wdata    : in  std_logic_vector(DATA_W-1 downto 0);
+    axil_wstrb    : in  std_logic_vector(STRB_W-1 downto 0);
+    axil_wvalid   : in  std_logic;
+    axil_wready   : out std_logic;
+    axil_bresp    : out std_logic_vector(1 downto 0);
+    axil_bvalid   : out std_logic;
+    axil_bready   : in  std_logic;
+    axil_araddr   : in  std_logic_vector(ADDR_W-1 downto 0);
+    axil_arprot   : in  std_logic_vector(2 downto 0);
+    axil_arvalid  : in  std_logic;
+    axil_arready  : out std_logic;
+    axil_rdata    : out std_logic_vector(DATA_W-1 downto 0);
+    axil_rresp    : out std_logic_vector(1 downto 0);
+    axil_rvalid   : out std_logic;
+    axil_rready   : in  std_logic
+    {% endmacro %}
+    {{ axil_ports() }}
+);
+end {{ module_name }};
+architecture arch_imp of {{ module_name }} is
+{% macro axil_signals(regmap_embed=False) %}
+    {% if regmap_embed %}
+signal wready : std_logic;
+signal waddr  : std_logic_vector(ADDR_W-1 downto 0);
+signal wdata  : std_logic_vector(DATA_W-1 downto 0);
+signal wen    : std_logic;
+signal wstrb  : std_logic_vector(STRB_W-1 downto 0);
+signal rdata  : std_logic_vector(DATA_W-1 downto 0);
+signal rvalid : std_logic;
+signal raddr  : std_logic_vector(ADDR_W-1 downto 0);
+signal ren    : std_logic;
+    {% endif %}
+signal waddr_int       : std_logic_vector(ADDR_W-1 downto 0);
+signal raddr_int       : std_logic_vector(ADDR_W-1 downto 0);
+signal wdata_int       : std_logic_vector(DATA_W-1 downto 0);
+signal strb_int        : std_logic_vector(STRB_W-1 downto 0);
+signal awflag          : std_logic;
+signal wflag           : std_logic;
+signal arflag          : std_logic;
+signal rflag           : std_logic;
+signal wen_int         : std_logic;
+signal ren_int         : std_logic;
+signal axil_bvalid_int : std_logic;
+signal axil_rdata_int  : std_logic_vector(DATA_W-1 downto 0);
+signal axil_rvalid_int : std_logic;
+{% endmacro %}
+{{ axil_signals() }}
+begin
+{% macro axil_core() %}
+axil_awready <= not awflag;
+axil_wready  <= not wflag;
+axil_bvalid  <= axil_bvalid_int;
+waddr        <= waddr_int;
+wdata        <= wdata_int;
+wstrb        <= strb_int;
+wen_int      <= awflag and wflag;
+wen          <= wen_int;
+axil_bresp   <= b"00";
+
+{{ process_begin(["waddr_int", "wdata_int", "strb_int", "awflag", "wflag", "axil_bvalid_int"],
+                 ["(others => '0')", "(others => '0')", "(others => '0')", "'0'", "'0'", "'0'"]) }}
+    if (axil_awvalid = '1' and awflag = '0') then
+        awflag    <= '1';
+        waddr_int <= axil_awaddr;
+    elsif (wen_int = '1' and wready = '1') then
+        awflag    <= '0';
+    end if;
+    if (axil_wvalid = '1' and wflag = '0') then
+        wflag     <= '1';
+        wdata_int <= axil_wdata;
+        strb_int  <= axil_wstrb;
+    elsif (wen_int = '1' and wready = '1') then
+        wflag     <= '0';
+    end if;
+    if (axil_bvalid_int = '1' and axil_bready = '1') then
+        axil_bvalid_int <= '0';
+    elsif ((axil_wvalid = '1' and awflag = '1') or (axil_awvalid = '1' and wflag = '1') or (wflag = '1' and awflag = '1')) then
+        axil_bvalid_int <= wready;
+    end if;
+{{ process_end() }}
+
+axil_arready <= not arflag;
+axil_rdata   <= axil_rdata_int;
+axil_rvalid  <= axil_rvalid_int;
+raddr        <= raddr_int;
+ren_int      <= arflag and (not rflag);
+ren          <= ren_int;
+axil_rresp   <= b"00";
+
+{{ process_begin(["raddr_int", "arflag", "rflag", "axil_rdata_int", "axil_rvalid_int"],
+                 ["(others => '0')", "'0'", "'0'", "(others => '0')", "'0'"]) }}
+    if (axil_arvalid = '1' and arflag = '0') then
+        arflag    <= '1';
+        raddr_int <= axil_araddr;
+    elsif (axil_rvalid_int = '1' and axil_rready = '1') then
+        arflag    <= '0';
+    end if;
+    if (rvalid = '1' and ren_int = '1' and rflag = '0') then
+        rflag <= '1';
+    elsif (axil_rvalid_int = '1' and axil_rready = '1') then
+        rflag <= '0';
+    end if;
+    if (rvalid = '1' and axil_rvalid_int = '0') then
+        axil_rdata_int  <= rdata;
+        axil_rvalid_int <= '1';
+    elsif (axil_rvalid_int = '1' and axil_rready = '1') then
+        axil_rvalid_int <= '0';
+    end if;
+{{ process_end() }}
+{% endmacro %}
+{{ axil_core() }}
+end arch_imp;

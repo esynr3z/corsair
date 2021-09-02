@@ -131,6 +131,7 @@ Generator                Description
 ``Yaml``                 Dump register map to a YAML file
 ``Txt``                  Dump register map to a text file
 ``Verilog``              Create Verilog file with register map
+``Vhdl``                 Create VHDL file with register map
 ``VerilogHeader``        Create Verilog header file with register map defines
 ``CHeader``              Create C header file with register map define
 ``SystemVerilogPackage`` Create SystemVerilog package with register map parameters
@@ -148,7 +149,8 @@ Generator                Description
 ``Generator``            Base generator class
 ``Jinja2``               Basic class for rendering Jinja2 templates
 ``Wavedrom``             Basic class for rendering register images with wavedrom
-``LbBridgeVerilog``      Create HDL file with bridge to Local Bus
+``LbBridgeVerilog``      Create Verilog file with bridge to Local Bus
+``LbBridgeVhdl``         Create Vhdl file with bridge to Local Bus
 ======================== ================================================================
 
 .. note::
@@ -202,6 +204,26 @@ Verilog
 |                 |            | ``lb``    | Custom LocalBus interface               |
 +-----------------+------------+-----------+-----------------------------------------+
 
+Vhdl
+----
++-----------------+---------------+-----------------------------------------------------+
+| Parameter       | Default       | Description                                         |
++=================+===============+=====================================================+
+| ``path``        | ``regs.vhd``  | Path to the output file                             |
++-----------------+---------------+-----------------------------------------------------+
+| ``read_filler`` | 0             | Numeric value to return if wrong address was read   |
++-----------------+---------------+-----------------------------------------------------+
+| ``interface``   | ``axil``      | Register map bus protocol                           |
+|                 |               +-----------+-----------------------------------------+
+|                 |               | ``axil``  | AXI4-Lite                               |
+|                 |               +-----------+-----------------------------------------+
+|                 |               | ``amm``   | Avalon-MM                               |
+|                 |               +-----------+-----------------------------------------+
+|                 |               | ``apb``   | APB4                                    |
+|                 |               +-----------+-----------------------------------------+
+|                 |               | ``lb``    | Custom LocalBus interface               |
++-----------------+---------------+-----------+-----------------------------------------+
+
 VerilogHeader
 -------------
 ========== ============= ================================================================
@@ -252,7 +274,6 @@ Parameter             Default          Description
 ``image_dir``         ``regs_img``     Path to directory where all images will be saved
 ``print_conventions`` ``True``         Enable generating table with register access modes explained
 ===================== ================ ================================================================
-
 
 Python
 ------

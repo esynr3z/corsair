@@ -1,0 +1,557 @@
+{#- Many thanks to github.com/smirnovich for providing the VHDL code for this template #}
+
+{# MACRO #}
+{#- vector range for select operations #}
+{% macro range(msb, lsb, is_vector=true) %}
+    {% if is_vector %}
+        {% if msb == lsb %}
+({{ msb }})
+        {%- else %}
+({{ msb }} downto {{ lsb }})
+        {%- endif %}
+    {%- endif %}
+{%- endmacro %}
+
+{#- vector range for declarations #}
+{% macro range_decl(msb, is_vector=true) %}
+    {% if is_vector %}
+std_logic_vector({{ msb }} downto 0)
+    {%- else %}
+std_logic
+    {%- endif %}
+{%- endmacro %}
+
+{#- literal #}
+{% macro literal(val, width=1) %}
+    {% if width == 1 %}
+'{{ val }}'
+    {%- else %}
+"{{ ('{:0%db}' % width).format(val) }}"
+    {%- endif %}
+{%- endmacro %}
+
+{#- comment with literal in hex #}
+{% macro literal_comment(val) %}
+-- {{ "0x%x" % val }}
+{%- endmacro %}
+
+{#- special literal for all zeros #}
+{% macro zeros(width=1) %}
+    {% if width == 1 %}
+'0'
+    {%- else %}
+(others => '0')
+    {%- endif %}
+{%- endmacro %}
+
+{#- special literal for all ones #}
+{% macro ones(width=1) %}
+    {% if width == 1 %}
+'1'
+    {%- else %}
+(others => '1')
+    {%- endif %}
+{%- endmacro %}
+
+{% macro always_begin(sig='test', width=1, init=0) %}
+{%- endmacro %}
+
+{#- 'process' header with reset logic #}
+{% macro process_begin(sig='test', width=1, init=0) %}
+    {% set rst_type = config['register_reset']%}
+    {% if rst_type == 'sync_pos' %}
+process (clk) begin
+if rising_edge(clk) then
+if (rst = '1') then
+    {{ sig }} <= {{ literal(init, width) }}; {{ literal_comment(init) }}
+else
+    {%- elif rst_type == 'sync_neg' %}
+process (clk) begin
+if rising_edge(clk) then
+if (rst = '0') then
+    {{ sig }} <= {{ literal(init, width) }}; {{ literal_comment(init) }}
+else
+    {%- elif rst_type == 'async_pos' %}
+process (clk, rst) begin
+if (rst = '1') then
+    {{ sig }} <= {{ literal(init, width) }}; {{ literal_comment(init) }}
+elsif rising_edge(clk) then
+    {%- elif rst_type == 'async_neg' %}
+process (clk, rst) begin
+if (rst = '0') then
+    {{ sig }} <= {{ literal(init, width) }}; {{ literal_comment(init) }}
+elsif rising_edge(clk) then
+    {%- endif %}
+{%- endmacro %}
+
+{#- 'process' footer #}
+{% macro process_end() %}
+    {% if 'async' in config['register_reset'] %}
+end if;
+end process;
+    {% else %}
+end if;
+end if;
+end process;
+    {% endif %}
+{%- endmacro %}
+
+{#- signal: csr for rdata bus #}
+{% macro sig_csr_rdata(reg) %}
+csr_{{ reg.name.lower() }}_rdata
+{%- endmacro %}
+
+{#- port: bitfield output #}
+{% macro port_bf_out(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_out
+{%- endmacro %}
+
+{#- port: bitfield input  #}
+{% macro port_bf_in(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_in
+{%- endmacro %}
+
+{#- port: bitfield input enable #}
+{% macro port_bf_en(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_en
+{%- endmacro %}
+
+{#- port: bitfield clear enable #}
+{% macro port_bf_clr(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_clr
+{%- endmacro %}
+
+{#- port: bitfield set enable #}
+{% macro port_bf_set(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_set
+{%- endmacro %}
+
+{#- port: bitfield read enable #}
+{% macro port_bf_ren(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_ren
+{%- endmacro %}
+
+{#- port: bitfield read valid #}
+{% macro port_bf_rvalid(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_rvalid
+{%- endmacro %}
+
+{#- port: bitfield write enable #}
+{% macro port_bf_wen(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_wen
+{%- endmacro %}
+
+{#- port: bitfield write ready #}
+{% macro port_bf_wready(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_wready
+{%- endmacro %}
+
+{#- signal: bitfield registered read valid #}
+{% macro sig_bf_rvalid_ff(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_rvalid_ff
+{%- endmacro %}
+
+{#- signal: bitfield flip-flops #}
+{% macro sig_bf_ff(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_ff
+{%- endmacro %}
+
+{#- port: bitfield read access strobe #}
+{% macro port_bf_raccess(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_raccess
+{%- endmacro %}
+
+{#- port: bitfield write access strobe #}
+{% macro port_bf_waccess(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_waccess
+{%- endmacro %}
+
+{#- port: bitfield lock signal #}
+{% macro port_bf_lock(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_lock
+{%- endmacro %}
+
+{#- signal: register read enable #}
+{% macro sig_csr_ren(reg) %}
+csr_{{ reg.name.lower() }}_ren
+{%- endmacro %}
+
+{#- signal: register read enable registered #}
+{% macro sig_csr_ren_ff(reg) %}
+csr_{{ reg.name.lower() }}_ren_ff
+{%- endmacro %}
+
+{#- signal: register write enable #}
+{% macro sig_csr_wen(reg) %}
+csr_{{ reg.name.lower() }}_wen
+{%- endmacro %}
+
+{#- conditional #}
+{% macro cond(val, branch_n, last=False) %}
+    {% if branch_n == 0 and not last %}
+if ({{ val }}) then
+    {%- elif branch_n and not last %}
+elsif ({{ val }}) then
+    {%- elif branch_n == 0 and last %}
+    {%- else %}
+else
+    {%- endif %}
+{%- endmacro %}
+
+{#- TEMPLATE NAMESPACE #}
+{% set tmp = namespace() %}
+{% from "amm2lb_vhdl.j2" import amm_core with context %}
+{% from "amm2lb_vhdl.j2" import amm_ports with context %}
+{% from "amm2lb_vhdl.j2" import amm_signals with context %}
+{% from "apb2lb_vhdl.j2" import apb_core with context %}
+{% from "apb2lb_vhdl.j2" import apb_ports with context %}
+{% from "apb2lb_vhdl.j2" import apb_signals with context %}
+{% from "axil2lb_vhdl.j2" import axil_core with context %}
+{% from "axil2lb_vhdl.j2" import axil_ports with context %}
+{% from "axil2lb_vhdl.j2" import axil_signals with context %}
+
+{#- TEMPLATE #}
+-- Created with Corsair v{{ corsair_ver }}
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity {{ module_name }} is
+generic(
+    ADDR_W : integer := {{ config['address_width'] }};
+    DATA_W : integer := {{ config['data_width'] }};
+    STRB_W : integer := {{ config['data_width'] // 8 }}
+);
+port(
+    clk    : in std_logic;
+    rst    : in std_logic;
+{% for reg in rmap %}
+    {% for bf in reg %}
+    -- {{ reg.name }}.{{ bf.name }}
+        {% if 'a' in bf.hardware %}
+    {{ port_bf_raccess(reg, bf) }} : out {{range_decl(0, False)}};
+    {{ port_bf_waccess(reg, bf) }} : out {{range_decl(0, False)}};
+        {% endif %}
+        {% if 'l' in bf.hardware %}
+    {{ port_bf_lock(reg, bf) }} : in {{range_decl(0, False)}};
+        {% endif %}
+        {% if 'e' in bf.hardware %}
+    {{ port_bf_en(reg, bf) }} : in {{range_decl(0, False)}};
+        {% endif %}
+        {% if 'c' in bf.hardware %}
+    {{ port_bf_clr(reg, bf) }} : in {{range_decl(0, False)}};
+        {% endif %}
+        {% if 's' in bf.hardware %}
+    {{ port_bf_set(reg, bf) }} : in {{range_decl(0, False)}};
+        {% endif %}
+        {% if 'q' in bf.hardware and 'r' in bf.access %}
+    {{ port_bf_rvalid(reg, bf) }} : in {{range_decl(0, False)}};
+    {{ port_bf_ren(reg, bf) }} : out {{range_decl(0, False)}};
+    {{ port_bf_in(reg, bf) }} : in {{ range_decl(bf.width - 1, bf.is_vector()) }};
+        {% endif %}
+        {% if 'i' in bf.hardware %}
+    {{ port_bf_in(reg, bf) }} : in {{ range_decl(bf.width - 1, bf.is_vector()) }};
+        {% endif %}
+        {% if 'o' in bf.hardware %}
+    {{ port_bf_out(reg, bf) }} : out {{ range_decl(bf.width - 1, bf.is_vector()) }};
+        {% endif %}
+        {% if 'q' in bf.hardware and  'w' in bf.access %}
+    {{ port_bf_out(reg, bf) }} : out {{ range_decl(bf.width - 1, bf.is_vector()) }};
+    {{ port_bf_wready(reg, bf) }} : in {{range_decl(0, False)}};
+    {{ port_bf_wen(reg, bf) }} : out {{range_decl(0, False)}};
+        {% endif %}
+    {% endfor %}
+
+{% endfor %}
+{% if interface == 'apb' %}
+{{ apb_ports() }}
+{% elif interface == 'axil' %}
+{{ axil_ports() }}
+{% elif interface == 'amm' %}
+{{ amm_ports() }}
+{% else %}
+    -- Local Bus
+    waddr  : in  std_logic_vector(ADDR_W-1 downto 0);
+    wdata  : in  std_logic_vector(DATA_W-1 downto 0);
+    wen    : in  std_logic;
+    wstrb  : in  std_logic_vector(STRB_W-1 downto 0);
+    wready : out std_logic;
+    raddr  : in  std_logic_vector(ADDR_W-1 downto 0);
+    ren    : in  std_logic;
+    rdata  : out std_logic_vector(DATA_W-1 downto 0);
+    rvalid : out std_logic
+{% endif %}
+);
+end entity;
+
+architecture rtl of {{ module_name }} is
+subtype ADDR_T is {{ range_decl(config['address_width'] - 1) }};
+
+{% if interface == 'apb' %}
+{{ apb_signals(regmap_embed=True) }}
+{% elif interface == 'axil' %}
+{{ axil_signals(regmap_embed=True) }}
+{% elif interface == 'amm' %}
+{{ amm_signals(regmap_embed=True) }}
+{% endif %}
+{% for reg in rmap %}
+signal {{ sig_csr_rdata(reg) }} : {{ range_decl(config['data_width'] - 1) }};
+    {% if 'w' in reg.access %}
+signal {{ sig_csr_wen(reg) }} : {{ range_decl(0, False) }};
+    {% endif %}
+    {% if 'r' in reg.access %}
+signal {{ sig_csr_ren(reg) }} : {{ range_decl(0, False) }};
+signal {{ sig_csr_ren_ff(reg) }} : {{ range_decl(0, False) }};
+    {% endif %}
+    {% for bf in reg %}
+signal {{ sig_bf_ff(reg, bf) }} : {{ range_decl(bf.width - 1, bf.is_vector()) }};
+        {% if 'r' in bf.access and 'q' in bf.hardware %}
+signal {{ sig_bf_rvalid_ff(reg, bf) }} : {{ range_decl(0, False) }};
+        {% endif %}
+    {% endfor %}
+
+{% endfor %}
+{% set tmp.rd_fifo_cnt = 0 %}
+{% set tmp.wr_fifo_cnt = 0 %}
+{% for reg in rmap %}
+    {% for bf in reg %}
+        {% if 'q' in bf.hardware and  'w' in bf.access %}
+            {% if tmp.wr_fifo_cnt == 0 %}
+signal wready_drv : {{ range_decl(0, False) }};
+            {% endif %}
+            {% set tmp.wr_fifo_cnt = tmp.wr_fifo_cnt + 1 %}
+        {% endif %}
+        {% if 'q' in bf.hardware and  'r' in bf.access %}
+            {% if tmp.rd_fifo_cnt == 0 %}
+signal rvalid_drv : {{ range_decl(0, False) }};
+            {% endif %}
+            {% set tmp.rd_fifo_cnt = tmp.rd_fifo_cnt + 1 %}
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+signal rdata_ff : {{ range_decl(config['data_width'] - 1) }};
+signal rvalid_ff : {{ range_decl(0, False) }};
+begin
+
+{% if interface == 'apb' %}
+{{ apb_core() }}
+{% elif interface == 'axil' %}
+{{ axil_core() }}
+{% elif interface == 'amm' %}
+{{ amm_core() }}
+{% endif %}
+{% for reg in rmap %}
+--------------------------------------------------------------------------------
+-- CSR:
+-- [{{ '0x%x' % reg.address }}] - {{ reg.name }} - {{ reg.description }}
+--------------------------------------------------------------------------------
+{# fill unused bits with zeros #}
+    {% set tmp.last_bit = 0 %}
+    {% for bf in reg %}
+        {% if bf.lsb > tmp.last_bit %}
+{{ sig_csr_rdata(reg) }}{{ range(bf.lsb - 1, tmp.last_bit) }} <= {{ zeros(bf.lsb - tmp.last_bit) }};
+        {% endif %}
+        {% set tmp.last_bit = bf.msb + 1 %}
+    {% endfor %}
+    {% if config['data_width'] - 1 > tmp.last_bit %}
+{{ sig_csr_rdata(reg) }}{{ range(config['data_width'] - 1, tmp.last_bit) }} <= {{ zeros(config['data_width'] - tmp.last_bit) }};
+    {% endif %}
+
+    {% if 'w' in reg.access %}
+{{ sig_csr_wen(reg) }} <= wen when (waddr = {{ literal(reg.address, config['address_width']) }}) else '0'; {{ literal_comment(reg.address) }}
+    {% endif %}
+
+    {% if 'r' in reg.access %}
+{{ sig_csr_ren(reg) }} <= ren when (raddr = {{ literal(reg.address, config['address_width']) }}) else '0'; {{ literal_comment(reg.address) }}
+{{ process_begin(sig=sig_csr_ren_ff(reg))}}
+        {{ sig_csr_ren_ff(reg) }} <= {{ sig_csr_ren(reg) }};
+{{ process_end() }}
+    {% endif %}
+    {% for bf in reg %}
+-----------------------
+-- Bit field:
+-- {{ reg.name }}{{ range(bf.msb, bf.lsb) }} - {{ bf.name }} - {{ bf.description }}
+-- access: {{ bf.access }}, hardware: {{ bf.hardware }}
+-----------------------
+        {% if 'a' in bf.hardware %}
+{{ port_bf_waccess(reg, bf) }} <= wready and {{ sig_csr_wen(reg) }};
+{{ port_bf_raccess(reg, bf) }} <= rvalid and {{ sig_csr_ren(reg) }};
+        {% endif %}
+
+        {% if 'wo' in bf.access %}
+{{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} <= {{ zeros(bf.width) }};
+        {% elif 'r' in bf.access and 'q' in bf.hardware %}
+{{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} <= {{ port_bf_in(reg, bf) }};
+        {% else %}
+{{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} <= {{ sig_bf_ff(reg, bf) }};
+        {% endif %}
+
+        {% if 'w' in bf.access and 'q' in bf.hardware %}
+{{ port_bf_out(reg, bf) }} <= wdata{{ range(bf.msb, bf.lsb) }};
+        {% elif 'o' in bf.hardware %}
+{{ port_bf_out(reg, bf) }} <= {{ sig_bf_ff(reg, bf) }};
+        {% endif %}
+        {% if 'r' in bf.access and 'q' in bf.hardware %}
+{{ port_bf_ren(reg, bf) }} <= {{ sig_csr_ren(reg) }} and (not {{ sig_csr_ren_ff(reg) }});
+        {% endif %}
+        {% if 'w' in bf.access and 'q' in bf.hardware %}
+{{ port_bf_wen(reg, bf) }} <= {{ sig_csr_wen(reg) }};
+        {% endif %}
+
+{{ process_begin(sig=sig_bf_ff(reg, bf), width=bf.width, init=bf.reset)}}
+    {% if 'l' in bf.hardware %}
+    if ({{ "%s = '0'" % port_bf_lock(reg, bf) }}) then
+    {% endif %}
+        {% set tmp.cond_cnt = 0 %}
+        {% if 's' in bf.hardware %}
+        if ({{ "%s = '1'" % port_bf_set(reg, bf) }}) then
+            {{ sig_bf_ff(reg, bf) }} <= {{ ones(bf.width) }};
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+        {%- endif %}
+        {% if 'c' in bf.hardware %}
+        {{ cond("%s = '1'" % port_bf_clr(reg, bf), tmp.cond_cnt) }}
+            {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+        {%- endif %}
+        {% if bf.access in ['roc', 'rolh'] %}
+        {{ cond("%s = '1'" % sig_csr_ren(reg), tmp.cond_cnt) }}
+            {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+        {%- endif %}
+        {% if bf.access == 'roll' %}
+        {{ cond("%s = '1'" % sig_csr_ren(reg), tmp.cond_cnt) }}
+            {{ sig_bf_ff(reg, bf) }} <= {{ ones(bf.width) }};
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+        {%- endif %}
+        {% if 'w' in bf.access %}
+        {{ cond("%s = '1'" % sig_csr_wen(reg), tmp.cond_cnt) }}
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+            {% for num, val in bf.byte_strobes.items() %}
+                {% if 'w1c' in bf.access %}
+            if ((wstrb({{ num }}) = '1') and (wdata({{ val['wdata_lsb'] }}) = '1')) then
+                {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= {{ zeros(val['bf_msb'] - val['bf_lsb'] + 1) }};
+                {% elif 'w1s' in bf.access %}
+            if ((wstrb({{ num }}) = '1') and (wdata({{ val['wdata_lsb'] }}) = '1')) then
+                {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= {{ ones(val['bf_msb'] - val['bf_lsb'] + 1) }};
+                {% else %}
+            if (wstrb({{ num }}) = '1') then
+                {{ sig_bf_ff(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= wdata{{ range(val['wdata_msb'], val['wdata_lsb']) }};
+                {% endif %}
+            end if;
+            {% endfor %}
+        {%- endif %}
+        {% if 'i' in bf.hardware %} {%- if 'e' in bf.hardware and 'll' in bf.access %}
+        {{ cond("(%s = '1') and (%s = %s)" % (port_bf_en(reg, bf), port_bf_in(reg, bf), zeros(bf.width)), tmp.cond_cnt)}}
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+            {% elif 'e' in bf.hardware and 'lh' in bf.access %}
+        {{ cond("(%s = '1') and (%s = %s)" % (port_bf_en(reg, bf), port_bf_in(reg, bf), ones(bf.width)), tmp.cond_cnt)}}
+           {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+            {% elif 'll' in bf.access %}
+        {{ cond("%s = %s" % (port_bf_in(reg, bf), zeros(bf.width)), tmp.cond_cnt)}}
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+            {% elif 'lh' in bf.access %}
+         {{ cond("%s = %s" % (port_bf_in(reg, bf), ones(bf.width)), tmp.cond_cnt)}}
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+            {% elif 'e' in bf.hardware %}
+        {{ cond("%s = '1'" % port_bf_en(reg, bf), tmp.cond_cnt)}}
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+            {% endif %}
+            {{ sig_bf_ff(reg, bf) }} <= {{ port_bf_in(reg, bf) }};
+        {% elif 'i' in bf.hardware %}
+        {{ cond("", tmp.cond_cnt, last=True) }}
+            {{ sig_bf_ff(reg, bf) }} <= {{ port_bf_in(reg, bf) }};
+        {% elif 'sc' in bf.access %}
+        {{ cond("", tmp.cond_cnt, last=True) }}
+            {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
+        {% else %}
+        {{ cond("", tmp.cond_cnt, last=True) }}
+            {{ sig_bf_ff(reg, bf) }} <= {{ sig_bf_ff(reg, bf) }};
+        {% endif %}
+        {% if tmp.cond_cnt != 0 %}
+        end if;
+        {% endif %}
+    {% if 'l' in bf.hardware %}
+    end if;
+    {% endif %}
+{{ process_end() }}
+
+        {% if 'r' in bf.access and 'q' in bf.hardware %}
+{{ process_begin(sig=sig_bf_rvalid_ff(reg, bf)) }}
+        {{ sig_bf_rvalid_ff(reg, bf) }} <= {{ port_bf_rvalid(reg, bf) }};
+{{ process_end() }}
+        {%endif%}
+
+    {% endfor %}
+{% endfor %}
+--------------------------------------------------------------------------------
+-- Write ready
+--------------------------------------------------------------------------------
+{% set tmp.fifo_cnt = 0 %}
+{% for reg in rmap %}
+    {% for bf in reg %}
+        {% if 'q' in bf.hardware and  'w' in bf.access %}
+            {% if tmp.fifo_cnt == 0 %}
+wready_drv <=
+                {% set tmp.fifo_cnt = tmp.fifo_cnt + 1 %}
+            {% endif %}
+    {{ port_bf_wready(reg, bf) }} when ({{ sig_csr_wen(reg) }} = '1') else
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+{% if tmp.fifo_cnt %}
+    '1';
+
+wready <= wready_drv;
+{% else %}
+wready <= '1';
+{% endif %}
+
+--------------------------------------------------------------------------------
+-- Read address decoder
+--------------------------------------------------------------------------------
+{{ process_begin(sig='rdata_ff', width=config['data_width'], init=read_filler)}}
+    if (ren = '1') then
+        case ADDR_T'(raddr) is
+{% for reg in rmap %}
+            when {{ literal(reg.address, config['address_width']) }} => rdata_ff <= {{ sig_csr_rdata(reg) }}; {{ literal_comment(reg.address) }}
+{% endfor %}
+            when others => rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
+        end case;
+    else
+        rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
+    end if;
+{{ process_end() }}
+rdata <= rdata_ff;
+
+--------------------------------------------------------------------------------
+-- Read data valid
+--------------------------------------------------------------------------------
+{{ process_begin(sig='rvalid_ff')}}
+    if ((ren = '1') and (rvalid = '1')) then
+        rvalid_ff <= '0';
+    elsif (ren = '1') then
+        rvalid_ff <= '1';
+    end if;
+{{ process_end() }}
+
+{% set tmp.fifo_cnt = 0 %}
+{% for reg in rmap %}
+    {% for bf in reg %}
+        {% if 'q' in bf.hardware and  'r' in bf.access %}
+            {% if tmp.fifo_cnt == 0 %}
+rvalid_drv <=
+                 {% set tmp.fifo_cnt = tmp.fifo_cnt + 1 %}
+            {% endif %}
+    {{ sig_bf_rvalid_ff(reg, bf) }} when ({{ sig_csr_ren(reg) }} = '1') else
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+{% if tmp.fifo_cnt %}
+    rvalid_ff;
+
+rvalid <= rvalid_drv;
+{% else %}
+rvalid <= rvalid_ff;
+{% endif %}
+
+end architecture;

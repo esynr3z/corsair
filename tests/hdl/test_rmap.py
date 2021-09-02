@@ -14,7 +14,7 @@ from corsair import config, generators, RegisterMap, Register, BitField
 TEST_DIR = parent_dir(__file__)
 
 
-def gen_rtl(tmpdir, interface, reset):
+def gen_rtl(tmpdir, interface, reset, hdl):
     # global configuration
     globcfg = config.default_globcfg()
     globcfg['data_width'] = 32
@@ -42,7 +42,7 @@ def gen_rtl(tmpdir, interface, reset):
     ]))
     rmap.add_registers(Register('REGRO', 'register ro', 0x10).add_bitfields([
         BitField("BFI", "bitfield ro i", width=8, lsb=0, access='ro', hardware='i'),
-        BitField("BFF", "bitfield ro f", width=4, lsb=8, access='ro', hardware='f', reset=42),
+        BitField("BFF", "bitfield ro f", width=4, lsb=8, access='ro', hardware='f', reset=13),
         BitField("BFIE", "bitfield ro ie", width=4, lsb=12, access='ro', hardware='ie'),
     ]))
     rmap.add_registers(Register('REGROC', 'register ro', 0x14).add_bitfields([
@@ -65,8 +65,12 @@ def gen_rtl(tmpdir, interface, reset):
         BitField("BFOQ", "bitfield wo oq", width=24, lsb=0, access='wo', hardware='q'),
     ]))
 
-    regmap_path = path_join(tmpdir, 'regs.v')
-    generators.Verilog(rmap, regmap_path, read_filler=0xdeadc0de, interface=interface).generate()
+    if hdl == 'vhdl':
+        regmap_path = path_join(tmpdir, 'regs.vhd')
+        generators.Vhdl(rmap, regmap_path, read_filler=0xdeadc0de, interface=interface).generate()
+    else:
+        regmap_path = path_join(tmpdir, 'regs.v')
+        generators.Verilog(rmap, regmap_path, read_filler=0xdeadc0de, interface=interface).generate()
 
     header_path = path_join(tmpdir, 'regs.vh')
     generators.VerilogHeader(rmap, header_path).generate()
@@ -87,6 +91,11 @@ def interface(request):
     return request.param
 
 
+@pytest.fixture(params=['verilog', 'vhdl'])
+def hdl(request):
+    return request.param
+
+
 @pytest.fixture(params=['sync_pos', 'sync_neg', 'async_pos', 'async_neg'])
 def reset(request):
     return request.param
@@ -97,7 +106,7 @@ def tb(request):
     return request.param
 
 
-def test(tmpdir, tb, interface, reset, simtool, defines=[], gui=False, pytest_run=True):
+def test(tmpdir, tb, interface, reset, hdl, simtool, defines=[], gui=False, pytest_run=True):
     # create sim
     tb_dir = path_join(TEST_DIR, 'test_rmap')
     beh_dir = path_join(TEST_DIR, 'beh')
@@ -109,7 +118,7 @@ def test(tmpdir, tb, interface, reset, simtool, defines=[], gui=False, pytest_ru
     sim.top = tb
     sim.setup()
     # prepare test
-    src = gen_rtl(tmpdir, interface, reset)
+    src = gen_rtl(tmpdir, interface, reset, hdl)
     sim.sources = list(src) + sim.sources
     sim.defines += [
         'INTERFACE_%s' % interface.upper(),
@@ -130,12 +139,15 @@ if __name__ == '__main__':
                                  help="interface <interface> to register map; default is 'apb'")
     cli.args_parser.add_argument('--reset', default='sync_pos', metavar='<reset>', dest='reset',
                                  help="reset <reset> for interface registers; default is 'sync_pos'")
+    cli.args_parser.add_argument('--hdl', default='verilog', metavar='<hdl>', dest='hdl',
+                                 help="choosen HDL; default is 'verilog'")
     args = cli.parse()
     try:
         globals()[args.test](tmpdir='work',
                              tb=args.tb,
                              interface=args.interface,
                              reset=args.reset,
+                             hdl=args.hdl,
                              simtool=args.simtool,
                              gui=args.gui,
                              defines=args.defines,

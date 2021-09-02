@@ -60,6 +60,14 @@ Verilog
    :inherited-members:
    :show-inheritance:
 
+Vhdl
+=======
+.. autoclass:: corsair.generators.Vhdl
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :show-inheritance:
+
 VerilogHeader
 =============
 .. autoclass:: corsair.generators.VerilogHeader
@@ -111,6 +119,14 @@ Python
 LbBridgeVerilog
 ===============
 .. autoclass:: corsair.generators.LbBridgeVerilog
+   :members:
+   :undoc-members:
+   :inherited-members:
+   :show-inheritance:
+
+LbBridgeVhdl
+============
+.. autoclass:: corsair.generators.LbBridgeVhdl
    :members:
    :undoc-members:
    :inherited-members:

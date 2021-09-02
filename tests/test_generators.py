@@ -82,6 +82,24 @@ class TestVerilog:
         assert 'endmodule' in raw_str
 
 
+class TestVhdl:
+    """Class 'generators.Vhdl' testing."""
+
+    def test_vhdl_write(self, tmpdir):
+        """Test of creating regmap module in VHDL."""
+        output_file = str(tmpdir.join('regs.vhd'))
+        print('output_file:', output_file)
+        # create regmap
+        rmap = utils.create_template()
+        # write output file
+        generators.Vhdl(rmap, output_file).generate()
+        # read file and verify
+        with open(output_file, 'r') as f:
+            raw_str = ''.join(f.readlines())
+        assert "case ADDR_T'(raddr)" in raw_str
+        assert 'end architecture;' in raw_str
+
+
 class TestVerilogHeader:
     """Class 'generators.VerilogHeader' testing."""
 
@@ -123,6 +141,32 @@ class TestLbBridgeVerilog:
     def test_axil(self, tmpdir):
         """Test of creating AXI-Lite to LocalBus module in Verilog"""
         self._test(tmpdir, 'axil2lb.v', 'axil', 'AXI-Lite to Local Bus bridge')
+
+
+class TestLbBridgeVhdl:
+    """Class 'generators.LbBridgeVhdl' testing."""
+
+    def _test(self, tmpdir, filename, bridge_type, assert_str):
+        output_file = str(tmpdir.join(filename))
+        print('output_file:', output_file)
+        # write output file
+        generators.LbBridgeVhdl(path=output_file, bridge_type=bridge_type).generate()
+        # read file and verify
+        with open(output_file, 'r') as f:
+            raw_str = ''.join(f.readlines())
+        assert assert_str in raw_str
+
+    def test_apb(self, tmpdir):
+        """Test of creating APB to LocalBus module in VHDL"""
+        self._test(tmpdir, 'apb2lb.vhd', 'apb', 'APB to Local Bus bridge')
+
+    def test_amm(self, tmpdir):
+        """Test of creating Avalon-MM to LocalBus module in VHDL"""
+        self._test(tmpdir, 'amm2lb.vhd', 'amm', 'Avalon-MM to Local Bus bridge')
+
+    def test_axil(self, tmpdir):
+        """Test of creating AXI-Lite to LocalBus module in VHDL"""
+        self._test(tmpdir, 'axil2lb.vhd', 'axil', 'AXI-Lite to Local Bus bridge')
 
 
 class TestMarkdown:

@@ -73,6 +73,7 @@ class Jinja2():
             templates_path = str(Path(__file__).parent / 'templates')
         j2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath=templates_path),
                                     trim_blocks=True, lstrip_blocks=True)
+        j2_env.globals.update(zip=zip)
         j2_template = j2_env.get_template(template)
         # render
         return j2_template.render(vars)
@@ -265,6 +266,46 @@ class Verilog(Generator, Jinja2):
         self.render_to_file(j2_template, j2_vars, self.path)
 
 
+class Vhdl(Generator, Jinja2):
+    """Create VHDL file with register map.
+
+    :param rmap: Register map object
+    :type rmap: :class:`corsair.RegisterMap`
+    :param path: Path to the output file
+    :type path: str
+    :param read_filler: Numeric value to return if wrong address was read
+    :type read_filler: int
+    :param interface: Register map bus protocol. Use one of: `axil`, `apb`, `amm`, `lb`
+    :type interface: str
+    """
+
+    def __init__(self, rmap=None, path='regs.vhd', read_filler=0, interface='axil', **args):
+        super().__init__(rmap, **args)
+        self.path = path
+        self.read_filler = read_filler
+        self.interface = interface
+
+    def validate(self):
+        super().validate()
+        assert self.interface in ['axil', 'apb', 'amm', 'lb'], \
+            "Unknown '%s' interface!" % (self.interface)
+
+    def generate(self):
+        # validate parameters
+        self.validate()
+        # prepare jinja2
+        j2_template = 'regmap_vhdl.j2'
+        j2_vars = {}
+        j2_vars['corsair_ver'] = __version__
+        j2_vars['rmap'] = self.rmap
+        j2_vars['module_name'] = utils.get_file_name(self.path)
+        j2_vars['read_filler'] = utils.str2int(self.read_filler)
+        j2_vars['interface'] = self.interface
+        j2_vars['config'] = config.globcfg
+        # render
+        self.render_to_file(j2_template, j2_vars, self.path)
+
+
 class VerilogHeader(Generator, Jinja2):
     """Create Verilog header file with register map defines.
 
@@ -366,7 +407,7 @@ class SystemVerilogPackage(Generator, Jinja2):
 
 
 class LbBridgeVerilog(Generator, Jinja2):
-    """Create HDL file with bridge to Local Bus.
+    """Create Verilog file with bridge to Local Bus.
 
     :param rmap: Register map object
     :type rmap: :class:`corsair.RegisterMap`
@@ -395,6 +436,44 @@ class LbBridgeVerilog(Generator, Jinja2):
             j2_template = 'apb2lb_verilog.j2'
         elif self.bridge_type == 'amm':
             j2_template = 'amm2lb_verilog.j2'
+        j2_vars = {}
+        j2_vars['corsair_ver'] = __version__
+        j2_vars['module_name'] = utils.get_file_name(self.path)
+        j2_vars['config'] = config.globcfg
+        # render
+        self.render_to_file(j2_template, j2_vars, self.path)
+
+
+class LbBridgeVhdl(Generator, Jinja2):
+    """Create VHDL file with bridge to Local Bus.
+
+    :param rmap: Register map object
+    :type rmap: :class:`corsair.RegisterMap`
+    :param path: Path to the output file
+    :type path: str
+    :param bridge_type: Bridge protocol. Use one of `axil`, `apb`, `amm`.
+    :type bridge_type: str
+    """
+
+    def __init__(self, rmap=None, path='axil2lb.v', bridge_type='axil', **args):
+        super().__init__(rmap, **args)
+        self.path = path
+        self.bridge_type = bridge_type
+
+    def validate(self):
+        assert self.bridge_type in ['axil', 'apb', 'amm'], \
+            "Unknown '%s' bridge type!" % (self.bridge_type)
+
+    def generate(self):
+        # validate parameters
+        self.validate()
+        # prepare jinja2
+        if self.bridge_type == 'axil':
+            j2_template = 'axil2lb_vhdl.j2'
+        elif self.bridge_type == 'apb':
+            j2_template = 'apb2lb_vhdl.j2'
+        elif self.bridge_type == 'amm':
+            j2_template = 'amm2lb_vhdl.j2'
         j2_vars = {}
         j2_vars['corsair_ver'] = __version__
         j2_vars['module_name'] = utils.get_file_name(self.path)

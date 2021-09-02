@@ -1,0 +1,127 @@
+{#- Many thanks to github.com/smirnovich for providing the VHDL code for this template #}
+
+{#- 'process' header with reset logic #}
+{% macro process_begin(sig='test', init="'0'") %}
+    {% set rst_type = config['register_reset']%}
+    {% if rst_type == 'sync_pos' %}
+process (clk) begin
+if rising_edge(clk) then
+if (rst = '1') then
+    {{ sig }} <= {{ init }};
+else
+    {%- elif rst_type == 'sync_neg' %}
+process (clk) begin
+if rising_edge(clk) then
+if (rst = '0') then
+    {{ sig }} <= {{ init }};
+else
+    {%- elif rst_type == 'async_pos' %}
+process (clk, rst) begin
+if (rst = '1') then
+    {{ sig }} <= {{ init }};
+elsif rising_edge(clk) then
+    {%- elif rst_type == 'async_neg' %}
+process (clk, rst) begin
+if (rst = '0') then
+    {{ sig }} <= {{ init }};
+elsif rising_edge(clk) then
+    {%- endif %}
+{%- endmacro %}
+
+{#- 'process' footer #}
+{% macro process_end() %}
+    {% if 'async' in config['register_reset'] %}
+end if;
+end process;
+    {% else %}
+end if;
+end if;
+end process;
+    {% endif %}
+{%- endmacro %}
+
+-- Created with Corsair v{{ corsair_ver }}
+--
+-- Avalon-MM to Local Bus bridge
+--
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity {{ module_name }} is
+generic(
+    ADDR_W : integer := {{ config['address_width'] }};
+    DATA_W : integer := {{ config['data_width'] }};
+    STRB_W : integer := {{ config['data_width'] // 8 }}
+);
+port(
+    clk : in std_logic;
+    rst : in std_logic;
+    -- Local Bus
+    wready : in  std_logic;
+    waddr  : out std_logic_vector(ADDR_W-1 downto 0);
+    wdata  : out std_logic_vector(DATA_W-1 downto 0);
+    wen    : out std_logic;
+    wstrb  : out std_logic_vector(STRB_W-1 downto 0);
+    rdata  : in  std_logic_vector(DATA_W-1 downto 0);
+    rvalid : in  std_logic;
+    raddr  : out std_logic_vector(ADDR_W-1 downto 0);
+    ren    : out std_logic;
+    {% macro amm_ports() %}
+    -- Avalon-MM
+    address       : in  std_logic_vector(ADDR_W-1 downto 0);
+    read          : in  std_logic;
+    readdata      : out std_logic_vector(DATA_W-1 downto 0);
+    readdatavalid : out std_logic;
+    byteenable    : in  std_logic_vector(STRB_W-1 downto 0);
+    write         : in  std_logic;
+    writedata     : in  std_logic_vector(DATA_W-1 downto 0);
+    waitrequest   : out std_logic
+    {% endmacro %}
+    {{ amm_ports() }}
+);
+end {{ module_name }};
+architecture arch_imp of {{ module_name }} is
+{% macro amm_signals(regmap_embed=False) %}
+    {% if regmap_embed %}
+signal wready : std_logic;
+signal waddr  : std_logic_vector(ADDR_W-1 downto 0);
+signal wdata  : std_logic_vector(DATA_W-1 downto 0);
+signal wen    : std_logic;
+signal wstrb  : std_logic_vector(STRB_W-1 downto 0);
+signal rdata  : std_logic_vector(DATA_W-1 downto 0);
+signal rvalid : std_logic;
+signal raddr  : std_logic_vector(ADDR_W-1 downto 0);
+signal ren    : std_logic;
+    {% endif %}
+signal ren_int   : std_logic;
+{% endmacro %}
+{{ amm_signals() }}
+begin
+{% macro amm_core() %}
+waddr <= address;
+raddr <= address;
+
+waitrequest <= not wready;
+readdatavalid <= rvalid;
+
+wdata    <= writedata;
+readdata <= rdata;
+
+wen <= write;
+
+wstrb <= byteenable;
+
+{{ process_begin("ren_int", "'1'") }}
+    if (read = '1') then
+        ren_int <= '1';
+    elsif (rvalid = '1') then
+        ren_int <= '0';
+    end if;
+{{ process_end() }}
+
+ren <= ren_int;
+
+{% endmacro %}
+{{ amm_core() }}
+end arch_imp;
