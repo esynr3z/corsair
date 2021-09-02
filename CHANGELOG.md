@@ -9,6 +9,8 @@
 * Add C header generator
 * Add Verilog header generator
 * Add SystemVerilog package generator
+* Embed bus interface (AXI-Lite, APB, Avalon-MM) into a register map
+* Add VHDL register map generator
 * Add plenty of examples
 * Rework of documentation
 * Update the tests
