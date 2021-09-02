@@ -566,7 +566,7 @@ end
 //---------------------
 reg [31:0] csr_id_uid_ff;
 
-assign csr_id_rdata[31:0] = 32'hcafe0666;
+assign csr_id_rdata[31:0] = csr_id_uid_ff;
 
 
 always @(posedge clk or negedge rst) begin

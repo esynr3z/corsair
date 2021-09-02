@@ -104,6 +104,7 @@ wire              ren;
     assign wdata        = wdata_int;
     assign wstrb        = strb_int;
     assign wen          = awflag && wflag;
+    assign axil_bresp   = 'd0; // always okay
 
     always @(posedge clk) begin
         if (rst == 1'b1) begin
@@ -142,6 +143,7 @@ wire              ren;
     assign axil_rvalid  = axil_rvalid_int;
     assign raddr        = raddr_int;
     assign ren          = arflag && ~rflag;
+    assign axil_rresp   = 'd0; // always okay
 
     always @(posedge clk) begin
         if (rst == 1'b1) begin
@@ -653,7 +655,7 @@ end
 //---------------------
 reg [31:0] csr_id_uid_ff;
 
-assign csr_id_rdata[31:0] = 32'hcafe0666;
+assign csr_id_rdata[31:0] = csr_id_uid_ff;
 
 
 always @(posedge clk) begin

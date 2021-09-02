@@ -74,6 +74,7 @@ def generate_templates(format):
     # targets
     targets = {}
     targets.update(corsair.generators.Verilog(path="hw/regs.v").make_target('v_module'))
+    targets.update(corsair.generators.Vhdl(path="hw/regs.vhd").make_target('vhdl_module'))
     targets.update(corsair.generators.VerilogHeader(path="hw/regs.vh").make_target('v_header'))
     targets.update(corsair.generators.SystemVerilogPackage(path="hw/regs_pkg.sv").make_target('sv_pkg'))
     targets.update(corsair.generators.Python(path="sw/regs.py").make_target('py'))

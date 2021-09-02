@@ -14,6 +14,12 @@ read_filler = 0
 interface = axil
 generator = Verilog
 
+[vhdl_module]
+path = hw/regs.vhd
+read_filler = 0
+interface = axil
+generator = Vhdl
+
 [v_header]
 path = hw/regs.vh
 prefix = CSR
