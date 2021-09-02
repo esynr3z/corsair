@@ -282,8 +282,6 @@ reg {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_ff(reg, bf) }};
 
         {% if 'wo' in bf.access %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ zeros(bf.width) }};
-        {% elif 'f' in bf.hardware %}
-assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ literal(bf.reset, bf.width) }};
         {% elif 'r' in bf.access and 'q' in bf.hardware %}
 assign {{ sig_csr_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} = {{ port_bf_in(reg, bf) }};
         {% else %}
