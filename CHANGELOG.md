@@ -1,4 +1,4 @@
-## 1.0.0 (unreleased)
+## 1.0.0 (2021-09-03)
 
 **Reworking the entire project almost from scratch. Lots of breaking changes.**
 
