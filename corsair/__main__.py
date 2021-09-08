@@ -70,6 +70,7 @@ def generate_templates(format):
     globcfg['data_width'] = 32
     globcfg['address_width'] = 16
     globcfg['register_reset'] = 'sync_pos'
+    corsair.config.set_globcfg(globcfg)
 
     # targets
     targets = {}
@@ -145,6 +146,7 @@ def app(args):
     else:
         regmap_path = None
         print("Warning: No register map file was specified!")
+    corsair.config.set_globcfg(globcfg)
 
     if regmap_path:
         # check it existance

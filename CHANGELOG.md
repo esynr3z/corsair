@@ -1,3 +1,7 @@
+## 1.0.1 (2021-09-08)
+
+* Fix an issue where the input globconfig file was not being applied to generators
+
 ## 1.0.0 (2021-09-03)
 
 **Reworking the entire project almost from scratch. Lots of breaking changes.**
