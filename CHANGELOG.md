@@ -1,3 +1,7 @@
+## 1.0.2 (2021-09-26)
+
+* Fix overlapping of bitfiled names in rendered images for registers
+
 ## 1.0.1 (2021-09-08)
 
 * Fix an issue where the input globconfig file was not being applied to generators

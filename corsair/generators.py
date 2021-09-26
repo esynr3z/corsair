@@ -104,14 +104,18 @@ class Wavedrom():
         lanes = bits // 16 if bits > 16 else 1
         for reg in rmap:
             reg_wd = {"reg": [],
-                      "options": {"bits": bits, "lanes": lanes}}
+                      "options": {"bits": bits, "lanes": lanes, "fontsize": 10}}
             bit_pos = -1
             for bf in reg:
                 if bit_pos == -1 and bf.lsb > 0:
                     reg_wd["reg"].append({"bits": bf.lsb})
                 elif bf.lsb - bit_pos > 1:
                     reg_wd["reg"].append({"bits": bf.lsb - bit_pos - 1})
-                reg_wd["reg"].append({"name": bf.name, "attr": bf.access, "bits": bf.width})
+                name = bf.name
+                name_max_len = 5 * bf.width
+                if len(bf.name) > name_max_len:  # to prevent labels overlapping
+                    name = bf.name[:name_max_len - 1] + '..'
+                reg_wd["reg"].append({"name": name, "attr": bf.access, "bits": bf.width})
                 bit_pos = bf.msb
             if (bits - 1) > bit_pos:
                 reg_wd["reg"].append({"bits": bits - bit_pos - 1})

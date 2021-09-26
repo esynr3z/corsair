@@ -1,7 +1,7 @@
 import setuptools
 from pkg_resources import parse_version
 
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 
 
 # Based on https://github.com/tulip-control/dd/blob/885a716a56e82bfee54b0178d0ce38298b85eb6a/setup.py#L68
