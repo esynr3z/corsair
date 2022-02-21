@@ -66,7 +66,7 @@ Access modes Description
 ``roc``      Read Only to Clear. The field is cleared after every read.
 ``roll``     Read Only / Latch Low. The field capture hardware active low pulse signal and stuck in 0. The field is set after every read.
 ``rolh``     Read Only / Latch High. The field capture hardware active high pulse signal and stuck in 1. Read the field to clear it.
-``wo``       Write only. Zeros are always read.
+``wo``       Write only. Zeros are always read. Can not be used with ``a`` hardware attribute.
 ``wosc``     Write Only / Self Clear. The field is cleared on the next clock tick after write.
 ============ ================================================================================================================================
 
