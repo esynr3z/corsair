@@ -362,7 +362,7 @@ class CHeader(Generator, Jinja2):
         data_width_allowed = [8, 16, 32, 64]
         assert config.globcfg['data_width'] in [8, 16, 32, 64], \
             "For %s generator, global 'data_width' must be one of '%s', but current is %d" % \
-            (self.name(), data_width_allowed, config.globcfg['data_width'])
+            (self._name(), data_width_allowed, config.globcfg['data_width'])
 
     def generate(self):
         # validate parameters
