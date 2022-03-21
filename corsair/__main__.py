@@ -81,6 +81,7 @@ def generate_templates(format):
     targets.update(corsair.generators.Python(path="sw/regs.py").make_target('py'))
     targets.update(corsair.generators.CHeader(path="sw/regs.h").make_target('c_header'))
     targets.update(corsair.generators.Markdown(path="doc/regs.md", image_dir="md_img").make_target('md_doc'))
+    targets.update(corsair.generators.RST(path="doc/regs.rst", image_dir="rst_img").make_target('rst_doc'))
     targets.update(corsair.generators.Asciidoc(path="doc/regs.adoc", image_dir="adoc_img").make_target('asciidoc_doc'))
 
     # create templates

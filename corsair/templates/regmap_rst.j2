@@ -1,0 +1,142 @@
+{# MACRO #}
+{#- generic range #}
+{% from "regmap_md.j2" import range with context %}
+{#- bit field mode #}
+{% from "regmap_md.j2" import mode with context %}
+{#- value in hex format #}
+{% from "regmap_md.j2" import literal with context %}
+{#- linkify title #}
+{% macro linkify(title) %}
+{{ title | lower | replace('_', '-') }}
+{%- endmacro %}
+{#- title with underline #}
+{% macro make_title(title, symbol) %}
+{{ title }}
+{{ symbol * title | length }}
+{%- endmacro %}
+{#- replace newlines #}
+{% macro rnl(string) %}
+{{ string | replace('\r', '') | replace('\n', ' |br| ') }}
+{%- endmacro %}
+
+{#- TEMPLATE NAMESPACE #}
+{% set tmp = namespace() %}
+
+{#- TEMPLATE #}
+.. |br| raw:: html
+
+   <br/>
+
+{{ make_title(title , '=') }}
+
+Created with `Corsair <https://github.com/esynr3z/corsair>`__ v{{ corsair_ver }}.
+
+{% if print_conventions %}
+{{ make_title("Conventions", '-') }}
+
+.. list-table::
+   :header-rows: 1
+
+   * - Access mode
+     - Description
+   * - rw
+     - Read and Write
+   * - rw1c
+     - Read and Write 1 to Clear
+   * - rw1s
+     - Read and Write 1 to Set
+   * - ro
+     - Read Only
+   * - roc
+     - Read Only to Clear
+   * - roll
+     - Read Only / Latch Low
+   * - rolh
+     - Read Only / Latch High
+   * - wo
+     - Write only
+   * - wosc
+     - Write Only / Self Clear
+{% endif %}
+
+{{ make_title("Register map summary", '-') }}
+
+Base address: {{ "0x%08x" % config['base_address'] }}
+
+.. list-table::
+   :header-rows: 1
+   :widths: auto
+
+   * - Name
+     - Address
+     - Description
+{% for reg in rmap %}
+   * - `{{ reg.name }} <#{{ linkify(reg.name) }}>`__
+     - {{ literal(reg.address, config['address_width']) }}
+     - {{ rnl(reg.description) }}
+{% endfor %}
+{% for reg in rmap %}
+
+
+{{ make_title(reg.name, '-') }}
+
+{{ reg.description }}
+
+Address offset: {{ literal(reg.address, config['address_width']) }}
+
+Reset value: {{ literal(reg.reset, config['data_width']) }}
+
+{% if print_images %}
+.. image:: {{ image_dir }}/{{ reg.name.lower()}}.svg
+   :alt: {{ reg.name.lower()}}
+{% endif %}
+
+.. list-table::
+   :header-rows: 1
+   :widths: auto
+
+   * - Name
+     - Bits
+     - Mode
+     - Reset
+     - Description
+    {% set tmp.reserved_msb = config['data_width'] - 1 %}
+    {% for bf in reg.bitfields[::-1] %}
+        {% if tmp.reserved_msb > bf.msb %}
+            {% set tmp.reserved_lsb = bf.msb + 1 %}
+            {% set tmp.reserved_width = tmp.reserved_msb - tmp.reserved_lsb + 1 %}
+   * - --
+     - {{ range(tmp.reserved_msb, tmp.reserved_lsb) }}
+     - --
+     - {{ literal(0, tmp.reserved_width) }}
+     - Reserved
+        {% endif %}
+   * - {{ bf.name }}
+     - {{ range(bf.msb, bf.lsb) }}
+     - {{ mode(bf) }}
+     - {{ literal(bf.reset, bf.width) }}
+     - {{ rnl(bf.description) }}
+        {% set tmp.reserved_msb = bf.lsb - 1 %}
+    {% endfor %}
+
+    {% for bf in reg %}
+        {% if bf.enums %}
+{{ make_title('Enumerated values for %s.%s' % (reg.name, bf.name), '.') }}
+
+.. list-table::
+   :header-rows: 1
+   :widths: auto
+
+   * - Name
+     - Value
+     - Description
+            {% for enum in bf %}
+   * - {{ enum.name }}
+     - {{ literal(enum.value, bf.width) }}
+     - {{ rnl(enum.description) }}
+            {% endfor %}
+
+        {% endif %}
+    {% endfor %}
+Back to `Register map <#register-map-summary>`__.
+{% endfor %}
