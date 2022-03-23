@@ -62,8 +62,8 @@ typedef struct {
     {% for bf in reg %}
         {% if tmp.lsb != bf.lsb %}
     {{ data_t() }} :{{ bf.lsb }}; // reserved
-            {% set tmp.lsb = bf.lsb %}
         {% endif %}
+        {% set tmp.lsb = bf.lsb + bf.width %}
     {{ data_t() }} {{ bf.name.upper() }} : {{ bf.width }}; // {{ bf.description }}
     {% endfor %}
 } {{ module_prefix()|lower }}{{ reg.name.lower() }}_t;
