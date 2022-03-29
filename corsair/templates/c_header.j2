@@ -2,6 +2,10 @@
 {% macro data_t() %}
 uint{{ config['data_width'] }}_t
 {%- endmacro %}
+{#- replace newlines #}
+{% macro one_line(string) %}
+{{ string | replace('\r', '') | replace('\n', '; ') }}
+{%- endmacro %}
 
 {#- register access #}
 {% macro reg_access(reg) %}
@@ -54,7 +58,7 @@ extern "C" {
 #define {{ module_prefix()|upper }}BASE_ADDR {{ "0x%x" % config['base_address'] }}
 
 {% for reg in rmap %}
-// {{ reg.name }} - {{ reg.description }}
+// {{ reg.name }} - {{ one_line(reg.description) }}
 #define {{ module_prefix()|upper }}{{ reg.name.upper() }}_ADDR {{ "0x%x" % (reg.address) }}
 #define {{ module_prefix()|upper }}{{ reg.name.upper() }}_RESET {{ "0x%x" % (reg.reset) }}
 typedef struct {
@@ -64,7 +68,7 @@ typedef struct {
     {{ data_t() }} : {{ bf.lsb - tmp.lsb }}; // reserved
         {% endif %}
     {% set tmp.lsb = bf.lsb + bf.width %}
-    {{ data_t() }} {{ bf.name.upper() }} : {{ bf.width }}; // {{ bf.description }}
+    {{ data_t() }} {{ bf.name.upper() }} : {{ bf.width }}; // {{ one_line(bf.description) }}
     {% endfor %}
     {% if tmp.lsb < config.data_width - 1 %}
     {{ data_t() }} : {{ config.data_width - tmp.lsb }}; // reserved
@@ -72,7 +76,7 @@ typedef struct {
 } {{ module_prefix()|lower }}{{ reg.name.lower() }}_t;
 
     {% for bf in reg %}
-// {{ reg.name }}.{{ bf.name }} - {{ bf.description }}
+// {{ reg.name }}.{{ bf.name }} - {{ one_line(bf.description) }}
 #define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_WIDTH {{ bf.width }}
 #define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_LSB {{ bf.lsb }}
 #define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_MASK {{ "0x%x" % (reg.address) }}
@@ -80,7 +84,7 @@ typedef struct {
         {% if bf.enums %}
 typedef enum {
             {% for enum in bf %}
-    {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_{{ enum.name.upper() }} = {{ "0x%x" % (enum.value) }}, //{{ enum.description }}
+    {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_{{ enum.name.upper() }} = {{ "0x%x" % (enum.value) }}, // {{ one_line(enum.description) }}
             {% endfor %}
 } {{ module_prefix()|lower }}{{ reg.name.lower() }}_{{ bf.name.lower() }}_t;
         {% endif %}
@@ -100,7 +104,7 @@ typedef struct {
     {% endif %}
     {% set tmp.addr_next = reg.address + tmp.bytes_in_word %}
     union {
-        {{ reg_access(reg) }} {{ data_t() }} {{ reg.name.upper() }}; // {{ reg.description }}
+        {{ reg_access(reg) }} {{ data_t() }} {{ reg.name.upper() }}; // {{ one_line(reg.description) }}
         {{ reg_access(reg) }} {{ module_prefix()|lower }}{{ reg.name.lower() }}_t {{ reg.name.upper() }}_bf; // Bit access for {{ reg.name.upper() }} register
     };
 {% endfor %}
