@@ -441,10 +441,10 @@ end
             {% if tmp.fifo_cnt == 0 %}
 reg rvalid_drv;
 always @(*) begin
-    if ({{ sig_csr_ren(reg) }})
+    if ({{ sig_csr_ren_ff(reg) }})
         rvalid_drv = {{ sig_bf_rvalid_ff(reg, bf) }};
             {% else %}
-    else if ({{ sig_csr_ren(reg) }})
+    else if ({{ sig_csr_ren_ff(reg) }})
         rvalid_drv = {{ sig_bf_rvalid_ff(reg, bf) }};
             {% endif %}
             {% set tmp.fifo_cnt = tmp.fifo_cnt + 1 %}
