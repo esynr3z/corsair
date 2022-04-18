@@ -124,6 +124,15 @@ initial begin : main
     if (data != 'hc0debabe)
         errors++;
 
+    // test read with 0 latency
+    addr = 'h014;
+    fork
+        mst.read(addr, data);
+        handle_read(addr, 0);
+    join
+    if (data != 'hc0debabe)
+        errors++;
+
     // test read with wait states
     addr = 'h008;
     fork
