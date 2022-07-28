@@ -2,5 +2,5 @@ sphinx
 sphinx_rtd_theme
 m2r2
 sphinxcontrib-wavedrom
-pyyaml
+pyyaml>=5.1
 jinja2
