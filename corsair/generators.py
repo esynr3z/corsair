@@ -241,13 +241,16 @@ class Verilog(Generator, Jinja2):
     :type read_filler: int
     :param interface: Register map bus protocol. Use one of: `axil`, `apb`, `amm`, `lb`
     :type interface: str
+    :param template_path: A path to the template to use instead of the default template.
+    :type interface: str
     """
 
-    def __init__(self, rmap=None, path='regs.v', read_filler=0, interface='axil', **args):
+    def __init__(self, rmap=None, path='regs.v', read_filler=0, interface='axil', template_path='', **args):
         super().__init__(rmap, **args)
         self.path = path
         self.read_filler = read_filler
         self.interface = interface
+        self.template_path = template_path
 
     def validate(self):
         super().validate()
@@ -258,7 +261,11 @@ class Verilog(Generator, Jinja2):
         # validate parameters
         self.validate()
         # prepare jinja2
-        j2_template = 'regmap_verilog.j2'
+        default_template = os.path.join(
+            Path(__file__).parent, 'templates', 'regmap_verilog.j2'
+        )
+        template_path = self.template_path if self.template_path != '' else default_template
+        j2_template = Path(template_path).name
         j2_vars = {}
         j2_vars['corsair_ver'] = __version__
         j2_vars['rmap'] = self.rmap
@@ -267,7 +274,7 @@ class Verilog(Generator, Jinja2):
         j2_vars['interface'] = self.interface
         j2_vars['config'] = config.globcfg
         # render
-        self.render_to_file(j2_template, j2_vars, self.path)
+        self.render_to_file(j2_template, j2_vars, self.path, Path(template_path).parent)
 
 
 class Vhdl(Generator, Jinja2):
@@ -281,13 +288,16 @@ class Vhdl(Generator, Jinja2):
     :type read_filler: int
     :param interface: Register map bus protocol. Use one of: `axil`, `apb`, `amm`, `lb`
     :type interface: str
+    :param template_path: A path to the template to use instead of the default template.
+    :type interface: str
     """
 
-    def __init__(self, rmap=None, path='regs.vhd', read_filler=0, interface='axil', **args):
+    def __init__(self, rmap=None, path='regs.vhd', read_filler=0, interface='axil', template_path='', **args):
         super().__init__(rmap, **args)
         self.path = path
         self.read_filler = read_filler
         self.interface = interface
+        self.template_path = template_path
 
     def validate(self):
         super().validate()
@@ -298,7 +308,11 @@ class Vhdl(Generator, Jinja2):
         # validate parameters
         self.validate()
         # prepare jinja2
-        j2_template = 'regmap_vhdl.j2'
+        default_template = os.path.join(
+            Path(__file__).parent, 'templates', 'regmap_vhdl.j2'
+        )
+        template_path = self.template_path if self.template_path != '' else default_template
+        j2_template = Path(template_path).name
         j2_vars = {}
         j2_vars['corsair_ver'] = __version__
         j2_vars['rmap'] = self.rmap
@@ -307,7 +321,7 @@ class Vhdl(Generator, Jinja2):
         j2_vars['interface'] = self.interface
         j2_vars['config'] = config.globcfg
         # render
-        self.render_to_file(j2_template, j2_vars, self.path)
+        self.render_to_file(j2_template, j2_vars, self.path, Path(template_path).parent)
 
 
 class VerilogHeader(Generator, Jinja2):
@@ -319,18 +333,25 @@ class VerilogHeader(Generator, Jinja2):
     :type path: str
     :param prefix: Prefix for the all defines. If empty output file name will be used.
     :type prefix: str
+    :param template_path: A path to the template to use instead of the default template.
+    :type interface: str
     """
 
-    def __init__(self, rmap=None, path='regs.vh', prefix="CSR", **args):
+    def __init__(self, rmap=None, path='regs.vh', prefix="CSR", template_path='', **args):
         super().__init__(rmap, **args)
         self.path = path
         self.prefix = prefix
+        self.template_path = template_path
 
     def generate(self):
         # validate parameters
         self.validate()
         # prepare jinja2
-        j2_template = 'verilog_header.j2'
+        default_template = os.path.join(
+            Path(__file__).parent, 'templates', 'verilog_header.j2'
+        )
+        template_path = self.template_path if self.template_path != '' else default_template
+        j2_template = Path(template_path).name
         j2_vars = {}
         j2_vars['corsair_ver'] = __version__
         j2_vars['rmap'] = self.rmap
@@ -338,7 +359,7 @@ class VerilogHeader(Generator, Jinja2):
         j2_vars['file_name'] = utils.get_file_name(self.path)
         j2_vars['config'] = config.globcfg
         # render
-        self.render_to_file(j2_template, j2_vars, self.path)
+        self.render_to_file(j2_template, j2_vars, self.path, Path(template_path).parent)
 
 
 class CHeader(Generator, Jinja2):
@@ -350,12 +371,15 @@ class CHeader(Generator, Jinja2):
     :type path: str
     :param prefix: Prefix for the all defines and types. If empty output file name will be used.
     :type prefix: str
+    :param template_path: A path to the template to use instead of the default template.
+    :type interface: str
     """
 
-    def __init__(self, rmap=None, path='regs.h', prefix="CSR", **args):
+    def __init__(self, rmap=None, path='regs.h', prefix="CSR", template_path='', **args):
         super().__init__(rmap, **args)
         self.path = path
         self.prefix = prefix
+        self.template_path = template_path
 
     def validate(self):
         super().validate()
@@ -368,7 +392,11 @@ class CHeader(Generator, Jinja2):
         # validate parameters
         self.validate()
         # prepare jinja2
-        j2_template = 'c_header.j2'
+        default_template = os.path.join(
+            Path(__file__).parent, 'templates', 'c_header.j2'
+        )
+        template_path = self.template_path if self.template_path != '' else default_template
+        j2_template = Path(template_path).name
         j2_vars = {}
         j2_vars['corsair_ver'] = __version__
         j2_vars['rmap'] = self.rmap
@@ -376,7 +404,7 @@ class CHeader(Generator, Jinja2):
         j2_vars['file_name'] = utils.get_file_name(self.path)
         j2_vars['config'] = config.globcfg
         # render
-        self.render_to_file(j2_template, j2_vars, self.path)
+        self.render_to_file(j2_template, j2_vars, self.path, Path(template_path).parent)
 
 
 class SystemVerilogPackage(Generator, Jinja2):
@@ -388,18 +416,25 @@ class SystemVerilogPackage(Generator, Jinja2):
     :type path: str
     :param prefix: Prefix for the all parameters and types. If empty output file name will be used.
     :type prefix: str
+    :param template_path: A path to the template to use instead of the default template.
+    :type interface: str
     """
 
-    def __init__(self, rmap=None, path='regs_pkg.sv', prefix="CSR", **args):
+    def __init__(self, rmap=None, path='regs_pkg.sv', prefix="CSR", template_path='', **args):
         super().__init__(rmap, **args)
         self.path = path
         self.prefix = prefix
+        self.template_path = template_path
 
     def generate(self):
         # validate parameters
         self.validate()
         # prepare jinja2
-        j2_template = 'sv_package.j2'
+        default_template = os.path.join(
+            Path(__file__).parent, 'templates', 'sv_package.j2'
+        )
+        template_path = self.template_path if self.template_path != '' else default_template
+        j2_template = Path(template_path).name
         j2_vars = {}
         j2_vars['corsair_ver'] = __version__
         j2_vars['rmap'] = self.rmap
@@ -407,7 +442,7 @@ class SystemVerilogPackage(Generator, Jinja2):
         j2_vars['file_name'] = utils.get_file_name(self.path)
         j2_vars['config'] = config.globcfg
         # render
-        self.render_to_file(j2_template, j2_vars, self.path)
+        self.render_to_file(j2_template, j2_vars, self.path, Path(template_path).parent)
 
 
 class LbBridgeVerilog(Generator, Jinja2):
@@ -419,12 +454,15 @@ class LbBridgeVerilog(Generator, Jinja2):
     :type path: str
     :param bridge_type: Bridge protocol. Use one of `axil`, `apb`, `amm`.
     :type bridge_type: str
+    :param template_path: A path to the template to use instead of the default template.
+    :type interface: str
     """
 
-    def __init__(self, rmap=None, path='axil2lb.v', bridge_type='axil', **args):
+    def __init__(self, rmap=None, path='axil2lb.v', bridge_type='axil', template_path='', **args):
         super().__init__(rmap, **args)
         self.path = path
         self.bridge_type = bridge_type
+        self.template_path = template_path
 
     def validate(self):
         assert self.bridge_type in ['axil', 'apb', 'amm'], \
@@ -434,18 +472,22 @@ class LbBridgeVerilog(Generator, Jinja2):
         # validate parameters
         self.validate()
         # prepare jinja2
-        if self.bridge_type == 'axil':
-            j2_template = 'axil2lb_verilog.j2'
-        elif self.bridge_type == 'apb':
-            j2_template = 'apb2lb_verilog.j2'
-        elif self.bridge_type == 'amm':
-            j2_template = 'amm2lb_verilog.j2'
+        default_templates = {
+            'axil' : 'axil2lb_verilog.j2',
+            'apb' : 'apb2lb_verilog.j2',
+            'amm' : 'amm2lb_verilog.j2'
+        }
+        default_template = os.path.join(
+            Path(__file__).parent, 'templates', default_templates[self.bridge_type]
+        )
+        template_path = self.template_path if self.template_path != '' else default_template
+        j2_template = Path(template_path).name
         j2_vars = {}
         j2_vars['corsair_ver'] = __version__
         j2_vars['module_name'] = utils.get_file_name(self.path)
         j2_vars['config'] = config.globcfg
         # render
-        self.render_to_file(j2_template, j2_vars, self.path)
+        self.render_to_file(j2_template, j2_vars, self.path, Path(template_path).parent)
 
 
 class LbBridgeVhdl(Generator, Jinja2):
@@ -457,12 +499,15 @@ class LbBridgeVhdl(Generator, Jinja2):
     :type path: str
     :param bridge_type: Bridge protocol. Use one of `axil`, `apb`, `amm`.
     :type bridge_type: str
+    :param template_path: A path to the template to use instead of the default template.
+    :type interface: str
     """
 
-    def __init__(self, rmap=None, path='axil2lb.v', bridge_type='axil', **args):
+    def __init__(self, rmap=None, path='axil2lb.v', bridge_type='axil', template_path='', **args):
         super().__init__(rmap, **args)
         self.path = path
         self.bridge_type = bridge_type
+        self.template_path = template_path
 
     def validate(self):
         assert self.bridge_type in ['axil', 'apb', 'amm'], \
@@ -472,18 +517,22 @@ class LbBridgeVhdl(Generator, Jinja2):
         # validate parameters
         self.validate()
         # prepare jinja2
-        if self.bridge_type == 'axil':
-            j2_template = 'axil2lb_vhdl.j2'
-        elif self.bridge_type == 'apb':
-            j2_template = 'apb2lb_vhdl.j2'
-        elif self.bridge_type == 'amm':
-            j2_template = 'amm2lb_vhdl.j2'
+        default_templates = {
+            'axil' : 'axil2lb_vhdl.j2',
+            'apb' : 'apb2lb_vhdl.j2',
+            'amm' : 'amm2lb_vhdl.j2'
+        }
+        default_template = os.path.join(
+            Path(__file__).parent, 'templates', default_templates[self.bridge_type]
+        )
+        template_path = self.template_path if self.template_path != '' else default_template
+        j2_template = Path(template_path).name
         j2_vars = {}
         j2_vars['corsair_ver'] = __version__
         j2_vars['module_name'] = utils.get_file_name(self.path)
         j2_vars['config'] = config.globcfg
         # render
-        self.render_to_file(j2_template, j2_vars, self.path)
+        self.render_to_file(j2_template, j2_vars, self.path, Path(template_path).parent)
 
 
 class Markdown(Generator, Jinja2, Wavedrom):
@@ -501,23 +550,30 @@ class Markdown(Generator, Jinja2, Wavedrom):
     :type image_dir: str
     :param print_conventions: Enable generating table with register access modes explained
     :type print_conventions: bool
+    :param template_path: A path to the template to use instead of the default template.
+    :type interface: str
     """
 
     def __init__(self, rmap=None, path='regs.md', title='Register map',
-                 print_images=True, image_dir="regs_img", print_conventions=True, **args):
+                 print_images=True, image_dir="regs_img", print_conventions=True, template_path='', **args):
         super().__init__(rmap, **args)
         self.path = path
         self.title = title
         self.print_images = print_images
         self.image_dir = image_dir
         self.print_conventions = print_conventions
+        self.template_path = template_path
 
     def generate(self):
         filename = utils.get_file_name(self.path)
         # validate parameters
         self.validate()
         # prepare jinja2
-        j2_template = 'regmap_md.j2'
+        default_template = os.path.join(
+            Path(__file__).parent, 'templates', 'regmap_md.j2'
+        )
+        template_path = self.template_path if self.template_path != '' else default_template
+        j2_template = Path(template_path).name
         j2_vars = {}
         j2_vars['corsair_ver'] = __version__
         j2_vars['rmap'] = self.rmap
@@ -528,7 +584,7 @@ class Markdown(Generator, Jinja2, Wavedrom):
         j2_vars['title'] = self.title
         j2_vars['config'] = config.globcfg
         # render
-        self.render_to_file(j2_template, j2_vars, self.path)
+        self.render_to_file(j2_template, j2_vars, self.path, Path(template_path).parent)
         # draw register images
         if self.print_images:
             self.draw_regs(Path(self.path).parent / self.image_dir, self.rmap)
@@ -549,23 +605,30 @@ class Asciidoc(Generator, Jinja2, Wavedrom):
     :type image_dir: str
     :param print_conventions: Enable generating table with register access modes explained
     :type print_conventions: bool
+    :param template_path: A path to the template to use instead of the default template.
+    :type interface: str
     """
 
     def __init__(self, rmap=None, path='regs.adoc', title='Register map',
-                 print_images=True, image_dir="regs_img", print_conventions=True, **args):
+                 print_images=True, image_dir="regs_img", print_conventions=True, template_path='', **args):
         super().__init__(rmap, **args)
         self.path = path
         self.title = title
         self.print_images = print_images
         self.image_dir = image_dir
         self.print_conventions = print_conventions
+        self.template_path = template_path
 
     def generate(self):
         filename = utils.get_file_name(self.path)
         # validate parameters
         self.validate()
         # prepare jinja2
-        j2_template = 'regmap_asciidoc.j2'
+        default_template = os.path.join(
+            Path(__file__).parent, 'templates', 'regmap_asciidoc.j2'
+        )
+        template_path = self.template_path if self.template_path != '' else default_template
+        j2_template = Path(template_path).name
         j2_vars = {}
         j2_vars['corsair_ver'] = __version__
         j2_vars['rmap'] = self.rmap
@@ -576,7 +639,7 @@ class Asciidoc(Generator, Jinja2, Wavedrom):
         j2_vars['title'] = self.title
         j2_vars['config'] = config.globcfg
         # render
-        self.render_to_file(j2_template, j2_vars, self.path)
+        self.render_to_file(j2_template, j2_vars, self.path, Path(template_path).parent)
         # draw register images
         if self.print_images:
             self.draw_regs(Path(self.path).parent / self.image_dir, self.rmap)
@@ -589,20 +652,27 @@ class Python(Generator, Jinja2):
     :type rmap: :class:`corsair.RegisterMap`
     :param path: Path to the output file
     :type path: str
+    :param template_path: A path to the template to use instead of the default template.
+    :type interface: str
     """
 
-    def __init__(self, rmap=None, path='regs.py', **args):
+    def __init__(self, rmap=None, path='regs.py', template_path='', **args):
         super().__init__(rmap, **args)
         self.path = path
+        self.template_path = template_path
 
     def generate(self):
         # validate parameters
         self.validate()
         # prepare jinja2
-        j2_template = 'regmap_py.j2'
+        default_template = os.path.join(
+            Path(__file__).parent, 'templates', 'regmap_py.j2'
+        )
+        template_path = self.template_path if self.template_path != '' else default_template
+        j2_template = Path(template_path).name
         j2_vars = {}
         j2_vars['corsair_ver'] = __version__
         j2_vars['rmap'] = self.rmap
         j2_vars['config'] = config.globcfg
         # render
-        self.render_to_file(j2_template, j2_vars, self.path)
+        self.render_to_file(j2_template, j2_vars, self.path, Path(template_path).parent)
