@@ -198,7 +198,7 @@ if [file exist wave.do] {{
                 sources += 'sv %s %s\n' % (self.worklib, src)
             elif ext == '.v':
                 sources += 'verilog %s %s\n' % (self.worklib, src)
-            elif ext == 'vhd':
+            elif ext == '.vhd':
                 sources += 'vhdl %s %s\n' % (self.worklib, src)
         with path_join(self.cwd, 'files.prj').open(mode='w', encoding="utf-8") as f:
             f.write(sources)
