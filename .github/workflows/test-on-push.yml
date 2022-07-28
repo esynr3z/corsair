@@ -27,4 +27,4 @@ jobs:
         echo "$HOME/ModelSim-20.1.0/modelsim_ase/bin" >> $GITHUB_PATH
     - name: Test package
       run: |
-        pytest -v -n auto
+        pytest -v -n auto --ignore tests/hdl
