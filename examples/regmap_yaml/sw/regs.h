@@ -6,10 +6,12 @@
 #define __O  volatile       // 'write only' permissions
 #define __IO volatile       // 'read / write' permissions
 
-#include "stdint.h"
 
 #ifdef __cplusplus
+#include <cstdint>
 extern "C" {
+#else
+#include <stdint.h>
 #endif
 
 #define CSR_BASE_ADDR 0x0
@@ -19,10 +21,10 @@ extern "C" {
 #define CSR_DATA_RESET 0x0
 typedef struct {
     uint32_t FIFO : 8; // Write to push value to TX FIFO, read to get data from RX FIFO
-    uint32_t :16; // reserved
+    uint32_t : 8; // reserved
     uint32_t FERR : 1; // Frame error flag. Read to clear.
-    uint32_t :17; // reserved
     uint32_t PERR : 1; // Parity error flag. Read to clear.
+    uint32_t : 14; // reserved
 } csr_data_t;
 
 // DATA.FIFO - Write to push value to TX FIFO, read to get data from RX FIFO
@@ -47,12 +49,13 @@ typedef struct {
 #define CSR_STAT_ADDR 0xc
 #define CSR_STAT_RESET 0x0
 typedef struct {
-    uint32_t :2; // reserved
+    uint32_t : 2; // reserved
     uint32_t BUSY : 1; // Transciever is busy
-    uint32_t :4; // reserved
+    uint32_t : 1; // reserved
     uint32_t RXE : 1; // RX FIFO is empty
-    uint32_t :8; // reserved
+    uint32_t : 3; // reserved
     uint32_t TXF : 1; // TX FIFO is full
+    uint32_t : 23; // reserved
 } csr_stat_t;
 
 // STAT.BUSY - Transciever is busy
@@ -78,12 +81,11 @@ typedef struct {
 #define CSR_CTRL_RESET 0x0
 typedef struct {
     uint32_t BAUD : 2; // Baudrate value
-    uint32_t :4; // reserved
+    uint32_t : 2; // reserved
     uint32_t TXEN : 1; // Transmitter enable. Can be disabled by hardware on error.
-    uint32_t :5; // reserved
     uint32_t RXEN : 1; // Receiver enable. Can be disabled by hardware on error.
-    uint32_t :6; // reserved
     uint32_t TXST : 1; // Force transmission start
+    uint32_t : 25; // reserved
 } csr_ctrl_t;
 
 // CTRL.BAUD - Baudrate value
@@ -120,7 +122,7 @@ typedef enum {
 #define CSR_LPMODE_RESET 0x0
 typedef struct {
     uint32_t DIV : 8; // Clock divider in low power mode
-    uint32_t :31; // reserved
+    uint32_t : 23; // reserved
     uint32_t EN : 1; // Low power mode enable
 } csr_lpmode_t;
 
@@ -141,8 +143,8 @@ typedef struct {
 #define CSR_INTSTAT_RESET 0x0
 typedef struct {
     uint32_t TX : 1; // Transmitter interrupt flag. Write 1 to clear.
-    uint32_t :1; // reserved
     uint32_t RX : 1; // Receiver interrupt. Write 1 to clear.
+    uint32_t : 30; // reserved
 } csr_intstat_t;
 
 // INTSTAT.TX - Transmitter interrupt flag. Write 1 to clear.

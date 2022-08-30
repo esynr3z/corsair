@@ -6,10 +6,12 @@
 #define __O  volatile       // 'write only' permissions
 #define __IO volatile       // 'read / write' permissions
 
-#include "stdint.h"
 
 #ifdef __cplusplus
+#include <cstdint>
 extern "C" {
+#else
+#include <stdint.h>
 #endif
 
 #define CSR_BASE_ADDR 0x0
@@ -32,6 +34,7 @@ typedef struct {
 #define CSR_CTRL_RESET 0x100
 typedef struct {
     uint32_t VAL : 16; // Value of the register
+    uint32_t : 16; // reserved
 } csr_ctrl_t;
 
 // CTRL.val - Value of the register
@@ -45,6 +48,7 @@ typedef struct {
 #define CSR_STATUS_RESET 0x0
 typedef struct {
     uint32_t VAL : 8; // Value of the register
+    uint32_t : 24; // reserved
 } csr_status_t;
 
 // STATUS.val - Value of the register
@@ -58,6 +62,7 @@ typedef struct {
 #define CSR_START_RESET 0x0
 typedef struct {
     uint32_t VAL : 1; // Value of the register
+    uint32_t : 31; // reserved
 } csr_start_t;
 
 // START.val - Value of the register
