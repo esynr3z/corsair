@@ -45,10 +45,12 @@ __IO
 #define __O  volatile       // 'write only' permissions
 #define __IO volatile       // 'read / write' permissions
 
-#include "stdint.h"
 
 #ifdef __cplusplus
+#include <cstdint>
 extern "C" {
+#else
+#include <stdint.h>
 #endif
 
 #define {{ module_prefix()|upper }}BASE_ADDR {{ "0x%x" % config['base_address'] }}
