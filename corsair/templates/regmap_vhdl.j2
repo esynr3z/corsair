@@ -229,8 +229,12 @@ port(
     {% for bf in reg %}
     -- {{ reg.name }}.{{ bf.name }}
         {% if 'a' in bf.hardware %}
+            {% if 'i' in bf.hardware %}
     {{ port_bf_raccess(reg, bf) }} : out {{range_decl(0, False)}};
+            {% endif %}
+            {% if 'o' in bf.hardware %}
     {{ port_bf_waccess(reg, bf) }} : out {{range_decl(0, False)}};
+            {% endif %}
         {% endif %}
         {% if 'l' in bf.hardware %}
     {{ port_bf_lock(reg, bf) }} : in {{range_decl(0, False)}};
@@ -374,8 +378,12 @@ begin
 -- access: {{ bf.access }}, hardware: {{ bf.hardware }}
 -----------------------
         {% if 'a' in bf.hardware %}
+            {% if 'o' in bf.hardware %}
 {{ port_bf_waccess(reg, bf) }} <= wready and {{ sig_csr_wen(reg) }};
+            {% endif %}
+            {% if 'i' in bf.hardware %}
 {{ port_bf_raccess(reg, bf) }} <= rvalid and {{ sig_csr_ren(reg) }};
+            {% endif %}
         {% endif %}
 
         {% if 'wo' in bf.access %}
