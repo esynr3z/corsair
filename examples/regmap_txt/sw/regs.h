@@ -26,7 +26,7 @@ typedef struct {
 // DATA.val - Value of the register
 #define CSR_DATA_VAL_WIDTH 32
 #define CSR_DATA_VAL_LSB 0
-#define CSR_DATA_VAL_MASK 0x0
+#define CSR_DATA_VAL_MASK 0xffffffff
 #define CSR_DATA_VAL_RESET 0x0
 
 // CTRL - Control register
@@ -40,7 +40,7 @@ typedef struct {
 // CTRL.val - Value of the register
 #define CSR_CTRL_VAL_WIDTH 16
 #define CSR_CTRL_VAL_LSB 0
-#define CSR_CTRL_VAL_MASK 0x4
+#define CSR_CTRL_VAL_MASK 0xffff
 #define CSR_CTRL_VAL_RESET 0x100
 
 // STATUS - Status register
@@ -54,7 +54,7 @@ typedef struct {
 // STATUS.val - Value of the register
 #define CSR_STATUS_VAL_WIDTH 8
 #define CSR_STATUS_VAL_LSB 0
-#define CSR_STATUS_VAL_MASK 0x8
+#define CSR_STATUS_VAL_MASK 0xff
 #define CSR_STATUS_VAL_RESET 0x0
 
 // START - Start register
@@ -68,7 +68,7 @@ typedef struct {
 // START.val - Value of the register
 #define CSR_START_VAL_WIDTH 1
 #define CSR_START_VAL_LSB 0
-#define CSR_START_VAL_MASK 0x100
+#define CSR_START_VAL_MASK 0x1
 #define CSR_START_VAL_RESET 0x0
 
 
