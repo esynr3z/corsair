@@ -30,19 +30,19 @@ typedef struct {
 // DATA.FIFO - Write to push value to TX FIFO, read to get data from RX FIFO
 #define CSR_DATA_FIFO_WIDTH 8
 #define CSR_DATA_FIFO_LSB 0
-#define CSR_DATA_FIFO_MASK 0x4
+#define CSR_DATA_FIFO_MASK 0xff
 #define CSR_DATA_FIFO_RESET 0x0
 
 // DATA.FERR - Frame error flag. Read to clear.
 #define CSR_DATA_FERR_WIDTH 1
 #define CSR_DATA_FERR_LSB 16
-#define CSR_DATA_FERR_MASK 0x4
+#define CSR_DATA_FERR_MASK 0x10000
 #define CSR_DATA_FERR_RESET 0x0
 
 // DATA.PERR - Parity error flag. Read to clear.
 #define CSR_DATA_PERR_WIDTH 1
 #define CSR_DATA_PERR_LSB 17
-#define CSR_DATA_PERR_MASK 0x4
+#define CSR_DATA_PERR_MASK 0x20000
 #define CSR_DATA_PERR_RESET 0x0
 
 // STAT - Status register
@@ -61,19 +61,19 @@ typedef struct {
 // STAT.BUSY - Transciever is busy
 #define CSR_STAT_BUSY_WIDTH 1
 #define CSR_STAT_BUSY_LSB 2
-#define CSR_STAT_BUSY_MASK 0xc
+#define CSR_STAT_BUSY_MASK 0x4
 #define CSR_STAT_BUSY_RESET 0x0
 
 // STAT.RXE - RX FIFO is empty
 #define CSR_STAT_RXE_WIDTH 1
 #define CSR_STAT_RXE_LSB 4
-#define CSR_STAT_RXE_MASK 0xc
+#define CSR_STAT_RXE_MASK 0x10
 #define CSR_STAT_RXE_RESET 0x0
 
 // STAT.TXF - TX FIFO is full
 #define CSR_STAT_TXF_WIDTH 1
 #define CSR_STAT_TXF_LSB 8
-#define CSR_STAT_TXF_MASK 0xc
+#define CSR_STAT_TXF_MASK 0x100
 #define CSR_STAT_TXF_RESET 0x0
 
 // CTRL - Control register
@@ -91,7 +91,7 @@ typedef struct {
 // CTRL.BAUD - Baudrate value
 #define CSR_CTRL_BAUD_WIDTH 2
 #define CSR_CTRL_BAUD_LSB 0
-#define CSR_CTRL_BAUD_MASK 0x10
+#define CSR_CTRL_BAUD_MASK 0x3
 #define CSR_CTRL_BAUD_RESET 0x0
 typedef enum {
     CSR_CTRL_BAUD_B9600 = 0x0, //9600 baud
@@ -108,13 +108,13 @@ typedef enum {
 // CTRL.RXEN - Receiver enable. Can be disabled by hardware on error.
 #define CSR_CTRL_RXEN_WIDTH 1
 #define CSR_CTRL_RXEN_LSB 5
-#define CSR_CTRL_RXEN_MASK 0x10
+#define CSR_CTRL_RXEN_MASK 0x20
 #define CSR_CTRL_RXEN_RESET 0x0
 
 // CTRL.TXST - Force transmission start
 #define CSR_CTRL_TXST_WIDTH 1
 #define CSR_CTRL_TXST_LSB 6
-#define CSR_CTRL_TXST_MASK 0x10
+#define CSR_CTRL_TXST_MASK 0x40
 #define CSR_CTRL_TXST_RESET 0x0
 
 // LPMODE - Low power mode control
@@ -129,13 +129,13 @@ typedef struct {
 // LPMODE.DIV - Clock divider in low power mode
 #define CSR_LPMODE_DIV_WIDTH 8
 #define CSR_LPMODE_DIV_LSB 0
-#define CSR_LPMODE_DIV_MASK 0x14
+#define CSR_LPMODE_DIV_MASK 0xff
 #define CSR_LPMODE_DIV_RESET 0x0
 
 // LPMODE.EN - Low power mode enable
 #define CSR_LPMODE_EN_WIDTH 1
 #define CSR_LPMODE_EN_LSB 31
-#define CSR_LPMODE_EN_MASK 0x14
+#define CSR_LPMODE_EN_MASK 0x80000000
 #define CSR_LPMODE_EN_RESET 0x0
 
 // INTSTAT - Interrupt status register
@@ -150,13 +150,13 @@ typedef struct {
 // INTSTAT.TX - Transmitter interrupt flag. Write 1 to clear.
 #define CSR_INTSTAT_TX_WIDTH 1
 #define CSR_INTSTAT_TX_LSB 0
-#define CSR_INTSTAT_TX_MASK 0x20
+#define CSR_INTSTAT_TX_MASK 0x1
 #define CSR_INTSTAT_TX_RESET 0x0
 
 // INTSTAT.RX - Receiver interrupt. Write 1 to clear.
 #define CSR_INTSTAT_RX_WIDTH 1
 #define CSR_INTSTAT_RX_LSB 1
-#define CSR_INTSTAT_RX_MASK 0x20
+#define CSR_INTSTAT_RX_MASK 0x2
 #define CSR_INTSTAT_RX_RESET 0x0
 
 // ID - IP-core ID register
@@ -169,7 +169,7 @@ typedef struct {
 // ID.UID - Unique ID
 #define CSR_ID_UID_WIDTH 32
 #define CSR_ID_UID_LSB 0
-#define CSR_ID_UID_MASK 0x40
+#define CSR_ID_UID_MASK 0xffffffff
 #define CSR_ID_UID_RESET 0xcafe0666
 
 

@@ -77,7 +77,7 @@ typedef struct {
 // {{ reg.name }}.{{ bf.name }} - {{ bf.description }}
 #define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_WIDTH {{ bf.width }}
 #define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_LSB {{ bf.lsb }}
-#define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_MASK {{ "0x%x" % (reg.address) }}
+#define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_MASK {{ "0x%x" % (bf.mask) }}
 #define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_RESET {{ "0x%x" % (bf.reset) }}
         {% if bf.enums %}
 typedef enum {
