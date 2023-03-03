@@ -22,12 +22,18 @@ std_logic
 {%- endmacro %}
 
 {#- literal #}
-{% macro literal(val, width=1) %}
+{% macro literal(val, width=1, width_is_param=0) %}
     {% if width == 1 %}
 '{{ val }}'
+    {%- elif width_is_param == 1 %}
+std_logic_vector(to_unsigned({{ val }}, {{ width }}))
     {%- else %}
 "{{ ('{:0%db}' % width).format(val) }}"
     {%- endif %}
+{%- endmacro %}
+
+{% macro hex_literal(val, width) %}
+x"{{ ('{:0%dx}' % (width//4)).format(val) }}"
 {%- endmacro %}
 
 {#- comment with literal in hex #}
@@ -57,29 +63,29 @@ std_logic
 {%- endmacro %}
 
 {#- 'process' header with reset logic #}
-{% macro process_begin(sig='test', width=1, init=0) %}
+{% macro process_begin(sig='test', width=1, init=0, width_is_param=0) %}
     {% set rst_type = config['register_reset']%}
     {% if rst_type == 'sync_pos' %}
 process (clk) begin
 if rising_edge(clk) then
 if (rst = '1') then
-    {{ sig }} <= {{ literal(init, width) }}; {{ literal_comment(init) }}
+    {{ sig }} <= {{ literal(init, width, width_is_param) }}; {{ literal_comment(init) }}
 else
     {%- elif rst_type == 'sync_neg' %}
 process (clk) begin
 if rising_edge(clk) then
 if (rst = '0') then
-    {{ sig }} <= {{ literal(init, width) }}; {{ literal_comment(init) }}
+    {{ sig }} <= {{ literal(init, width, width_is_param) }}; {{ literal_comment(init) }}
 else
     {%- elif rst_type == 'async_pos' %}
 process (clk, rst) begin
 if (rst = '1') then
-    {{ sig }} <= {{ literal(init, width) }}; {{ literal_comment(init) }}
+    {{ sig }} <= {{ literal(init, width, width_is_param) }}; {{ literal_comment(init) }}
 elsif rising_edge(clk) then
     {%- elif rst_type == 'async_neg' %}
 process (clk, rst) begin
 if (rst = '0') then
-    {{ sig }} <= {{ literal(init, width) }}; {{ literal_comment(init) }}
+    {{ sig }} <= {{ literal(init, width, width_is_param) }}; {{ literal_comment(init) }}
 elsif rising_edge(clk) then
     {%- endif %}
 {%- endmacro %}
@@ -289,7 +295,7 @@ port(
 end entity;
 
 architecture rtl of {{ module_name }} is
-subtype ADDR_T is {{ range_decl(config['address_width'] - 1) }};
+signal wide_raddr : {{ range_decl(63) }}; -- 64 is the max address width
 
 {% if interface == 'apb' %}
 {{ apb_signals(regmap_embed=True) }}
@@ -362,11 +368,11 @@ begin
     {% endif %}
 
     {% if 'w' in reg.access %}
-{{ sig_csr_wen(reg) }} <= wen when (waddr = {{ literal(reg.address, config['address_width']) }}) else '0'; {{ literal_comment(reg.address) }}
+{{ sig_csr_wen(reg) }} <= wen when (waddr = {{ literal(reg.address, "ADDR_W", width_is_param=1) }}) else '0'; {{ literal_comment(reg.address) }}
     {% endif %}
 
     {% if 'r' in reg.access %}
-{{ sig_csr_ren(reg) }} <= ren when (raddr = {{ literal(reg.address, config['address_width']) }}) else '0'; {{ literal_comment(reg.address) }}
+{{ sig_csr_ren(reg) }} <= ren when (raddr = {{ literal(reg.address, "ADDR_W", width_is_param=1) }}) else '0'; {{ literal_comment(reg.address) }}
 {{ process_begin(sig=sig_csr_ren_ff(reg))}}
         {{ sig_csr_ren_ff(reg) }} <= {{ sig_csr_ren(reg) }};
 {{ process_end() }}
@@ -517,19 +523,20 @@ wready <= '1';
 --------------------------------------------------------------------------------
 -- Read address decoder
 --------------------------------------------------------------------------------
-{{ process_begin(sig='rdata_ff', width=config['data_width'], init=read_filler)}}
+{{ process_begin(sig='rdata_ff', width="DATA_W", init=read_filler, width_is_param=1)}}
     if (ren = '1') then
-        case ADDR_T'(raddr) is
+        case wide_raddr is
 {% for reg in rmap %}
-            when {{ literal(reg.address, config['address_width']) }} => rdata_ff <= {{ sig_csr_rdata(reg) }}; {{ literal_comment(reg.address) }}
+            when {{ hex_literal(reg.address, 64) }} => rdata_ff <= {{ sig_csr_rdata(reg) }}; {{ literal_comment(reg.address) }}
 {% endfor %}
-            when others => rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
+            when others => rdata_ff <= {{ literal(read_filler, "DATA_W", width_is_param=1) }}; {{ literal_comment(read_filler) }}
         end case;
     else
-        rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
+        rdata_ff <= {{ literal(read_filler, "DATA_W", width_is_param=1) }}; {{ literal_comment(read_filler) }}
     end if;
 {{ process_end() }}
 rdata <= rdata_ff;
+wide_raddr <= (1 to 64-ADDR_W => '0') & raddr;
 
 --------------------------------------------------------------------------------
 -- Read data valid
