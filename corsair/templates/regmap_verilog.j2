@@ -182,8 +182,12 @@ module {{ module_name }} #(
     {% for bf in reg %}
     // {{ reg.name }}.{{ bf.name }}
         {% if 'a' in bf.hardware %}
+            {% if 'i' in bf.hardware %}
     output {{ port_bf_raccess(reg, bf) }},
+            {% endif %}
+            {% if 'o' in bf.hardware %}
     output {{ port_bf_waccess(reg, bf) }},
+            {% endif %}
         {% endif %}
         {% if 'l' in bf.hardware %}
     input {{ port_bf_lock(reg, bf) }},
@@ -275,8 +279,12 @@ end
 // access: {{ bf.access }}, hardware: {{ bf.hardware }}
 //---------------------
         {% if 'a' in bf.hardware %}
+            {% if 'o' in bf.hardware %}
 assign {{ port_bf_waccess(reg, bf) }} = wready && {{ sig_csr_wen(reg) }};
+            {% endif %}
+            {% if 'i' in bf.hardware %}
 assign {{ port_bf_raccess(reg, bf) }} = rvalid && {{ sig_csr_ren(reg) }};
+            {% endif %}
         {% endif %}
 reg {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_ff(reg, bf) }};
 

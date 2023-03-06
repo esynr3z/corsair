@@ -66,7 +66,7 @@ setuptools.setup(
         ],
     },
     install_requires=[
-        'pyyaml',
+        'pyyaml>=5.1',
         'jinja2',
         'wavedrom',
     ],

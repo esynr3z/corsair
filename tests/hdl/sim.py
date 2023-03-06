@@ -189,6 +189,7 @@ if [file exist wave.do] {{
         print(' '.join([d for d in self.defines]))
         # prepare and run elaboration
         elab_args = "--debug all --incr --prj files.prj %s.%s " % (self.worklib, self.top)
+        elab_args += " --override_timeunit --override_timeprecision --timescale 1ns/1ps "
         elab_args += ' '.join(['-d ' + define for define in self.defines]) + ' '
         elab_args += ' '.join(['-i ' + incdir for incdir in self.incdirs])
         sources = ''
@@ -198,7 +199,7 @@ if [file exist wave.do] {{
                 sources += 'sv %s %s\n' % (self.worklib, src)
             elif ext == '.v':
                 sources += 'verilog %s %s\n' % (self.worklib, src)
-            elif ext == 'vhd':
+            elif ext == '.vhd':
                 sources += 'vhdl %s %s\n' % (self.worklib, src)
         with path_join(self.cwd, 'files.prj').open(mode='w', encoding="utf-8") as f:
             f.write(sources)
