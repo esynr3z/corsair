@@ -1,3 +1,7 @@
+## 1.0.3 (2023-03-06)
+
+* Various bug fixes
+
 ## 1.0.2 (2021-09-26)
 
 * Fix overlapping of bitfiled names in rendered images for registers

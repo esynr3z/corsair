@@ -108,22 +108,26 @@ task test_ro_iq;
     $display("%0t, Start RO+IQ tests!", $time);
     // push 5 elements to the fifo
     fifo.delete();
-    for (int i=0; i<5; i++) begin
+    for (int i=1; i<6; i++) begin
         fifo.push_front((i + 4096) * i);
     end
     addr = CSR_REGROQ_ADDR;
     // read 5 elements from the fifo with data values control
     fork
-        for (int i=0; i<5; i++) begin
+        for (int i=1; i<6; i++) begin
             mst.read(addr, data);
             if (data !== ((i + 4096) * i))
                 errors++;
         end
+        csr_regroq_bfiq_rvalid <= 1'b1;
+        csr_regroq_bfiq_in <= fifo.pop_back();
         for (int i=0; i<5; i++) begin
             wait (csr_regroq_bfiq_ren);
             repeat (i+1) @(posedge clk);
-            csr_regroq_bfiq_in <= fifo.pop_back();
-            csr_regroq_bfiq_rvalid <= 1'b1;
+            if (i != 0) begin
+                csr_regroq_bfiq_in <= fifo.pop_back();
+                csr_regroq_bfiq_rvalid <= 1'b1;
+            end
             @(posedge clk);
             csr_regroq_bfiq_rvalid <= 1'b0;
             @(posedge clk);

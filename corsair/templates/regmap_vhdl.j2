@@ -557,7 +557,7 @@ wide_raddr <= (1 to 64-ADDR_W => '0') & raddr;
 rvalid_drv <=
                  {% set tmp.fifo_cnt = tmp.fifo_cnt + 1 %}
             {% endif %}
-    {{ sig_bf_rvalid_ff(reg, bf) }} when ({{ sig_csr_ren(reg) }} = '1') else
+    {{ sig_bf_rvalid_ff(reg, bf) }} when ({{ sig_csr_ren_ff(reg) }} = '1') else
         {% endif %}
     {% endfor %}
 {% endfor %}
