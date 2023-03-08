@@ -523,16 +523,16 @@ wready <= '1';
 --------------------------------------------------------------------------------
 -- Read address decoder
 --------------------------------------------------------------------------------
-{{ process_begin(sig='rdata_ff', width="DATA_W", init=read_filler, width_is_param=1)}}
+{{ process_begin(sig='rdata_ff', width=config['data_width'], init=read_filler)}}
     if (ren = '1') then
         case wide_raddr is
 {% for reg in rmap %}
             when {{ hex_literal(reg.address, 64) }} => rdata_ff <= {{ sig_csr_rdata(reg) }}; {{ literal_comment(reg.address) }}
 {% endfor %}
-            when others => rdata_ff <= {{ literal(read_filler, "DATA_W", width_is_param=1) }}; {{ literal_comment(read_filler) }}
+            when others => rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
         end case;
     else
-        rdata_ff <= {{ literal(read_filler, "DATA_W", width_is_param=1) }}; {{ literal_comment(read_filler) }}
+        rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
     end if;
 {{ process_end() }}
 rdata <= rdata_ff;
