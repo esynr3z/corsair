@@ -426,13 +426,18 @@ begin
             {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
             {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
         {%- endif %}
-        {% if bf.access in ['roc', 'rolh'] %}
-        {{ cond("%s = '1'" % sig_csr_ren(reg), tmp.cond_cnt) }}
+        {% if bf.access == 'roc' %}
+        {{ cond("{} = '1'".format(sig_csr_ren(reg)), tmp.cond_cnt) }}
+            {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+        {%- endif %}
+        {% if bf.access == 'rolh' %}
+        {{ cond("{} = '1' and {} = '1'".format(sig_csr_ren(reg), sig_bf_ff(reg, bf)), tmp.cond_cnt) }}
             {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
             {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
         {%- endif %}
         {% if bf.access == 'roll' %}
-        {{ cond("%s = '1'" % sig_csr_ren(reg), tmp.cond_cnt) }}
+        {{ cond("{} = '1' and {} = '0'".format(sig_csr_ren(reg), sig_bf_ff(reg, bf)), tmp.cond_cnt) }}
             {{ sig_bf_ff(reg, bf) }} <= {{ ones(bf.width) }};
             {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
         {%- endif %}
