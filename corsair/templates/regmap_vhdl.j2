@@ -295,7 +295,6 @@ port(
 end entity;
 
 architecture rtl of {{ module_name }} is
-signal wide_raddr : {{ range_decl(63) }}; -- 64 is the max address width
 
 {% if interface == 'apb' %}
 {{ apb_signals(regmap_embed=True) }}
@@ -525,18 +524,25 @@ wready <= '1';
 --------------------------------------------------------------------------------
 {{ process_begin(sig='rdata_ff', width=config['data_width'], init=read_filler)}}
     if (ren = '1') then
-        case wide_raddr is
+{% set loop_ns = namespace(first_reg = True) %}
 {% for reg in rmap %}
-            when {{ hex_literal(reg.address, 64) }} => rdata_ff <= {{ sig_csr_rdata(reg) }}; {{ literal_comment(reg.address) }}
+    {% if loop_ns.first_reg %}
+        if raddr = {{ literal(reg.address, "ADDR_W", width_is_param=1)}} then {{ literal_comment(reg.address) }}
+            rdata_ff <= {{ sig_csr_rdata(reg) }};
+    {% else %}
+        elsif raddr = {{ literal(reg.address, "ADDR_W", width_is_param=1)}} then {{ literal_comment(reg.address) }}
+            rdata_ff <= {{ sig_csr_rdata(reg) }};
+    {% endif %}
+    {% set loop_ns.first_reg = False %}
 {% endfor %}
-            when others => rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
-        end case;
+        else 
+            rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
+        end if;
     else
         rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
     end if;
 {{ process_end() }}
 rdata <= rdata_ff;
-wide_raddr <= (1 to 64-ADDR_W => '0') & raddr;
 
 --------------------------------------------------------------------------------
 -- Read data valid
