@@ -96,7 +96,7 @@ class TestVhdl:
         # read file and verify
         with open(output_file, 'r') as f:
             raw_str = ''.join(f.readlines())
-        assert "case ADDR_T'(raddr)" in raw_str
+        assert "case wide_raddr is" in raw_str
         assert 'end architecture;' in raw_str
 
 
