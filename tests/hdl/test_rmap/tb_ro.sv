@@ -411,15 +411,15 @@ initial begin : main
     wait(!rst);
     repeat(5) @(posedge clk);
 
-    // test_ro_i();
-    // test_ro_ie();
-    // test_ro_f();
-    // test_roc_ie();
-    // test_ro_iq();
-    // test_roll_i();
-    // test_rolh_i();
+    test_ro_i();
+    test_ro_ie();
+    test_ro_f();
+    test_roc_ie();
+    test_ro_iq();
+    test_roll_i();
+    test_rolh_i();
     test_roll_ie();
-    // test_rolh_ie();
+    test_rolh_ie();
 
     repeat(5) @(posedge clk);
     if (errors)
