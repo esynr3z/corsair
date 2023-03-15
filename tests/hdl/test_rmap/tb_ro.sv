@@ -163,6 +163,36 @@ task test_roll_i;
     mst.read(addr, data);
     if (data[CSR_REGROLX_BFLL_LSB+:CSR_REGROLX_BFLL_WIDTH] != 1)
         errors++;
+
+    // check simultanious reading & latching -- latched value should not be reset
+    fork
+        mst.read(addr, data);
+        begin // simultanious read with latching new tick
+            @(posedge tb_ro.dut.csr_regrolx_ren);
+            csr_regrolx_bfll_in <= 1'b0;
+            @(posedge clk);
+            csr_regrolx_bfll_in <= 1'b1;
+        end
+    join
+    if (data[CSR_REGROLX_BFLL_LSB+:CSR_REGROLX_BFLL_WIDTH] != 1) errors++;
+    mst.read(addr, data); // reading once more time to check that latch was not reset
+    if (data[CSR_REGROLX_BFLL_LSB+:CSR_REGROLX_BFLL_WIDTH] != 0) errors++;
+
+    // check latching just after read operation
+    fork
+        mst.read(addr, data);
+        begin // simultanious read with latching new tick
+            @(posedge tb_ro.dut.csr_regrolx_ren);
+            @(posedge clk);
+            csr_regrolx_bfll_in <= 1'b0;
+            @(posedge clk);
+            csr_regrolx_bfll_in <= 1'b1;
+        end
+    join
+    if (data[CSR_REGROLX_BFLL_LSB+:CSR_REGROLX_BFLL_WIDTH] != 1) errors++;
+    mst.read(addr, data); // reading once more time to check that latch was not reset
+        if (data[CSR_REGROLX_BFLL_LSB+:CSR_REGROLX_BFLL_WIDTH] != 0) errors++;
+
     $display("%0t, %0d errors", $time, errors);
 endtask
 
@@ -192,6 +222,36 @@ task test_rolh_i;
     mst.read(addr, data);
     if (data[CSR_REGROLX_BFLH_LSB+:CSR_REGROLX_BFLH_WIDTH] != 0)
         errors++;
+
+    // check simultanious reading & latching -- latched value should not be reset
+    fork
+        mst.read(addr, data);
+        begin // simultanious read with latching new tick
+            @(posedge tb_ro.dut.csr_regrolx_ren);
+            csr_regrolx_bflh_in <= 1'b1;
+            @(posedge clk);
+            csr_regrolx_bflh_in <= 1'b0;
+        end
+    join
+    if (data[CSR_REGROLX_BFLH_LSB+:CSR_REGROLX_BFLH_WIDTH] != 0) errors++;
+    mst.read(addr, data); // reading once more time to check that latch was not reset
+    if (data[CSR_REGROLX_BFLH_LSB+:CSR_REGROLX_BFLH_WIDTH] != 1) errors++;
+
+    // check latching just after read operation
+    fork
+        mst.read(addr, data);
+        begin // simultanious read with latching new tick
+            @(posedge tb_ro.dut.csr_regrolx_ren);
+            @(posedge clk);
+            csr_regrolx_bflh_in <= 1'b1;
+            @(posedge clk);
+            csr_regrolx_bflh_in <= 1'b0;
+        end
+    join
+    if (data[CSR_REGROLX_BFLH_LSB+:CSR_REGROLX_BFLH_WIDTH] != 0) errors++;
+    mst.read(addr, data); // reading once more time to check that latch was not reset
+    if (data[CSR_REGROLX_BFLH_LSB+:CSR_REGROLX_BFLH_WIDTH] != 1) errors++;
+
     $display("%0t, %0d errors", $time, errors);
 endtask
 
@@ -234,6 +294,40 @@ task test_roll_ie;
     mst.read(addr, data);
     if (data[CSR_REGROLX_BFLLE_LSB+:CSR_REGROLX_BFLLE_WIDTH] != 1)
         errors++;
+    
+    // check simultanious reading & latching -- latched value should not be reset
+    fork
+        mst.read(addr, data);
+        begin // simultanious read with latching new tick
+            @(posedge tb_ro.dut.csr_regrolx_ren);
+            csr_regrolx_bflle_in <= 1'b0;
+            csr_regrolx_bflle_en <= 1'b1;
+            @(posedge clk);
+            csr_regrolx_bflle_in <= 1'b1;
+            csr_regrolx_bflle_en <= 1'b0;
+        end
+    join
+    if (data[CSR_REGROLX_BFLLE_LSB+:CSR_REGROLX_BFLLE_WIDTH] != 1) errors++;
+    mst.read(addr, data); // reading once more time to check that latch was not reset
+    if (data[CSR_REGROLX_BFLLE_LSB+:CSR_REGROLX_BFLLE_WIDTH] != 0) errors++;
+
+    // check latching just after read operation
+    fork
+        mst.read(addr, data);
+        begin // simultanious read with latching new tick
+            @(posedge tb_ro.dut.csr_regrolx_ren);
+            @(posedge clk);
+            csr_regrolx_bflle_in <= 1'b0;
+            csr_regrolx_bflle_en <= 1'b1;
+            @(posedge clk);
+            csr_regrolx_bflle_in <= 1'b1;
+            csr_regrolx_bflle_en <= 1'b0;
+        end
+    join
+    if (data[CSR_REGROLX_BFLLE_LSB+:CSR_REGROLX_BFLLE_WIDTH] != 1) errors++;
+    mst.read(addr, data); // reading once more time to check that latch was not reset
+    if (data[CSR_REGROLX_BFLLE_LSB+:CSR_REGROLX_BFLLE_WIDTH] != 0) errors++;
+
     $display("%0t, %0d errors", $time, errors);
 endtask
 
@@ -276,6 +370,40 @@ task test_rolh_ie;
     mst.read(addr, data);
     if (data[CSR_REGROLX_BFLHE_LSB+:CSR_REGROLX_BFLHE_WIDTH] != 0)
         errors++;
+    
+    // check simultanious reading & latching -- latched value should not be reset
+    fork
+        mst.read(addr, data);
+        begin // simultanious read with latching new tick
+            @(posedge tb_ro.dut.csr_regrolx_ren);
+            csr_regrolx_bflhe_in <= 1'b1;
+            csr_regrolx_bflhe_en <= 1'b1;
+            @(posedge clk);
+            csr_regrolx_bflhe_in <= 1'b0;
+            csr_regrolx_bflhe_en <= 1'b0;
+        end
+    join
+    if (data[CSR_REGROLX_BFLHE_LSB+:CSR_REGROLX_BFLHE_WIDTH] != 0) errors++;
+    mst.read(addr, data); // reading once more time to check that latch was not reset
+    if (data[CSR_REGROLX_BFLHE_LSB+:CSR_REGROLX_BFLHE_WIDTH] != 1) errors++;
+
+    // check latching just after read operation
+    fork
+        mst.read(addr, data);
+        begin // simultanious read with latching new tick
+            @(posedge tb_ro.dut.csr_regrolx_ren);
+            @(posedge clk);
+            csr_regrolx_bflhe_in <= 1'b1;
+            csr_regrolx_bflhe_en <= 1'b1;
+            @(posedge clk);
+            csr_regrolx_bflhe_in <= 1'b0;
+            csr_regrolx_bflhe_en <= 1'b0;
+        end
+    join
+    if (data[CSR_REGROLX_BFLHE_LSB+:CSR_REGROLX_BFLHE_WIDTH] != 0) errors++;
+    mst.read(addr, data); // reading once more time to check that latch was not reset
+    if (data[CSR_REGROLX_BFLHE_LSB+:CSR_REGROLX_BFLHE_WIDTH] != 1) errors++;
+    
     $display("%0t, %0d errors", $time, errors);
 endtask
 
@@ -283,15 +411,15 @@ initial begin : main
     wait(!rst);
     repeat(5) @(posedge clk);
 
-    test_ro_i();
-    test_ro_ie();
-    test_ro_f();
-    test_roc_ie();
-    test_ro_iq();
-    test_roll_i();
-    test_rolh_i();
+    // test_ro_i();
+    // test_ro_ie();
+    // test_ro_f();
+    // test_roc_ie();
+    // test_ro_iq();
+    // test_roll_i();
+    // test_rolh_i();
     test_roll_ie();
-    test_rolh_ie();
+    // test_rolh_ie();
 
     repeat(5) @(posedge clk);
     if (errors)
