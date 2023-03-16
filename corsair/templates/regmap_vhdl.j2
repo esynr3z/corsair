@@ -22,12 +22,18 @@ std_logic
 {%- endmacro %}
 
 {#- literal #}
-{% macro literal(val, width=1) %}
+{% macro literal(val, width=1, width_is_param=0) %}
     {% if width == 1 %}
 '{{ val }}'
+    {%- elif width_is_param == 1 %}
+std_logic_vector(to_unsigned({{ val }}, {{ width }}))
     {%- else %}
 "{{ ('{:0%db}' % width).format(val) }}"
     {%- endif %}
+{%- endmacro %}
+
+{% macro hex_literal(val, width) %}
+x"{{ ('{:0%dx}' % (width//4)).format(val) }}"
 {%- endmacro %}
 
 {#- comment with literal in hex #}
@@ -57,29 +63,29 @@ std_logic
 {%- endmacro %}
 
 {#- 'process' header with reset logic #}
-{% macro process_begin(sig='test', width=1, init=0) %}
+{% macro process_begin(sig='test', width=1, init=0, width_is_param=0) %}
     {% set rst_type = config['register_reset']%}
     {% if rst_type == 'sync_pos' %}
 process (clk) begin
 if rising_edge(clk) then
 if (rst = '1') then
-    {{ sig }} <= {{ literal(init, width) }}; {{ literal_comment(init) }}
+    {{ sig }} <= {{ literal(init, width, width_is_param) }}; {{ literal_comment(init) }}
 else
     {%- elif rst_type == 'sync_neg' %}
 process (clk) begin
 if rising_edge(clk) then
 if (rst = '0') then
-    {{ sig }} <= {{ literal(init, width) }}; {{ literal_comment(init) }}
+    {{ sig }} <= {{ literal(init, width, width_is_param) }}; {{ literal_comment(init) }}
 else
     {%- elif rst_type == 'async_pos' %}
 process (clk, rst) begin
 if (rst = '1') then
-    {{ sig }} <= {{ literal(init, width) }}; {{ literal_comment(init) }}
+    {{ sig }} <= {{ literal(init, width, width_is_param) }}; {{ literal_comment(init) }}
 elsif rising_edge(clk) then
     {%- elif rst_type == 'async_neg' %}
 process (clk, rst) begin
 if (rst = '0') then
-    {{ sig }} <= {{ literal(init, width) }}; {{ literal_comment(init) }}
+    {{ sig }} <= {{ literal(init, width, width_is_param) }}; {{ literal_comment(init) }}
 elsif rising_edge(clk) then
     {%- endif %}
 {%- endmacro %}
@@ -289,7 +295,6 @@ port(
 end entity;
 
 architecture rtl of {{ module_name }} is
-subtype ADDR_T is {{ range_decl(config['address_width'] - 1) }};
 
 {% if interface == 'apb' %}
 {{ apb_signals(regmap_embed=True) }}
@@ -362,11 +367,11 @@ begin
     {% endif %}
 
     {% if 'w' in reg.access %}
-{{ sig_csr_wen(reg) }} <= wen when (waddr = {{ literal(reg.address, config['address_width']) }}) else '0'; {{ literal_comment(reg.address) }}
+{{ sig_csr_wen(reg) }} <= wen when (waddr = {{ literal(reg.address, "ADDR_W", width_is_param=1) }}) else '0'; {{ literal_comment(reg.address) }}
     {% endif %}
 
     {% if 'r' in reg.access %}
-{{ sig_csr_ren(reg) }} <= ren when (raddr = {{ literal(reg.address, config['address_width']) }}) else '0'; {{ literal_comment(reg.address) }}
+{{ sig_csr_ren(reg) }} <= ren when (raddr = {{ literal(reg.address, "ADDR_W", width_is_param=1) }}) else '0'; {{ literal_comment(reg.address) }}
 {{ process_begin(sig=sig_csr_ren_ff(reg))}}
         {{ sig_csr_ren_ff(reg) }} <= {{ sig_csr_ren(reg) }};
 {{ process_end() }}
@@ -421,13 +426,18 @@ begin
             {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
             {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
         {%- endif %}
-        {% if bf.access in ['roc', 'rolh'] %}
-        {{ cond("%s = '1'" % sig_csr_ren(reg), tmp.cond_cnt) }}
+        {% if bf.access == 'roc' %}
+        {{ cond("{} = '1' and {} = '0'".format(sig_csr_ren(reg), sig_csr_ren_ff(reg)), tmp.cond_cnt) }}
+            {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+        {%- endif %}
+        {% if bf.access == 'rolh' %}
+        {{ cond("{} = '1' and {} = '0' and {} = {}".format(sig_csr_ren(reg), sig_csr_ren_ff(reg), sig_bf_ff(reg, bf), ones(bf.width)), tmp.cond_cnt) }}
             {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
             {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
         {%- endif %}
         {% if bf.access == 'roll' %}
-        {{ cond("%s = '1'" % sig_csr_ren(reg), tmp.cond_cnt) }}
+        {{ cond("{} = '1' and {} = '0' and {} = {}".format(sig_csr_ren(reg), sig_csr_ren_ff(reg), sig_bf_ff(reg, bf), zeros(bf.width)), tmp.cond_cnt) }}
             {{ sig_bf_ff(reg, bf) }} <= {{ ones(bf.width) }};
             {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
         {%- endif %}
@@ -519,12 +529,20 @@ wready <= '1';
 --------------------------------------------------------------------------------
 {{ process_begin(sig='rdata_ff', width=config['data_width'], init=read_filler)}}
     if (ren = '1') then
-        case ADDR_T'(raddr) is
+{% set loop_ns = namespace(first_reg = True) %}
 {% for reg in rmap %}
-            when {{ literal(reg.address, config['address_width']) }} => rdata_ff <= {{ sig_csr_rdata(reg) }}; {{ literal_comment(reg.address) }}
+    {% if loop_ns.first_reg %}
+        if raddr = {{ literal(reg.address, "ADDR_W", width_is_param=1)}} then {{ literal_comment(reg.address) }}
+            rdata_ff <= {{ sig_csr_rdata(reg) }};
+    {% else %}
+        elsif raddr = {{ literal(reg.address, "ADDR_W", width_is_param=1)}} then {{ literal_comment(reg.address) }}
+            rdata_ff <= {{ sig_csr_rdata(reg) }};
+    {% endif %}
+    {% set loop_ns.first_reg = False %}
 {% endfor %}
-            when others => rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
-        end case;
+        else 
+            rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
+        end if;
     else
         rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
     end if;
@@ -550,7 +568,7 @@ rdata <= rdata_ff;
 rvalid_drv <=
                  {% set tmp.fifo_cnt = tmp.fifo_cnt + 1 %}
             {% endif %}
-    {{ sig_bf_rvalid_ff(reg, bf) }} when ({{ sig_csr_ren(reg) }} = '1') else
+    {{ sig_bf_rvalid_ff(reg, bf) }} when ({{ sig_csr_ren_ff(reg) }} = '1') else
         {% endif %}
     {% endfor %}
 {% endfor %}

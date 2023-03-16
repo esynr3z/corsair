@@ -71,7 +71,7 @@ wstrb <= pstrb;
 wen   <= psel and penable and pwrite;
 
 raddr <= paddr;
-ren   <= psel and (not pwrite);
+ren   <= psel and penable and (not pwrite);
 {% endmacro %}
 {{ apb_core() }}
 end arch_imp;
