@@ -6,10 +6,12 @@
 #define __O  volatile       // 'write only' permissions
 #define __IO volatile       // 'read / write' permissions
 
-#include "stdint.h"
 
 #ifdef __cplusplus
+#include <cstdint>
 extern "C" {
+#else
+#include <stdint.h>
 #endif
 
 #define CSR_BASE_ADDR 0x0
@@ -24,7 +26,7 @@ typedef struct {
 // DATA.val - Value of the register
 #define CSR_DATA_VAL_WIDTH 32
 #define CSR_DATA_VAL_LSB 0
-#define CSR_DATA_VAL_MASK 0x0
+#define CSR_DATA_VAL_MASK 0xffffffff
 #define CSR_DATA_VAL_RESET 0x0
 
 // CTRL - Control register
@@ -32,12 +34,13 @@ typedef struct {
 #define CSR_CTRL_RESET 0x100
 typedef struct {
     uint32_t VAL : 16; // Value of the register
+    uint32_t : 16; // reserved
 } csr_ctrl_t;
 
 // CTRL.val - Value of the register
 #define CSR_CTRL_VAL_WIDTH 16
 #define CSR_CTRL_VAL_LSB 0
-#define CSR_CTRL_VAL_MASK 0x4
+#define CSR_CTRL_VAL_MASK 0xffff
 #define CSR_CTRL_VAL_RESET 0x100
 
 // STATUS - Status register
@@ -45,12 +48,13 @@ typedef struct {
 #define CSR_STATUS_RESET 0x0
 typedef struct {
     uint32_t VAL : 8; // Value of the register
+    uint32_t : 24; // reserved
 } csr_status_t;
 
 // STATUS.val - Value of the register
 #define CSR_STATUS_VAL_WIDTH 8
 #define CSR_STATUS_VAL_LSB 0
-#define CSR_STATUS_VAL_MASK 0x8
+#define CSR_STATUS_VAL_MASK 0xff
 #define CSR_STATUS_VAL_RESET 0x0
 
 // START - Start register
@@ -58,12 +62,13 @@ typedef struct {
 #define CSR_START_RESET 0x0
 typedef struct {
     uint32_t VAL : 1; // Value of the register
+    uint32_t : 31; // reserved
 } csr_start_t;
 
 // START.val - Value of the register
 #define CSR_START_VAL_WIDTH 1
 #define CSR_START_VAL_LSB 0
-#define CSR_START_VAL_MASK 0x100
+#define CSR_START_VAL_MASK 0x1
 #define CSR_START_VAL_RESET 0x0
 
 

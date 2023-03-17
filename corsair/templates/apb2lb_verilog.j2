@@ -54,7 +54,7 @@ assign wstrb = pstrb;
 assign wen   = psel & penable & pwrite;
 
 assign raddr = paddr;
-assign ren   = psel & (~pwrite);
+assign ren   = psel & penable & (~pwrite);
 {% endmacro %}
 {{ apb_core() }}
 endmodule
