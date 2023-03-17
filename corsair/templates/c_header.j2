@@ -45,10 +45,12 @@ __IO
 #define __O  volatile       // 'write only' permissions
 #define __IO volatile       // 'read / write' permissions
 
-#include "stdint.h"
 
 #ifdef __cplusplus
+#include <cstdint>
 extern "C" {
+#else
+#include <stdint.h>
 #endif
 
 #define {{ module_prefix()|upper }}BASE_ADDR {{ "0x%x" % config['base_address'] }}
@@ -61,18 +63,21 @@ typedef struct {
     {% set tmp.lsb = 0 %}
     {% for bf in reg %}
         {% if tmp.lsb != bf.lsb %}
-    {{ data_t() }} :{{ bf.lsb }}; // reserved
+    {{ data_t() }} : {{ bf.lsb - tmp.lsb }}; // reserved
         {% endif %}
         {% set tmp.lsb = bf.lsb + bf.width %}
     {{ data_t() }} {{ bf.name.upper() }} : {{ bf.width }}; // {{ bf.description }}
     {% endfor %}
+    {%if tmp.lsb < config.data_width - 1%}
+    {{ data_t() }} : {{ config.data_width - tmp.lsb }}; // reserved
+    {% endif %}
 } {{ module_prefix()|lower }}{{ reg.name.lower() }}_t;
 
     {% for bf in reg %}
 // {{ reg.name }}.{{ bf.name }} - {{ bf.description }}
 #define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_WIDTH {{ bf.width }}
 #define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_LSB {{ bf.lsb }}
-#define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_MASK {{ "0x%x" % (reg.address) }}
+#define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_MASK {{ "0x%x" % (bf.mask) }}
 #define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_RESET {{ "0x%x" % (bf.reset) }}
         {% if bf.enums %}
 typedef enum {

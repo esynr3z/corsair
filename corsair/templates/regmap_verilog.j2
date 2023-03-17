@@ -182,8 +182,12 @@ module {{ module_name }} #(
     {% for bf in reg %}
     // {{ reg.name }}.{{ bf.name }}
         {% if 'a' in bf.hardware %}
+            {% if 'i' in bf.hardware %}
     output {{ port_bf_raccess(reg, bf) }},
+            {% endif %}
+            {% if 'o' in bf.hardware %}
     output {{ port_bf_waccess(reg, bf) }},
+            {% endif %}
         {% endif %}
         {% if 'l' in bf.hardware %}
     input {{ port_bf_lock(reg, bf) }},
@@ -275,8 +279,12 @@ end
 // access: {{ bf.access }}, hardware: {{ bf.hardware }}
 //---------------------
         {% if 'a' in bf.hardware %}
+            {% if 'o' in bf.hardware %}
 assign {{ port_bf_waccess(reg, bf) }} = wready && {{ sig_csr_wen(reg) }};
+            {% endif %}
+            {% if 'i' in bf.hardware %}
 assign {{ port_bf_raccess(reg, bf) }} = rvalid && {{ sig_csr_ren(reg) }};
+            {% endif %}
         {% endif %}
 reg {{ range_decl(bf.width - 1, bf.is_vector()) }} {{ sig_bf_ff(reg, bf) }};
 
@@ -310,12 +318,16 @@ assign {{ port_bf_wen(reg, bf) }} = {{ sig_csr_wen(reg) }};
         if ({{ port_bf_clr(reg, bf) }}) begin
             {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
         end else
-        {%- endif %} {% if bf.access in ['roc', 'rolh'] -%}
-        if ({{ sig_csr_ren(reg) }}) begin
+        {%- endif %} {% if bf.access == 'roc' %}
+        if ({{ sig_csr_ren(reg) }} && !{{ sig_csr_ren_ff(reg) }}) begin
+            {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
+        end else
+        {%- endif %} {% if bf.access == 'rolh' %}
+        if ({{ sig_csr_ren(reg) }} && !{{ sig_csr_ren_ff(reg) }} && ({{ sig_bf_ff(reg, bf) }} != {{ zeros(bf.width) }})) begin
             {{ sig_bf_ff(reg, bf) }} <= {{ zeros(bf.width) }};
         end else
         {%- endif %} {% if bf.access == 'roll' -%}
-        if ({{ sig_csr_ren(reg) }}) begin
+        if ({{ sig_csr_ren(reg) }} && !{{ sig_csr_ren_ff(reg) }} && ({{ sig_bf_ff(reg, bf) }} != {{ ones(bf.width) }})) begin
             {{ sig_bf_ff(reg, bf) }} <= {{ ones(bf.width) }};
         end else
         {%- endif %} {% if 'w' in bf.access -%}
@@ -338,13 +350,13 @@ assign {{ port_bf_wen(reg, bf) }} = {{ sig_csr_wen(reg) }};
         if ({{ port_bf_en(reg, bf) }} && ({{ port_bf_in(reg, bf) }} == {{ zeros(bf.width) }})) begin
             {% elif 'e' in bf.hardware and 'lh' in bf.access -%}
         if ({{ port_bf_en(reg, bf) }} && ({{ port_bf_in(reg, bf)}} == {{ ones(bf.width) }})) begin
-            {% elif 'll' in bf.access -%}
+            {% elif bf.access == 'roll' -%}
         if ({{ port_bf_in(reg, bf) }} == {{ zeros(bf.width) }}) begin
-            {% elif 'lh' in bf.access -%}
+            {% elif bf.access == 'rolh' -%}
         if ({{ port_bf_in(reg, bf) }} == {{ ones(bf.width) }}) begin
             {% elif 'e' in bf.hardware -%}
         if ({{ port_bf_en(reg, bf) }}) begin
-            {% else -%}
+            {% else -%} {# no condition #}
         begin
             {%- endif %}
             {{ sig_bf_ff(reg, bf) }} <= {{ port_bf_in(reg, bf) }};
@@ -441,10 +453,10 @@ end
             {% if tmp.fifo_cnt == 0 %}
 reg rvalid_drv;
 always @(*) begin
-    if ({{ sig_csr_ren(reg) }})
+    if ({{ sig_csr_ren_ff(reg) }})
         rvalid_drv = {{ sig_bf_rvalid_ff(reg, bf) }};
             {% else %}
-    else if ({{ sig_csr_ren(reg) }})
+    else if ({{ sig_csr_ren_ff(reg) }})
         rvalid_drv = {{ sig_bf_rvalid_ff(reg, bf) }};
             {% endif %}
             {% set tmp.fifo_cnt = tmp.fifo_cnt + 1 %}
