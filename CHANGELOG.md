@@ -1,3 +1,9 @@
+## 1.0.4 (2023-03-17)
+
+* Fix rolh/roll missing latch bug
+* Fix constants comparison on address in vhdl
+* Fix C/C++ header generation
+
 ## 1.0.3 (2023-03-06)
 
 * Various bug fixes
