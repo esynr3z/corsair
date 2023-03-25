@@ -104,7 +104,7 @@ class Wavedrom():
         lanes = bits // 16 if bits > 16 else 1
         for reg in rmap:
             reg_wd = {"reg": [],
-                      "options": {"bits": bits, "lanes": lanes, "fontsize": 10}}
+                      "config": {"bits": bits, "lanes": lanes, "fontsize": 10}}
             bit_pos = -1
             for bf in reg:
                 if bit_pos == -1 and bf.lsb > 0:
