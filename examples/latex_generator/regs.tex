@@ -1,0 +1,630 @@
+% Expansion Register
+\leveldown{Expansion Register}
+
+\begin{longtable}{|C{5cm}|C{7cm}|}
+\caption{Expansion Register - Address Map} \\
+\hline\hline
+\textbf{Address} & \textbf{Description} \\
+\hline\hline
+0x80 &  GPIO0_VALUE          \\ \cline{0-1}
+0x81 &  GPIO0_DIR            \\ \cline{0-1}
+0x82 &  GPIO1_VALUE          \\ \cline{0-1}
+0x83 &  GPIO1_DIR            \\ \cline{0-1}
+0x84 &  GPIO2_VALUE          \\ \cline{0-1}
+0x85 &  GPIO2_DIR            \\ \cline{0-1}
+0x86 &  GPIO3_VALUE          \\ \cline{0-1}
+0x87 &  GPIO3_DIR            \\ \cline{0-1}
+0x88 &  CONTROL              \\ \cline{0-1}
+0x89 &  SM_FAULT             \\ \cline{0-1}
+0x8f &  GPIO_CNT_CTL         \\ \cline{0-1}
+0x90 &  DES0_GPIO_RE_CNT     \\ \cline{0-1}
+0x91 &  DES0_GPIO_FE_CNT     \\ \cline{0-1}
+0x92 &  DES1_GPIO_RE_CNT     \\ \cline{0-1}
+0x93 &  DES1_GPIO_FE_CNT     \\ \cline{0-1}
+0x9e &  GPIO4_VALUE          \\ \cline{0-1}
+0x9f &  GPIO4_DIR            \\ \cline{0-1}
+\end{longtable}
+\label{exp_reg_address_map}
+
+    Group ID #0 hat 2 Element(e).
+    Group ID #1 hat 2 Element(e).
+    Group ID #2 hat 2 Element(e).
+    Group ID #3 hat 2 Element(e).
+    Group ID #4 hat 1 Element(e).
+    Group ID #5 hat 1 Element(e).
+    Group ID #6 hat 5 Element(e).
+    Group ID #7 hat 2 Element(e).
+
+\newpage
+
+\leveldown{ GPIO0 }
+\leveldown{ GPIO0 Value }
+\begin{register}{h!}{ GPIO0_VALUE }{ 0x80 }% GPIO0_VALUE, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{2}{ \tiny RES            }
+\bitbox{1}{ \tiny GPIO0\_5       }
+\bitbox{1}{ \tiny GPIO0\_4       }
+\bitbox{1}{ \tiny GPIO0\_3       }
+\bitbox{1}{ \tiny GPIO0\_2       }
+\bitbox{2}{ \tiny RES            }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:6   & RES            & RES 
+      & ro & 0 \\ \midrule
+5     & GPIO0\_5       & Deserializer \#0 GENERAL_IO5 Value 
+      & rw & 0 \\ \midrule
+4     & GPIO0\_4       & Deserializer \#0 GENERAL_IO4 Value 
+      & rw & 0 \\ \midrule
+3     & GPIO0\_3       & Deserializer \#0 GENERAL_IO3 Value 
+      & rw & 0 \\ \midrule
+2     & GPIO0\_2       & Deserializer \#0 GENERAL_IO2 Value 
+      & rw & 0 \\ \midrule
+1:0   & RES            & RES 
+      & ro & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:gpio0_value}
+\end{register}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ GPIO0 Direction }
+\begin{register}{h!}{ GPIO0_DIR }{ 0x81 }% GPIO0_DIR, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{2}{ \tiny RES            }
+\bitbox{1}{ \tiny GPIO0\_5\_DIR  }
+\bitbox{1}{ \tiny GPIO0\_4\_DIR  }
+\bitbox{1}{ \tiny GPIO0\_3\_DIR  }
+\bitbox{1}{ \tiny GPIO0\_2\_DIR  }
+\bitbox{2}{ \tiny RES            }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:6   & RES            & RES 
+      & ro & 0 \\ \midrule
+5     & GPIO0\_5\_DIR  & FPGA Pin to Deserializer \#0 GENERAL_IO4 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+4     & GPIO0\_4\_DIR  & FPGA Pin to Deserializer \#0 GENERAL_IO4 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+3     & GPIO0\_3\_DIR  & FPGA Pin to Deserializer \#0 GENERAL_IO3 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+2     & GPIO0\_2\_DIR  & FPGA Pin to Deserializer \#0 GENERAL_IO2 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+1:0   & RES            & RES 
+      & ro & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:gpio0_dir}
+\end{register}
+\addtocounter{currentlevel}{1}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ GPIO1 }
+\leveldown{ GPIO1 Value }
+\begin{register}{h!}{ GPIO1_VALUE }{ 0x82 }% GPIO1_VALUE, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{2}{ \tiny RES            }
+\bitbox{1}{ \tiny GPIO1\_5       }
+\bitbox{1}{ \tiny GPIO1\_4       }
+\bitbox{1}{ \tiny GPIO1\_3       }
+\bitbox{1}{ \tiny GPIO1\_2       }
+\bitbox{2}{ \tiny RES            }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:6   & RES            & RES 
+      & ro & 0 \\ \midrule
+5     & GPIO1\_5       & Deserializer \#1 GENERAL_IO5 Value 
+      & rw & 0 \\ \midrule
+4     & GPIO1\_4       & Deserializer \#1 GENERAL_IO4 Value 
+      & rw & 0 \\ \midrule
+3     & GPIO1\_3       & Deserializer \#1 GENERAL_IO3 Value 
+      & rw & 0 \\ \midrule
+2     & GPIO1\_2       & Deserializer \#1 GENERAL_IO2 Value 
+      & rw & 0 \\ \midrule
+1:0   & RES            & RES 
+      & ro & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:gpio1_value}
+\end{register}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ GPIO1 Direction }
+\begin{register}{h!}{ GPIO1_DIR }{ 0x83 }% GPIO1_DIR, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{2}{ \tiny RES            }
+\bitbox{1}{ \tiny GPIO1\_5\_DIR  }
+\bitbox{1}{ \tiny GPIO1\_4\_DIR  }
+\bitbox{1}{ \tiny GPIO1\_3\_DIR  }
+\bitbox{1}{ \tiny GPIO1\_2\_DIR  }
+\bitbox{2}{ \tiny RES            }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:6   & RES            & RES 
+      & ro & 0 \\ \midrule
+5     & GPIO1\_5\_DIR  & FPGA Pin to Deserializer \#1 GENERAL_IO4 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+4     & GPIO1\_4\_DIR  & FPGA Pin to Deserializer \#1 GENERAL_IO4 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+3     & GPIO1\_3\_DIR  & FPGA Pin to Deserializer \#1 GENERAL_IO3 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+2     & GPIO1\_2\_DIR  & FPGA Pin to Deserializer \#1 GENERAL_IO2 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+1:0   & RES            & RES 
+      & ro & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:gpio1_dir}
+\end{register}
+\addtocounter{currentlevel}{1}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ GPIO2 }
+\leveldown{ GPIO2 Value }
+\begin{register}{h!}{ GPIO2_VALUE }{ 0x84 }% GPIO2_VALUE, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{3}{ \tiny RES            }
+\bitbox{1}{ \tiny GPIO2\_4       }
+\bitbox{1}{ \tiny GPIO2\_3       }
+\bitbox{1}{ \tiny GPIO2\_2       }
+\bitbox{2}{ \tiny RES            }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:5   & RES            & RES 
+      & ro & 0 \\ \midrule
+4     & GPIO2\_4       & Serializer \#0 GENERAL_IO4 Value 
+      & rw & 0 \\ \midrule
+3     & GPIO2\_3       & Serializer \#0 GENERAL_IO3 Value 
+      & rw & 0 \\ \midrule
+2     & GPIO2\_2       & Serializer \#0 GENERAL_IO2 Value 
+      & rw & 0 \\ \midrule
+1:0   & RES            & RES 
+      & ro & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:gpio2_value}
+\end{register}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ GPIO2 Direction }
+\begin{register}{h!}{ GPIO2_DIR }{ 0x85 }% GPIO2_DIR, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{3}{ \tiny RES            }
+\bitbox{1}{ \tiny GPIO2\_4\_DIR  }
+\bitbox{1}{ \tiny GPIO2\_3\_DIR  }
+\bitbox{1}{ \tiny GPIO2\_2\_DIR  }
+\bitbox{2}{ \tiny RES            }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:5   & RES            & RES 
+      & ro & 0 \\ \midrule
+4     & GPIO2\_4\_DIR  & FPGA Pin to Serializer \#0 GENERAL_IO4 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+3     & GPIO2\_3\_DIR  & FPGA Pin to Serializer \#0 GENERAL_IO3 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+2     & GPIO2\_2\_DIR  & FPGA Pin to Serializer \#0 GENERAL_IO2 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+1:0   & RES            & RES 
+      & ro & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:gpio2_dir}
+\end{register}
+\addtocounter{currentlevel}{1}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ GPIO3 }
+\leveldown{ GPIO3 Value }
+\begin{register}{h!}{ GPIO3_VALUE }{ 0x86 }% GPIO3_VALUE, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{3}{ \tiny RES            }
+\bitbox{1}{ \tiny GPIO3\_4       }
+\bitbox{1}{ \tiny GPIO3\_3       }
+\bitbox{1}{ \tiny GPIO3\_2       }
+\bitbox{2}{ \tiny RES            }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:5   & RES            & RES 
+      & ro & 0 \\ \midrule
+4     & GPIO3\_4       & Serializer \#1 GENERAL_IO4 Value 
+      & rw & 0 \\ \midrule
+3     & GPIO3\_3       & Serializer \#1 GENERAL_IO3 Value 
+      & rw & 0 \\ \midrule
+2     & GPIO3\_2       & Serializer \#1 GENERAL_IO2 Value 
+      & rw & 0 \\ \midrule
+1:0   & RES            & RES 
+      & ro & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:gpio3_value}
+\end{register}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ GPIO3 Direction }
+\begin{register}{h!}{ GPIO3_DIR }{ 0x87 }% GPIO3_DIR, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{3}{ \tiny RES            }
+\bitbox{1}{ \tiny GPIO3\_4\_DIR  }
+\bitbox{1}{ \tiny GPIO3\_3\_DIR  }
+\bitbox{1}{ \tiny GPIO3\_2\_DIR  }
+\bitbox{2}{ \tiny RES            }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:5   & RES            & RES 
+      & ro & 0 \\ \midrule
+4     & GPIO3\_4\_DIR  & FPGA Pin to Serializer \#1 GENERAL_IO4 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+3     & GPIO3\_3\_DIR  & FPGA Pin to Serializer \#1 GENERAL_IO3 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+2     & GPIO3\_2\_DIR  & FPGA Pin to Serializer \#1 GENERAL_IO2 is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+1:0   & RES            & RES 
+      & ro & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:gpio3_dir}
+\end{register}
+\addtocounter{currentlevel}{1}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ Control Register }
+\begin{register}{h!}{ CONTROL }{ 0x88 }% CONTROL, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{1}{ \tiny POC2\_BYP\_ERR }
+\bitbox{1}{ \tiny POC2\_BYP\_EN  }
+\bitbox{1}{ \tiny POC2\_ERR      }
+\bitbox{1}{ \tiny POC2\_EN       }
+\bitbox{1}{ \tiny POC1\_BYP\_ERR }
+\bitbox{1}{ \tiny POC1\_BYP\_EN  }
+\bitbox{1}{ \tiny POC1\_ERR      }
+\bitbox{1}{ \tiny POC1\_EN       }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7     & POC2\_BYP\_ERR & PoC 2 Bypass Error 
+      & ro & 0 \\ \midrule
+6     & POC2\_BYP\_EN  & PoC 2 Bypass Enable 
+      & rw & 0 \\ \midrule
+5     & POC2\_ERR      & PoC 2 Error 
+      & ro & 0 \\ \midrule
+4     & POC2\_EN       & PoC 2 Enable 
+      & rw & 0 \\ \midrule
+3     & POC1\_BYP\_ERR & PoC 1 Bypass Error 
+      & ro & 0 \\ \midrule
+2     & POC1\_BYP\_EN  & PoC 1 Bypass Enable 
+      & rw & 0 \\ \midrule
+1     & POC1\_ERR      & PoC 1 Error 
+      & ro & 0 \\ \midrule
+0     & POC1\_EN       & PoC 1 Enable 
+      & rw & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:control}
+\end{register}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ SM Fault Register }
+\begin{register}{h!}{ SM_FAULT }{ 0x89 }% SM_FAULT, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{1}{ \tiny RES            }
+\bitbox{1}{ \tiny SER1\_EXT\_SM\_FAULT }
+\bitbox{1}{ \tiny RES            }
+\bitbox{1}{ \tiny SER0\_EXT\_SM\_FAULT }
+\bitbox{1}{ \tiny DES1\_SM\_FAULT }
+\bitbox{1}{ \tiny DES1\_EXT\_SM\_FAULT }
+\bitbox{1}{ \tiny DES0\_SM\_FAULT }
+\bitbox{1}{ \tiny DES0\_EXT\_SM\_FAULT }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7     & RES            & RES 
+      & ro & 0 \\ \midrule
+6     & SER1\_EXT\_SM\_FAULT & Serializer 1 EXT SM Fault 
+      & ro & 0 \\ \midrule
+5     & RES            & RES 
+      & ro & 0 \\ \midrule
+4     & SER0\_EXT\_SM\_FAULT & Serializer 0 EXT SM Fault 
+      & ro & 0 \\ \midrule
+3     & DES1\_SM\_FAULT & Deserializer 1 SM Fault 
+      & ro & 0 \\ \midrule
+2     & DES1\_EXT\_SM\_FAULT & Deserializer 1 EXT SM Fault 
+      & ro & 0 \\ \midrule
+1     & DES0\_SM\_FAULT & Deserializer 0 SM Fault 
+      & ro & 0 \\ \midrule
+0     & DES0\_EXT\_SM\_FAULT & Deserializer 0 EXT SM Fault 
+      & ro & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:sm_fault}
+\end{register}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ Deserializer GPIO Edge Counter }
+\leveldown{ Deserializer GPIO Edge Counter Control }
+\begin{register}{h!}{ GPIO_CNT_CTL }{ 0x8f }% GPIO_CNT_CTL, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{4}{ \tiny DES1\_GPIO\_SEL }
+\bitbox{4}{ \tiny DES0\_GPIO\_SEL }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:4   & DES1\_GPIO\_SEL & Deserializer \#1 GPIO Select \newline
+      0x0 : Deserializer \#1 GENERAL_IO0 \newline
+      0x1 : Deserializer \#1 GENERAL_IO1 \newline
+      0x2 : Deserializer \#1 GENERAL_IO2 \newline
+      0x3 : Deserializer \#1 GENERAL_IO3 \newline
+      0x4 : Deserializer \#1 GENERAL_IO4 \newline
+      0x5 : Deserializer \#1 GENERAL_IO5 
+      & rw & 0 \\ \midrule
+3:0   & DES0\_GPIO\_SEL & Deserializer \#0 GPIO Select \newline
+      0x0 : Deserializer \#0 GENERAL_IO0 \newline
+      0x1 : Deserializer \#0 GENERAL_IO1 \newline
+      0x2 : Deserializer \#0 GENERAL_IO2 \newline
+      0x3 : Deserializer \#0 GENERAL_IO3 \newline
+      0x4 : Deserializer \#0 GENERAL_IO4 \newline
+      0x5 : Deserializer \#0 GENERAL_IO5 
+      & rw & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:gpio_cnt_ctl}
+\end{register}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ Deserializer #0 GPIO Rising Edge Counter }
+\begin{register}{h!}{ DES0_GPIO_RE_CNT }{ 0x90 }% DES0_GPIO_RE_CNT, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{8}{ \tiny EDGE\_CNT      }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:0   & EDGE\_CNT      & Deserializer \#0 Rising Edge Counter \newline Count the rising edges of the selected Deserializer \#0 GENERAL_IO. 
+      & roc & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:des0_gpio_re_cnt}
+\end{register}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ Deserializer #0 GPIO Falling Edge Counter }
+\begin{register}{h!}{ DES0_GPIO_FE_CNT }{ 0x91 }% DES0_GPIO_FE_CNT, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{8}{ \tiny EDGE\_CNT      }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:0   & EDGE\_CNT      & Deserializer \#0 Falling Edge Counter \newline Count the rising edges of the selected Deserializer \#0 GENERAL_IO. 
+      & roc & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:des0_gpio_fe_cnt}
+\end{register}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ Deserializer #1 GPIO Rising Edge Counter }
+\begin{register}{h!}{ DES1_GPIO_RE_CNT }{ 0x92 }% DES1_GPIO_RE_CNT, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{8}{ \tiny EDGE\_CNT      }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:0   & EDGE\_CNT      & Deserializer \#1 Rising Edge Counter \newline Count the rising edges of the selected Deserializer \#1 GENERAL_IO. 
+      & roc & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:des1_gpio_re_cnt}
+\end{register}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ Deserializer #1 GPIO Falling Edge Counter }
+\begin{register}{h!}{ DES1_GPIO_FE_CNT }{ 0x93 }% DES1_GPIO_FE_CNT, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{8}{ \tiny EDGE\_CNT      }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:0   & EDGE\_CNT      & Deserializer \#1 Falling Edge Counter \newline Count the falling edges of the selected Deserializer \#1 GENERAL_IO. 
+      & roc & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:des1_gpio_fe_cnt}
+\end{register}
+\addtocounter{currentlevel}{1}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ GPIO4 }
+\leveldown{ GPIO4 Value }
+\begin{register}{h!}{ GPIO4_VALUE }{ 0x9e }% GPIO4_VALUE, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{4}{ \tiny RES            }
+\bitbox{1}{ \tiny GPIO4\_3       }
+\bitbox{1}{ \tiny GPIO4\_2       }
+\bitbox{1}{ \tiny GPIO4\_1       }
+\bitbox{1}{ \tiny GPIO4\_0       }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:4   & RES            & RES 
+      & ro & 0 \\ \midrule
+3     & GPIO4\_3       & Net 'SPI\_MISO Value' 
+      & rw & 0 \\ \midrule
+2     & GPIO4\_2       & Net 'SPI\_MOSI Value' 
+      & rw & 0 \\ \midrule
+1     & GPIO4\_1       & Net 'SPI\_CS Value' 
+      & rw & 0 \\ \midrule
+0     & GPIO4\_0       & Net 'SPI\_CLK Value' 
+      & rw & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:gpio4_value}
+\end{register}
+\addtocounter{currentlevel}{1}
+
+
+\leveldown{ GPIO4 Direction }
+\begin{register}{h!}{ GPIO4_DIR }{ 0x9f }% GPIO4_DIR, ID=
+\begin{bytefield}[endianness=big,bitwidth=5em]{8}
+\bitheader{0-7} \\
+\bitbox{4}{ \tiny RES            }
+\bitbox{1}{ \tiny GPIO4\_5\_DIR  }
+\bitbox{1}{ \tiny GPIO4\_4\_DIR  }
+\bitbox{1}{ \tiny GPIO4\_3\_DIR  }
+\bitbox{1}{ \tiny GPIO4\_2\_DIR  }
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+7:4   & RES            & RES 
+      & ro & 0 \\ \midrule
+3     & GPIO4\_5\_DIR  & FPGA Pin to net 'SPI\_MISO' is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+2     & GPIO4\_4\_DIR  & FPGA Pin to net 'SPI\_MOSI' is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+1     & GPIO4\_3\_DIR  & FPGA Pin to net 'SPI\_CS' is Input (0) / Output (1) 
+      & rw & 0 \\ \midrule
+0     & GPIO4\_2\_DIR  & FPGA Pin to net 'SPI\_CLK' is Input (0) / Output (1) 
+      & rw & 0 \\ \bottomrule
+\end{tabularx}
+\label{reg:gpio4_dir}
+\end{register}
+\addtocounter{currentlevel}{1}
+\addtocounter{currentlevel}{1}
+

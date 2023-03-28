@@ -1,0 +1,22 @@
+[globcfg]
+#project = Camera Adapter
+data_width = 8
+address_width = 8
+regmap_path = regs.yaml
+
+[sx_vhdl_module]
+path = expansion.vhd
+read_filler = 0
+generator = custom_generator.py::SxVhdlGenerator
+
+[latex]
+path = regs.tex
+generator = custom_generator.py::TexGenerator
+
+[md_doc]
+path = doc/expansion.md
+title = Expansion Register Map
+print_images = True
+image_dir = md_img
+print_conventions = True
+generator = Markdown

@@ -1,0 +1,120 @@
+{# MACRO #}
+{#- value in hex format #}
+{% macro literal(reset, width) %}
+{{ "0x%0{w}x".format(w=width // 4) % reset }}
+{%- endmacro %}
+
+{#- bit position #}
+{% macro bitpos(msb, lsb) %}
+    {% if msb == lsb %}
+{{ msb }}
+    {%- else %}
+{{ msb }}:{{ lsb }}
+    {%- endif %}
+{%- endmacro %}
+
+{#- reset value #}
+{% macro reset(val, width) %}
+    {% if width == 1 %}
+{{ val }}
+    {%- else %}
+{{ '0x%x' % val }}
+    {%- endif %}
+{%- endmacro %}
+
+{#- parse field name #}
+{% macro fieldname(name) %}
+    {% if "res" in name.lower() -%}
+RES
+    {%- elif "#" in name %}
+{{ name|replace("#", "\\#") }}
+    {%- elif "_" in name %}
+{{ name|replace("_", "\\_") }}
+    {%- else %}
+{{ name }}
+    {%- endif %}
+{%- endmacro %}
+
+
+{#- TEMPLATE NAMESPACE #}
+{% set tmp = namespace() %}
+
+
+{#- TEMPLATE #}
+% Expansion Register
+\leveldown{Expansion Register}
+
+\begin{longtable}{|C{5cm}|C{7cm}|}
+\caption{Expansion Register - Address Map} \\
+\hline\hline
+\textbf{Address} & \textbf{Description} \\
+\hline\hline
+    {% for reg in rmap %}
+{{ '0x%02x' % reg.address }} &  {{ '%-20s' % (reg.name) }} \\ \cline{0-1}
+    {% endfor %}
+\end{longtable}
+\label{exp_reg_address_map}
+
+{% set group_id_counts = {} %}
+{% for reg in rmap %}
+    {% if reg.group_id in group_id_counts %}
+        {% set group_id_counts = group_id_counts.update({reg.group_id: group_id_counts[reg.group_id] + 1}) %}
+    {% else %}
+        {% set group_id_counts = group_id_counts.update({reg.group_id: 1}) %}
+    {% endif %}
+{% endfor %}
+{% for group_id, count in group_id_counts.items() %}
+    Group ID #{{ group_id }} hat {{ count }} Element(e).
+{% endfor %}
+
+\newpage
+
+{#- save number members of each group #}
+{%- set ref_group_id = group_id_counts.copy() %}
+
+{% for reg in rmap %}
+
+{% if reg.group_id in group_id_counts and ref_group_id[reg.group_id] > 1%}
+    {% if group_id_counts[reg.group_id] == ref_group_id[reg.group_id] %}
+\leveldown{ {{ reg.description.split(" ")[:-1]|join(" ") }} }
+    {% endif %}
+    {% set new_value = group_id_counts[reg.group_id] - 1 %}
+    {% set group_id_counts = group_id_counts.update({reg.group_id: new_value}) %}
+{% endif %}
+\leveldown{ {{ reg.description }} }
+\begin{register}{h!}{ {{ reg.name }} }{ {{ '0x%02x' % reg.address }} }% {{ reg.name }}, ID={{ tmp.group_id }}
+\begin{bytefield}[endianness=big,bitwidth=5em]{ {{- config['data_width'] -}} }
+\bitheader{0-{{- config['data_width'] - 1 -}} } \\
+        {% for bf in reg|reverse %}
+\bitbox{ {{- bf.width -}} }{ \tiny {{ '%-14s' % fieldname(bf.name) }} }
+        {% endfor %}
+\end{bytefield}
+
+% insert space between two tables
+\vspace{1cm}
+
+\begin{tabularx}{\textwidth}{c c X C{2cm} c }
+\rowcolor{sxyellow}
+\toprule
+\textbf{Bits} & \textbf{Field Name } & \textbf{Description} & \textbf{Type} & \textbf{Reset} \\
+\toprule
+{# fill table #}
+        {% for bf in reg|reverse %}
+{{ '%-5s' % bitpos(bf.msb, bf.lsb) }} & {{ '%-14s' % fieldname(bf.name) }} & {{ '%s %s' % (fieldname(bf.description), "\\newline" if bf.enums) }}
+            {% if bf.enums %}
+                {% for enum in bf %}
+{{ '%9s : %s' % (literal(enum.value, bf.width), fieldname(enum.description)) }} {{ "\\newline" if not loop.last }}
+                {% endfor %}
+            {% endif %}
+      & {{bf.access}} & {{ bf.reset }} \\ {{ "\\midrule" if not loop.last else "\\bottomrule" }}
+        {% endfor %}
+\end{tabularx}
+\label{reg:{{ reg.name.lower() }}}
+\end{register}
+\addtocounter{currentlevel}{1}
+{# move one level up at end of group #}
+        {% if new_value == 0 and ref_group_id[reg.group_id] > 1 %}
+\addtocounter{currentlevel}{1}
+        {% endif %}
+
+    {% endfor %}

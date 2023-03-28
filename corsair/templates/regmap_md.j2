@@ -18,6 +18,20 @@
 {{ "0x%0{w}x".format(w=width // 4) % reset }}
 {%- endmacro %}
 
+{#- parse field name #}
+{% macro fieldname(name) %}
+    {% if "res" in name.lower() -%}
+RES
+    {%- else %}
+{{ name|replace("_", "\\_") }}
+    {%- endif %}
+{%- endmacro %}
+
+{#- remove newline #}
+{% macro rm_newline(name) %}
+{{ name|replace(" \\newline", ".") }}
+{%- endmacro %}
+
 {#- TEMPLATE NAMESPACE #}
 {% set tmp = namespace() %}
 
@@ -74,7 +88,7 @@ Reset value: {{ literal(reg.reset, config['data_width']) }}
             {% set tmp.reserved_width = tmp.reserved_msb - tmp.reserved_lsb + 1 %}
 {{ "| %-16s | %-6s | %-15s | %-10s | %s |" % ('-', range(tmp.reserved_msb, tmp.reserved_lsb), '-', literal(0, tmp.reserved_width), 'Reserved') }}
         {% endif %}
-{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % (bf.name, range(bf.msb, bf.lsb), mode(bf), literal(bf.reset, bf.width), bf.description) }}
+{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % (fieldname(bf.name), range(bf.msb, bf.lsb), mode(bf), literal(bf.reset, bf.width), rm_newline(bf.description)) }}
         {% set tmp.reserved_msb = bf.lsb - 1 %}
     {% endfor %}
     {% for bf in reg %}
@@ -85,7 +99,7 @@ Enumerated values for {{ reg.name }}.{{ bf.name }}.
 | Name             | Value   | Description |
 | :---             | :---    | :---        |
             {% for enum in bf %}
-{{ "| %-16s | %-6s | %s |" % (enum.name, literal(enum.value, bf.width), enum.description) }}
+{{ "| %-16s | %-6s | %s |" % (fieldname(enum.name), literal(enum.value, bf.width), enum.description) }}
             {% endfor %}
         {% endif %}
     {% endfor %}

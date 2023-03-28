@@ -1,0 +1,413 @@
+{#- Many thanks to github.com/smirnovich for providing the VHDL code for this template #}
+
+{#- MACRO #}
+{#- vector range for select operations #}
+{% macro range(msb, lsb, is_vector=true) %}
+    {% if is_vector %}
+        {% if msb == lsb %}
+({{ msb }})
+        {%- else %}
+({{ msb }} DOWNTO {{ lsb }})
+        {%- endif %}
+    {%- endif %}
+{%- endmacro %}
+
+{#- vector range for declarations #}
+{% macro range_decl(msb, is_vector=true) %}
+    {% if is_vector %}
+STD_LOGIC_VECTOR({{ msb }} DOWNTO 0)
+    {%- else %}
+STD_LOGIC
+    {%- endif %}
+{%- endmacro %}
+
+{#- literal #}
+{% macro literal(val, width=1, width_is_param=0) %}
+    {% if width == 1 %}
+'{{ val }}'
+    {%- elif width_is_param == 1 %}
+STD_LOGIC_VECTOR(to_unsigned({{ val }}, {{ width }}))
+    {%- else %}
+(OTHERS => '{{ val }}')
+    {%- endif %}
+{%- endmacro %}
+
+{%- macro hex_literal(val, width) %}
+x"{{ ('{:0%dx}' % (width//4)).format(val) }}"
+{%- endmacro %}
+
+{#- comment with literal in hex #}
+{% macro literal_comment(val) %}
+  -- {{ "0x%x" % val }}
+{%- endmacro %}
+
+{#- special literal for all zeros #}
+{% macro zeros(width=1) %}
+    {% if width == 1 %}
+'0'
+    {%- else %}
+(OTHERS => '0')
+    {%- endif %}
+{%- endmacro %}
+
+{#- special literal for all ones #}
+{% macro ones(width=1) %}
+    {% if width == 1 %}
+'1'
+    {%- else %}
+(OTHERS => '1')
+    {%- endif %}
+{%- endmacro %}
+
+{%- macro always_begin(sig='test', width=1, init=0) %}
+{%- endmacro %}
+
+{#- 'process' header with reset logic #}
+{%- macro process_begin(label='', sig='test', width=1, init=0, desc="", width_is_param=0) -%}
+  --* purpose : {{ desc }}
+  --* type    : sequential, rising edge, low active asynchronous reset
+  {{ 'p_%s : ' % label.lower() if label else '' }}PROCESS (clk, rst_n)
+  BEGIN{{ '  -- PROCESS p_%s' % label.lower() if label else '' }}
+    IF (rst_n = '0') THEN
+      {{ sig }} <= {{ literal(init, width, width_is_param) }};{{ literal_comment(init) }}
+    ELSIF rising_edge(clk) THEN
+{%- endmacro %}
+
+{#- 'process' footer #}
+{%- macro process_end(label='') %}
+    END IF;
+  END PROCESS{{ ' p_%s' % label.lower() if label else '' }};
+{%- endmacro %}
+
+{#-   SIGNAL: csr for rdata bus #}
+{% macro sig_rdata(reg) %}
+s_{{ reg.name.lower() }}_rdata
+{%- endmacro %}
+
+{#- port: bitfield output #}
+{% macro port_bf_out(reg, bf) %}
+o_{{ reg.name.lower() }}_{{ bf.name.lower() }}
+{%- endmacro %}
+
+{#- port: bitfield input  #}
+{% macro port_bf_in(reg, bf) %}
+i_{{ reg.name.lower() }}_{{ bf.name.lower() }}
+{%- endmacro %}
+
+{#- port: bitfield input enable #}
+{% macro port_bf_en(reg, bf) %}
+i_{{ reg.name.lower() }}_{{ bf.name.lower() }}_en
+{%- endmacro %}
+
+{#- port: bitfield clear enable #}
+{% macro port_bf_clr(reg, bf) %}
+i_{{ reg.name.lower() }}_{{ bf.name.lower() }}_clr
+{%- endmacro %}
+
+{#- port: bitfield set enable #}
+{% macro port_bf_set(reg, bf) %}
+i_{{ reg.name.lower() }}_{{ bf.name.lower() }}_set
+{%- endmacro %}
+
+{#- port: bitfield read enable #}
+{% macro port_bf_ren(reg, bf) %}
+o_{{ reg.name.lower() }}_{{ bf.name.lower() }}_ren
+{%- endmacro %}
+
+{#- port: bitfield read valid #}
+{% macro port_bf_rvalid(reg, bf) %}
+i_{{ reg.name.lower() }}_{{ bf.name.lower() }}_rvalid
+{%- endmacro %}
+
+{#- port: bitfield write enable #}
+{% macro port_bf_wen(reg, bf) %}
+o_{{ reg.name.lower() }}_{{ bf.name.lower() }}_wen
+{%- endmacro %}
+
+{#- port: bitfield write ready #}
+{% macro port_bf_wready(reg, bf) %}
+i_{{ reg.name.lower() }}_{{ bf.name.lower() }}_wready
+{%- endmacro %}
+
+{#-   SIGNAL: bitfield registered read valid #}
+{% macro sig_bf_rvalid(reg, bf) %}
+s_{{ reg.name.lower() }}_{{ bf.name.lower() }}_rvalid
+{%- endmacro %}
+
+{#-   SIGNAL: bitfield flip-flops #}
+{% macro sig_bf(reg, bf) %}
+s_{{ reg.name.lower() }}_{{ bf.name.lower() }}
+{%- endmacro %}
+
+{#- port: bitfield read access strobe #}
+{% macro port_bf_raccess(reg, bf) %}
+o_{{ reg.name.lower() }}_{{ bf.name.lower() }}_rd
+{%- endmacro %}
+
+{#- port: bitfield write access strobe #}
+{% macro port_bf_waccess(reg, bf) %}
+o_{{ reg.name.lower() }}_{{ bf.name.lower() }}_wr
+{%- endmacro %}
+
+{#- port: bitfield lock   SIGNAL #}
+{% macro port_bf_lock(reg, bf) %}
+s_{{ reg.name.lower() }}_{{ bf.name.lower() }}_lock
+{%- endmacro %}
+
+{#-   SIGNAL: register read enable #}
+{% macro sig_ren(reg) %}
+s_{{ reg.name.lower() }}_ren
+{%- endmacro %}
+
+{#-   SIGNAL: register read enable registered #}
+{% macro sig_ren(reg) %}
+s_{{ reg.name.lower() }}_ren
+{%- endmacro %}
+
+{#-   SIGNAL: register write enable #}
+{% macro sig_wen(reg) %}
+s_{{ reg.name.lower() }}_wen
+{%- endmacro %}
+
+{#- conditional #}
+{% macro cond(val, branch_n, last=False) %}
+    {% if branch_n == 0 and not last %}
+  IF ({{ val }}) THEN
+    {%- elif branch_n and not last %}
+  ELSIF ({{ val }}) THEN
+    {%- elif branch_n == 0 and last %}
+    {%- else %}
+  ELSE
+    {%- endif %}
+{%- endmacro %}
+
+{#- TEMPLATE NAMESPACE #}
+{% set tmp = namespace() %}
+
+{#- TEMPLATE #}
+-------------------------------------------------------------------------------
+-- COPYRIGHT (c) SOLECTRIX GmbH, Germany, {{ date.split(".")[2] }}            All rights reserved
+--
+-- The copyright to the document(s) herein is the property of SOLECTRIX GmbH
+-- The document(s) may be used and/or copied only with the written permission
+-- from SOLECTRIX GmbH or in accordance with the terms/conditions stipulated
+-- in the agreement/contract under which the document(s) have been supplied
+-------------------------------------------------------------------------------
+-- Project  : {{ config['project']|default('N/A') }}
+-- File     : {{ module_name }}.vhd
+-- Created  : {{ date }}
+-- Standard : VHDL'93/02
+-------------------------------------------------------------------------------
+--*
+--* @short Register module (created with Corsair v.{{ corsair_ver }})
+--*
+--*   Needed Libraries and Packages:
+--*   @li ieee.std_logic_1164 standard multi-value logic package
+--*   @li ieee.numeric_std package
+--*
+--* @author {{ author }}
+--* @date {{ date }}
+--* @internal
+--/
+-------------------------------------------------------------------------------
+-- Modification history :
+-- Date        Author & Description
+-- {{ date }}  {{ author }}: Created
+-------------------------------------------------------------------------------
+
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+USE ieee.numeric_std.ALL;
+
+-------------------------------------------------------------------------------
+
+ENTITY {{ module_name }} IS
+  GENERIC (
+    g_addr_bits : INTEGER := {{ config['address_width'] }});
+  PORT (
+    -- Clock & Reset
+    {{ '%-30s' % "clk" }} : IN  STD_LOGIC;
+    {{ '%-30s' % "rst_n" }} : IN  STD_LOGIC;
+    -- Register Ports
+{% for reg in rmap %}
+    {% for bf in reg %}
+{#-    
+    -- *** {{ reg.name }} ***
+    ---- {{ bf.name }} #}
+        {% if 'a' in bf.hardware %}
+            {% if 'i' in bf.hardware %}
+    {{ '%-30s' % port_bf_raccess(reg, bf) }} : OUT {{range_decl(0, False)}};
+            {% endif %}
+            {% if 'o' in bf.hardware %}
+    {{ '%-30s' % port_bf_waccess(reg, bf) }} : OUT {{range_decl(0, False)}};
+            {% endif %}
+        {% endif %}
+        {% if 'c' in bf.hardware %}
+    {{ '%-30s' % port_bf_clr(reg, bf) }} : IN  {{range_decl(0, False)}};
+        {% endif %}
+        {% if 's' in bf.hardware %}
+    {{ '%-30s' % port_bf_set(reg, bf) }} : IN  {{range_decl(0, False)}};
+        {% endif %}
+        {% if 'i' in bf.hardware %}
+    {{ '%-30s' % port_bf_in(reg, bf) }} : IN  {{ range_decl(bf.width - 1, bf.is_vector()) }};
+        {% endif %}
+        {% if 'o' in bf.hardware %}
+    {{ '%-30s' % port_bf_out(reg, bf) }} : OUT {{ range_decl(bf.width - 1, bf.is_vector()) }};
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+    -- Expansion interface
+    {{ '%-30s' % "i_we" }} : IN  STD_LOGIC;
+    {{ '%-30s' % "i_re" }} : IN  STD_LOGIC;
+    {{ '%-30s' % "i_addr" }} : IN  STD_LOGIC_VECTOR(g_addr_bits - 1 DOWNTO 0);
+    {{ '%-30s' % "i_data" }} : IN  STD_LOGIC_VECTOR(7 DOWNTO 0);
+    {{ '%-30s' % "o_data" }} : OUT STD_LOGIC_VECTOR(7 DOWNTO 0));
+END ENTITY {{ module_name }};
+
+-------------------------------------------------------------------------------
+
+ARCHITECTURE rtl OF {{ module_name }} IS
+
+  -- signal declaration(s)
+{% for reg in rmap %}
+  SIGNAL {{ '%-30s' % sig_rdata(reg) }} : {{ range_decl(config['data_width'] - 1) }};
+    {% if 'w' in reg.access %}
+  SIGNAL {{ '%-30s' % sig_wen(reg) }} : {{ range_decl(0, False) }};
+    {% endif %}
+    {% if 'r' in reg.access %}
+  SIGNAL {{ '%-30s' % sig_ren(reg) }} : {{ range_decl(0, False) }};
+    {% endif %}
+    {% for bf in reg %}
+  SIGNAL {{ '%-30s' % sig_bf(reg, bf) }} : {{ range_decl(bf.width - 1, bf.is_vector()) }};
+    {% endfor %}
+{% endfor %}
+
+BEGIN
+
+{% for reg in rmap %}
+  --------------------------------------------------------------------------------
+  -- [{{ '0x%x' % reg.address }}] : {{ reg.name }} - {{ reg.description }}
+  --------------------------------------------------------------------------------
+{# fill unused bits with zeros #}
+    {% set tmp.last_bit = 0 %}
+    {% for bf in reg %}
+        {% if bf.lsb > tmp.last_bit %}
+  {{ sig_rdata(reg) }}{{ range(bf.lsb - 1, tmp.last_bit) }} <= {{ zeros(bf.lsb - tmp.last_bit) }};
+        {% endif %}
+        {% set tmp.last_bit = bf.msb + 1 %}
+    {% endfor %}
+    {% if config['data_width'] - 1 > tmp.last_bit %}
+  {{ sig_rdata(reg) }}{{ range(config['data_width'] - 1, tmp.last_bit) }} <= {{ zeros(config['data_width'] - tmp.last_bit) }};
+    {% endif %}
+
+    {% if 'w' in reg.access %}
+  -- {{ reg.name }} write access
+  {{ sig_wen(reg) }} <= i_we WHEN (i_addr = {{ literal(reg.address, "g_addr_bits", width_is_param=1) }}) ELSE '0';{{ literal_comment(reg.address) }}
+    {% endif %}
+    {% if 'r' in reg.access %}
+  -- {{ reg.name }} read enable
+  {{ sig_ren(reg) }} <= i_re WHEN (i_addr = {{ literal(reg.address, "g_addr_bits", width_is_param=1) }}) ELSE '0';{{ literal_comment(reg.address) }}
+    {% endif %}
+    {% for bf in reg %}
+
+  -----------------------
+  -- Bit field:
+  -- {{ reg.name }}{{ range(bf.msb, bf.lsb) }} : {{ bf.name }} - {{ bf.description }}
+  -- access: {{ bf.access }}, hardware: {{ bf.hardware }}
+  -----------------------
+        {% if 'a' in bf.hardware %}
+  -- access notification
+            {% if 'o' in bf.hardware %}
+  ---- write notify
+  {{ port_bf_waccess(reg, bf) }} <= {{ sig_wen(reg) }};
+            {% endif %}
+            {% if 'i' in bf.hardware %}
+  ---- read notify
+  {{ port_bf_raccess(reg, bf) }} <= {{ sig_ren(reg) }};
+            {% endif %}
+        {% endif %}
+        {% if 'wo' in bf.access %}
+  -- write only
+  {{ sig_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} <= {{ zeros(bf.width) }};
+        {% else %}
+  -- readback
+  {{ sig_rdata(reg) }}{{ range(bf.msb, bf.lsb) }} <= {{ sig_bf(reg, bf) }};
+        {% endif %}
+        {% if 'o' in bf.hardware %}
+  -- output
+  {{ port_bf_out(reg, bf) }} <= {{ sig_bf(reg, bf) }};
+        {% endif %}
+
+  {{ process_begin(label=bf.name, sig=sig_bf(reg, bf), width=bf.width, init=bf.reset, desc=bf.name)}}
+        {% set tmp.cond_cnt = 0 %}
+        {% if 's' in bf.hardware %}
+      IF ({{ "%s = '1'" % port_bf_set(reg, bf) }}) then
+        {{ sig_bf(reg, bf) }} <= {{ ones(bf.width) }};
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+        {%- endif %}
+        {% if 'c' in bf.hardware %}
+    {{ cond("%s = '1'" % port_bf_clr(reg, bf), tmp.cond_cnt) }}
+        {{ sig_bf(reg, bf) }} <= {{ zeros(bf.width) }};
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+        {%- endif %}
+        {% if bf.access == 'roc' %}
+    {{ cond("{} = '1' and {} = '0'".format(sig_ren(reg), sig_ren(reg)), tmp.cond_cnt) }}
+            {{ sig_bf(reg, bf) }} <= {{ zeros(bf.width) }};
+        {%- endif %}
+        {% if 'w' in bf.access %}
+    {{ cond("%s = '1'" % sig_wen(reg), tmp.cond_cnt) }}
+            {% set tmp.cond_cnt = tmp.cond_cnt + 1 %}
+            {% for num, val in bf.byte_strobes.items() %}
+            {% if 'w1c' in bf.access %}
+        IF (i_data({{ val['wdata_lsb'] }}) = '1') THEN  -- write '1' to clear
+          {{ sig_bf(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= {{ zeros(val['bf_msb'] - val['bf_lsb'] + 1) }};
+        END IF;
+            {% elif 'w1s' in bf.access %}
+        IF (i_data({{ val['wdata_lsb'] }}) = '1') THEN  -- write '1' to set
+          {{ sig_bf(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= {{ ones(val['bf_msb'] - val['bf_lsb'] + 1) }};
+        END IF; 
+            {% else %}
+        {{ sig_bf(reg, bf) }}{{ range(val['bf_msb'], val['bf_lsb'], bf.is_vector()) }} <= i_data{{ range(val['wdata_msb'], val['wdata_lsb']) }};
+            {% endif %}
+            {% endfor %}
+        {%- endif %}
+        {% if 'i' in bf.hardware %}
+    {{ cond("", tmp.cond_cnt, last=True) }}
+        {{ sig_bf(reg, bf) }} <= {{ port_bf_in(reg, bf) }};
+        {% elif 'sc' in bf.access %}
+    {{ cond("", tmp.cond_cnt, last=True) }}  -- self-clearing
+        {{ sig_bf(reg, bf) }} <= {{ zeros(bf.width) }};
+        {% else %}
+    {{ cond("", tmp.cond_cnt, last=True) }}
+        {{ sig_bf(reg, bf) }} <= {{ sig_bf(reg, bf) }};
+        {% endif %}
+        {% if tmp.cond_cnt != 0 %}
+      END IF;
+        {% endif %}
+{{ process_end(label=bf.name) }}
+    {% endfor %}
+
+
+{% endfor %}
+
+  --------------------------------------------------------------------------------
+  -- Address decoder
+  --------------------------------------------------------------------------------
+  {{ process_begin(label='addr_decode', sig='o_data', width=config['data_width'], init=read_filler, desc="Register address decoder")}}
+{% set loop_ns = namespace(first_reg = True) %}
+{% for reg in rmap %}
+    {% if loop_ns.first_reg %}
+      IF (i_addr = {{ literal(reg.address, "g_addr_bits", width_is_param=1)}}) THEN{{ literal_comment(reg.address) }}
+        o_data <= {{ sig_rdata(reg) }};
+    {% else %}
+      ELSIF (i_addr = {{ literal(reg.address, "g_addr_bits", width_is_param=1)}}) THEN{{ literal_comment(reg.address) }}
+        o_data <= {{ sig_rdata(reg) }};
+    {% endif %}
+    {% set loop_ns.first_reg = False %}
+{% endfor %}
+      ELSE 
+        o_data <= {{ literal(read_filler, config['data_width']) }};{{ literal_comment(read_filler) }}
+      END IF;
+{{ process_end(label='addr_decode') }}
+
+END ARCHITECTURE rtl;

@@ -98,21 +98,23 @@ class Wavedrom():
     """Basic class for rendering register images with wavedrom"""
 
     def draw_regs(self, imgdir, rmap):
+        import re
         imgdir.mkdir(exist_ok=True)
 
         bits = config.globcfg['data_width']
         lanes = bits // 16 if bits > 16 else 1
         for reg in rmap:
             reg_wd = {"reg": [],
-                      "config": {"bits": bits, "lanes": lanes, "fontsize": 10}}
+                      "config": {"bits": bits, "lanes": lanes, "fontsize": 12}}
             bit_pos = -1
             for bf in reg:
                 if bit_pos == -1 and bf.lsb > 0:
                     reg_wd["reg"].append({"bits": bf.lsb})
                 elif bf.lsb - bit_pos > 1:
                     reg_wd["reg"].append({"bits": bf.lsb - bit_pos - 1})
-                name = bf.name
-                name_max_len = 5 * bf.width
+                pattern = r"^RES\d+"
+                name = re.sub(pattern, "RES", bf.name)
+                name_max_len = 12 * bf.width
                 if len(bf.name) > name_max_len:  # to prevent labels overlapping
                     name = bf.name[:name_max_len - 1] + '..'
                 reg_wd["reg"].append({"name": name, "attr": bf.access, "bits": bf.width})

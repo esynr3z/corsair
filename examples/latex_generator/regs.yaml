@@ -1,0 +1,520 @@
+regmap:
+-   name: GPIO0_VALUE
+    description: "GPIO0 Value"
+    group_id: 0
+    address: 0x80
+    bitfields:
+    -   name: GPIO0_2
+        description: "Deserializer #0 GENERAL_IO2 Value"
+        reset: 0
+        width: 1
+        lsb: 2
+        access: rw
+        hardware: io
+    -   name: GPIO0_3
+        description: "Deserializer #0 GENERAL_IO3 Value"
+        reset: 0
+        width: 1
+        lsb: 3
+        access: rw
+        hardware: io    
+    -   name: GPIO0_4
+        description: "Deserializer #0 GENERAL_IO4 Value"
+        reset: 0
+        width: 1
+        lsb: 4
+        access: rw
+        hardware: io    
+    -   name: GPIO0_5
+        description: "Deserializer #0 GENERAL_IO5 Value"
+        reset: 0
+        width: 1
+        lsb: 5
+        access: rw
+        hardware: io
+-   name: GPIO0_DIR
+    description: "GPIO0 Direction"
+    group_id: 0
+    address: 0x81
+    bitfields:
+    -   name: GPIO0_2_DIR
+        description: "FPGA Pin to Deserializer #0 GENERAL_IO2 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 2
+        access: rw
+        hardware: o
+    -   name: GPIO0_3_DIR
+        description: "FPGA Pin to Deserializer #0 GENERAL_IO3 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 3
+        access: rw
+        hardware: o
+    -   name: GPIO0_4_DIR
+        description: "FPGA Pin to Deserializer #0 GENERAL_IO4 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 4
+        access: rw
+        hardware: o
+    -   name: GPIO0_5_DIR
+        description: "FPGA Pin to Deserializer #0 GENERAL_IO4 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 5
+        access: rw
+        hardware: o
+-   name: GPIO1_VALUE
+    description: "GPIO1 Value"
+    group_id: 1
+    address: 0x82
+    bitfields:
+    -   name: GPIO1_2
+        description: "Deserializer #1 GENERAL_IO2 Value"
+        reset: 0
+        width: 1
+        lsb: 2
+        access: rw
+        hardware: io
+    -   name: GPIO1_3
+        description: "Deserializer #1 GENERAL_IO3 Value"
+        reset: 0
+        width: 1
+        lsb: 3
+        access: rw
+        hardware: io    
+    -   name: GPIO1_4
+        description: "Deserializer #1 GENERAL_IO4 Value"
+        reset: 0
+        width: 1
+        lsb: 4
+        access: rw
+        hardware: io    
+    -   name: GPIO1_5
+        description: "Deserializer #1 GENERAL_IO5 Value"
+        reset: 0
+        width: 1
+        lsb: 5
+        access: rw
+        hardware: io
+-   name: GPIO1_DIR
+    description: "GPIO1 Direction"
+    group_id: 1
+    address: 0x83
+    bitfields:
+    -   name: GPIO1_2_DIR
+        description: "FPGA Pin to Deserializer #1 GENERAL_IO2 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 2
+        access: rw
+        hardware: o
+    -   name: GPIO1_3_DIR
+        description: "FPGA Pin to Deserializer #1 GENERAL_IO3 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 3
+        access: rw
+        hardware: o
+    -   name: GPIO1_4_DIR
+        description: "FPGA Pin to Deserializer #1 GENERAL_IO4 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 4
+        access: rw
+        hardware: o
+    -   name: GPIO1_5_DIR
+        description: "FPGA Pin to Deserializer #1 GENERAL_IO4 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 5
+        access: rw
+        hardware: o
+-   name: GPIO2_VALUE
+    description: "GPIO2 Value"
+    group_id: 2
+    address: 0x84
+    bitfields:
+    -   name: GPIO2_2
+        description: "Serializer #0 GENERAL_IO2 Value"
+        reset: 0
+        width: 1
+        lsb: 2
+        access: rw
+        hardware: io
+    -   name: GPIO2_3
+        description: "Serializer #0 GENERAL_IO3 Value"
+        reset: 0
+        width: 1
+        lsb: 3
+        access: rw
+        hardware: io    
+    -   name: GPIO2_4
+        description: "Serializer #0 GENERAL_IO4 Value"
+        reset: 0
+        width: 1
+        lsb: 4
+        access: rw
+        hardware: io    
+-   name: GPIO2_DIR
+    description: "GPIO2 Direction"
+    group_id: 2
+    address: 0x85
+    bitfields:
+    -   name: GPIO2_2_DIR
+        description: "FPGA Pin to Serializer #0 GENERAL_IO2 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 2
+        access: rw
+        hardware: o
+    -   name: GPIO2_3_DIR
+        description: "FPGA Pin to Serializer #0 GENERAL_IO3 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 3
+        access: rw
+        hardware: o
+    -   name: GPIO2_4_DIR
+        description: "FPGA Pin to Serializer #0 GENERAL_IO4 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 4
+        access: rw
+        hardware: o
+-   name: GPIO3_VALUE
+    description: "GPIO3 Value"
+    group_id: 3
+    address: 0x86
+    bitfields:
+    -   name: GPIO3_2
+        description: "Serializer #1 GENERAL_IO2 Value"
+        reset: 0
+        width: 1
+        lsb: 2
+        access: rw
+        hardware: io
+    -   name: GPIO3_3
+        description: "Serializer #1 GENERAL_IO3 Value"
+        reset: 0
+        width: 1
+        lsb: 3
+        access: rw
+        hardware: io    
+    -   name: GPIO3_4
+        description: "Serializer #1 GENERAL_IO4 Value"
+        reset: 0
+        width: 1
+        lsb: 4
+        access: rw
+        hardware: io    
+-   name: GPIO3_DIR
+    description: "GPIO3 Direction"
+    group_id: 3
+    address: 0x87
+    bitfields:
+    -   name: GPIO3_2_DIR
+        description: "FPGA Pin to Serializer #1 GENERAL_IO2 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 2
+        access: rw
+        hardware: o
+    -   name: GPIO3_3_DIR
+        description: "FPGA Pin to Serializer #1 GENERAL_IO3 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 3
+        access: rw
+        hardware: o
+    -   name: GPIO3_4_DIR
+        description: "FPGA Pin to Serializer #1 GENERAL_IO4 is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 4
+        access: rw
+        hardware: o
+-   name: CONTROL
+    description: "Control Register"
+    group_id: 4
+    address: 0x88
+    bitfields:
+    -   name: POC1_EN
+        description: "PoC 1 Enable"
+        reset: 0
+        width: 1
+        lsb: 0
+        access: rw
+        hardware: o
+    -   name: POC1_ERR
+        description: "PoC 1 Error"
+        reset: 0
+        width: 1
+        lsb: 1
+        access: ro
+        hardware: i
+    -   name: POC1_BYP_EN
+        description: "PoC 1 Bypass Enable"
+        reset: 0
+        width: 1
+        lsb: 2
+        access: rw
+        hardware: o
+    -   name: POC1_BYP_ERR
+        description: "PoC 1 Bypass Error"
+        reset: 0
+        width: 1
+        lsb: 3
+        access: ro
+        hardware: i
+    -   name: POC2_EN
+        description: "PoC 2 Enable"
+        reset: 0
+        width: 1
+        lsb: 4
+        access: rw
+        hardware: o
+    -   name: POC2_ERR
+        description: "PoC 2 Error"
+        reset: 0
+        width: 1
+        lsb: 5
+        access: ro
+        hardware: i
+    -   name: POC2_BYP_EN
+        description: "PoC 2 Bypass Enable"
+        reset: 0
+        width: 1
+        lsb: 6
+        access: rw
+        hardware: o
+    -   name: POC2_BYP_ERR
+        description: "PoC 2 Bypass Error"
+        reset: 0
+        width: 1
+        lsb: 7
+        access: ro
+        hardware: i
+-   name: SM_FAULT
+    description: "SM Fault Register"
+    group_id: 5
+    address: 0x89
+    bitfields:
+    -   name: DES0_EXT_SM_FAULT
+        description: "Deserializer 0 EXT SM Fault"
+        reset: 0
+        width: 1
+        lsb: 0
+        access: ro
+        hardware: i
+    -   name: DES0_SM_FAULT
+        description: "Deserializer 0 SM Fault"
+        reset: 0
+        width: 1
+        lsb: 1
+        access: ro
+        hardware: i
+    -   name: DES1_EXT_SM_FAULT
+        description: "Deserializer 1 EXT SM Fault"
+        reset: 0
+        width: 1
+        lsb: 2
+        access: ro
+        hardware: i
+    -   name: DES1_SM_FAULT
+        description: "Deserializer 1 SM Fault"
+        reset: 0
+        width: 1
+        lsb: 3
+        access: ro
+        hardware: i
+    -   name: SER0_EXT_SM_FAULT
+        description: "Serializer 0 EXT SM Fault"
+        reset: 0
+        width: 1
+        lsb: 4
+        access: ro
+        hardware: i
+    -   name: SER1_EXT_SM_FAULT
+        description: "Serializer 1 EXT SM Fault"
+        reset: 0
+        width: 1
+        lsb: 6
+        access: ro
+        hardware: i
+-   name: GPIO_CNT_CTL
+    description: "Deserializer GPIO Edge Counter Control"
+    group_id: 6
+    address: 0x8F
+    bitfields:
+    -   name: DES0_GPIO_SEL
+        description: "Deserializer #0 GPIO Select"
+        reset: 0
+        width: 4
+        lsb: 0
+        access: rw
+        hardware: o
+        enums:
+        -   name: GENERAL_IO0
+            description: "Deserializer #0 GENERAL_IO0"
+            value: 0x0
+        -   name: GENERAL_IO1
+            description: "Deserializer #0 GENERAL_IO1"
+            value: 0x1
+        -   name: GENERAL_IO2
+            description: "Deserializer #0 GENERAL_IO2"
+            value: 0x2
+        -   name: GENERAL_IO3
+            description: "Deserializer #0 GENERAL_IO3"
+            value: 0x3
+        -   name: GENERAL_IO4
+            description: "Deserializer #0 GENERAL_IO4"
+            value: 0x4
+        -   name: GENERAL_IO5
+            description: "Deserializer #0 GENERAL_IO5"
+            value: 0x5
+    -   name: DES1_GPIO_SEL
+        description: "Deserializer #1 GPIO Select"
+        reset: 0
+        width: 4
+        lsb: 4
+        access: rw
+        hardware: o
+        enums:
+        -   name: GENERAL_IO0
+            description: "Deserializer #1 GENERAL_IO0"
+            value: 0x0
+        -   name: GENERAL_IO1
+            description: "Deserializer #1 GENERAL_IO1"
+            value: 0x1
+        -   name: GENERAL_IO2
+            description: "Deserializer #1 GENERAL_IO2"
+            value: 0x2
+        -   name: GENERAL_IO3
+            description: "Deserializer #1 GENERAL_IO3"
+            value: 0x3
+        -   name: GENERAL_IO4
+            description: "Deserializer #1 GENERAL_IO4"
+            value: 0x4
+        -   name: GENERAL_IO5
+            description: "Deserializer #1 GENERAL_IO5"
+            value: 0x5
+-   name: DES0_GPIO_RE_CNT
+    description: "Deserializer #0 GPIO Rising Edge Counter"
+    group_id: 6
+    address: 0x90
+    bitfields:
+    -   name: EDGE_CNT
+        description: "Deserializer #0 Rising Edge Counter \\newline
+                     Count the rising edges of the selected Deserializer #0 GENERAL_IO."
+        reset: 0
+        width: 8
+        lsb: 0
+        access: roc
+        hardware: ia
+-   name: DES0_GPIO_FE_CNT
+    description: "Deserializer #0 GPIO Falling Edge Counter"
+    group_id: 6
+    address: 0x91
+    bitfields:
+    -   name: EDGE_CNT
+        description: "Deserializer #0 Falling Edge Counter \\newline
+                     Count the rising edges of the selected Deserializer #0 GENERAL_IO."
+        reset: 0
+        width: 8
+        lsb: 0
+        access: roc
+        hardware: ia
+-   name: DES1_GPIO_RE_CNT
+    description: "Deserializer #1 GPIO Rising Edge Counter"
+    group_id: 6
+    address: 0x92
+    bitfields:
+    -   name: EDGE_CNT
+        description: "Deserializer #1 Rising Edge Counter \\newline
+                     Count the rising edges of the selected Deserializer #1 GENERAL_IO."
+        reset: 0
+        width: 8
+        lsb: 0
+        access: roc
+        hardware: ia
+-   name: DES1_GPIO_FE_CNT
+    description: "Deserializer #1 GPIO Falling Edge Counter"
+    group_id: 6
+    address: 0x93
+    bitfields:
+    -   name: EDGE_CNT
+        description: "Deserializer #1 Falling Edge Counter \\newline
+                     Count the falling edges of the selected Deserializer #1 GENERAL_IO."
+        reset: 0
+        width: 8
+        lsb: 0
+        access: roc
+        hardware: ia
+-   name: GPIO4_VALUE
+    description: "GPIO4 Value"
+    group_id: 7
+    address: 0x9E
+    bitfields:
+    -   name: GPIO4_0
+        description: "Net 'SPI_CLK Value'"
+        reset: 0
+        width: 1
+        lsb: 0
+        access: rw
+        hardware: io
+    -   name: GPIO4_1
+        description: "Net 'SPI_CS Value'"
+        reset: 0
+        width: 1
+        lsb: 1
+        access: rw
+        hardware: io    
+    -   name: GPIO4_2
+        description: "Net 'SPI_MOSI Value'"
+        reset: 0
+        width: 1
+        lsb: 2
+        access: rw
+        hardware: io    
+    -   name: GPIO4_3
+        description: "Net 'SPI_MISO Value'"
+        reset: 0
+        width: 1
+        lsb: 3
+        access: rw
+        hardware: io
+-   name: GPIO4_DIR
+    description: "GPIO4 Direction"
+    group_id: 7
+    address: 0x9F
+    bitfields:
+    -   name: GPIO4_2_DIR
+        description: "FPGA Pin to net 'SPI_CLK' is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 0
+        access: rw
+        hardware: o
+    -   name: GPIO4_3_DIR
+        description: "FPGA Pin to net 'SPI_CS' is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 1
+        access: rw
+        hardware: o
+    -   name: GPIO4_4_DIR
+        description: "FPGA Pin to net 'SPI_MOSI' is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 2
+        access: rw
+        hardware: o
+    -   name: GPIO4_5_DIR
+        description: "FPGA Pin to net 'SPI_MISO' is Input (0) / Output (1)"
+        reset: 0
+        width: 1
+        lsb: 3
+        access: rw
+        hardware: o
