@@ -253,7 +253,7 @@ assign {{ sig_csr_rdata(reg) }}{{ range(bf.lsb - 1, tmp.last_bit) }} = {{ zeros(
         {% endif %}
         {% set tmp.last_bit = bf.msb + 1 %}
     {% endfor %}
-    {% if config['data_width'] - 1 > tmp.last_bit %}
+    {% if config['data_width'] > tmp.last_bit %}
 assign {{ sig_csr_rdata(reg) }}{{ range(config['data_width'] - 1, tmp.last_bit) }} = {{ zeros(config['data_width'] - tmp.last_bit) }};
     {% endif %}
 
