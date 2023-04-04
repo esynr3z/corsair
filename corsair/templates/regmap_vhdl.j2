@@ -362,7 +362,7 @@ begin
         {% endif %}
         {% set tmp.last_bit = bf.msb + 1 %}
     {% endfor %}
-    {% if config['data_width'] - 1 > tmp.last_bit %}
+    {% if config['data_width'] > tmp.last_bit %}
 {{ sig_csr_rdata(reg) }}{{ range(config['data_width'] - 1, tmp.last_bit) }} <= {{ zeros(config['data_width'] - tmp.last_bit) }};
     {% endif %}
 
