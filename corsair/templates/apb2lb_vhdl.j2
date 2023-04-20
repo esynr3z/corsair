@@ -59,7 +59,7 @@ begin
 {% macro apb_core() %}
 -- APB interface
 prdata  <= rdata;
-pslverr <= '1'; -- always OKAY
+pslverr <= '0'; -- always OKAY
 pready  <= wready when (psel='1' and penable='1' and pwrite='1') else
            rvalid when (psel='1' and pwrite='0' and penable='1') else
            '1';
