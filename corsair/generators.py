@@ -606,3 +606,37 @@ class Python(Generator, Jinja2):
         j2_vars['config'] = config.globcfg
         # render
         self.render_to_file(j2_template, j2_vars, self.path)
+
+
+class CmsisSvd(Generator, Jinja2):
+    """ Create the CMSIS SVD file.
+
+    :param rmap: Register map object
+    :type rmap: :class:`corsair.RegisterMap`
+    :param path: Path to the output file
+    :type path: str
+    """
+
+    def __init__(self, rmap=None, path='regs.svd', peripheral_name='CSR',
+                 description='no description', part_version='1.0.0', **args):
+        super().__init__(rmap, **args)
+        self.path = path
+        self.other = {'peripheral_name': peripheral_name,
+                      'description': description,
+                      'part_version': part_version}
+
+    def generate(self):
+        # validate parameters
+        self.validate()
+        for key, item in self.other.items():
+            assert item and utils.is_str(item), f'[SVD] {key} must be a non-empty string.'
+        # prepare jinja2
+        j2_template = 'cmsis_svd.j2'
+        j2_vars = {}
+        j2_vars['corsair_ver'] = __version__
+        j2_vars['rmap'] = self.rmap
+        j2_vars['config'] = config.globcfg
+        j2_vars['part_name'] = utils.get_file_name(self.path)
+        j2_vars.update(self.other)
+        # render
+        self.render_to_file(j2_template, j2_vars, self.path)

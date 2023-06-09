@@ -1,0 +1,91 @@
+{#- value in hex format #}
+{% macro literal(reset, width) %}
+{{ "0x%0{w}x".format(w=width // 4) % reset }}
+{%- endmacro %}
+{#- sw access #}
+{% macro access(bf) %}
+<access>{%- if bf.access.startswith('ro') %}
+read-only
+{%- elif bf.access.startswith('wo') %}
+write-only
+{%- else %}
+read-write
+{%- endif %}</access>
+{%- endmacro %}
+{#- read / write modify #}
+{% macro rw_mod(bf) %}
+{% if bf.access == 'rw1c' %}
+              <modifiedWriteValues>oneToClear</modifiedWriteValues>
+{% elif bf.access == '1s' %}
+              <modifiedWriteValues>oneToSet</modifiedWriteValues>
+{% elif bf.access in ['roc', 'rolh'] %}
+              <readAction>clear</readAction>
+{% elif bf.access == 'roll' %}
+              <readAction>set</readAction>
+{% endif -%}
+{% endmacro %}
+<?xml version="1.0" encoding="utf-8"?>
+<device schemaVersion="1.1" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="https://raw.githubusercontent.com/ARM-software/CMSIS_5/develop/CMSIS/Utilities/CMSIS-SVD.xsd" >
+  <name>{{ part_name }}</name>
+  <version>{{ part_version }}</version>
+  <description>{{ description }}</description>
+  <addressUnitBits>{{ config.address_width }}</addressUnitBits>
+  <width>{{ config.data_width }}</width>
+  <size>{{ config.data_width }}</size>
+
+  <peripherals>
+    {% set min_offset = (rmap | map(attribute='address') | sort)[0] %}
+    {% set max_offset = (rmap | map(attribute='address') | sort)[-1] %}
+    <!-- {{ peripheral_name }} -->
+    <peripheral>
+      <name>{{ peripheral_name }}</name>
+      <baseAddress>{{ literal(config.base_address, config.address_width) }}</baseAddress>
+      <addressBlock>
+        <offset>{{ literal(min_offset, config.address_width) }}</offset>
+        <size>{{ '0x%x' % (max_offset - min_offset + config.data_width / config.address_width) | int }}</size>
+        <usage>registers</usage>
+      </addressBlock>
+      <registers>
+{% for reg in rmap %}
+        <!-- {{ reg.name }} -->
+        <register>
+          <name>{{ reg.name }}</name>
+{% if reg.description %}
+          <description>{{ reg.description }}</description>
+{% endif %}
+          <addressOffset>{{ literal(reg.address, config.address_width) }}</addressOffset>
+          <resetValue>{{ literal(reg.reset, config.data_width) }}</resetValue>
+
+          <fields>
+{% for bf in reg.bitfields %}
+            <!-- {{ bf.name }} -->
+            <field>
+              <name>{{ bf.name }}</name>
+{% if bf.description %}
+              <description>{{ bf.description }}</description>
+{% endif %}
+              <bitRange>[{{ bf.msb }}:{{ bf.lsb }}]</bitRange>
+              {{ access(bf) }}
+{{ rw_mod(bf) }}
+{% if bf.enums %}
+              <enumeratedValues>
+{% for enum in bf.enums %}
+                <enumeratedValue>
+                  <name>{{ enum.name }}</name>
+{% if enum.description %}
+                  <description>{{ enum.description }}</description>
+{% endif %}
+                  <value>{{ enum.value }}</value>
+                </enumeratedValue>
+{% endfor %}
+              </enumeratedValues>
+{% endif %}
+            </field>
+{% endfor %}
+          </fields>
+        </register>
+{% endfor %}
+      </registers>
+    </peripheral>
+  </peripherals>
+</device>
