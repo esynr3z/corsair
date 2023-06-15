@@ -31,7 +31,7 @@ def read_csrconfig(cfgpath):
     globcfg = default_globcfg()
     if 'globcfg' in cfg.sections():
         globcfg.update(dict(cfg['globcfg']))
-        globcfg["base_address"] = utils.str2int(globcfg["base_address"])
+        globcfg["base_address"] = utils.always_str(globcfg["base_address"])
         globcfg["data_width"] = utils.str2int(globcfg["data_width"])
         globcfg["address_width"] = utils.str2int(globcfg["address_width"])
         try:
@@ -65,7 +65,7 @@ def write_csrconfig(cfgpath, globcfg, targets):
 def validate_globcfg(globcfg):
     """Validate a dictionary with global configuration."""
     # base_address
-    assert utils.is_non_neg_int(globcfg["base_address"]), \
+    assert utils.is_str(globcfg["base_address"]), \
         "Wrong value for 'base_address'='%s'. Must be a non negative integer." % globcfg["base_address"]
 
     # data_width
