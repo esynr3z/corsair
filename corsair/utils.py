@@ -31,6 +31,15 @@ def str2int(val, base=None):
         raise ValueError("Can't convert '%s' to int!" % val)
 
 
+def always_str(val, base=None):
+    """return <val> converted into a hex string, if that fails, return <val>"""
+    try:
+        intval = str2int(val, base)
+        return hex(intval)
+    except ValueError:
+        return val
+
+
 def str2bool(val):
     """String to integer conversion"""
     try:
