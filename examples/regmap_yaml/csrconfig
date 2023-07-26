@@ -47,6 +47,14 @@ image_dir = md_img
 print_conventions = True
 generator = Markdown
 
+[rst_doc]
+path = doc/regs.rst
+title = Register map
+print_images = True
+image_dir = md_img
+print_conventions = True
+generator = RST
+
 [asciidoc_doc]
 path = doc/regs.adoc
 title = Register map
