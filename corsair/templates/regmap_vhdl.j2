@@ -172,6 +172,11 @@ csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_raccess
 csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_waccess
 {%- endmacro %}
 
+{#- port: bitfield write access strobe #}
+{% macro port_bf_waccess_ff(reg, bf) %}
+csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_waccess_ff
+{%- endmacro %}
+
 {#- port: bitfield lock signal #}
 {% macro port_bf_lock(reg, bf) %}
 csr_{{ reg.name.lower() }}_{{ bf.name.lower() }}_lock
@@ -384,7 +389,8 @@ begin
 -----------------------
         {% if 'a' in bf.hardware %}
             {% if 'o' in bf.hardware %}
-{{ port_bf_waccess(reg, bf) }} <= wready and {{ sig_csr_wen(reg) }};
+{# {{ port_bf_waccess(reg, bf) }} <= wready and {{ sig_csr_wen(reg) }}; #}
+{{ port_bf_waccess(reg, bf) }} <= {{ port_bf_waccess_ff(reg, bf) }};
             {% endif %}
             {% if 'i' in bf.hardware %}
 {{ port_bf_raccess(reg, bf) }} <= rvalid and {{ sig_csr_ren(reg) }};
@@ -491,6 +497,10 @@ begin
     {% if 'l' in bf.hardware %}
     end if;
     {% endif %}
+{{ process_end() }}
+
+{{ process_begin(sig=port_bf_waccess_ff(reg, bf), width=1, init=0)}}
+    {{ port_bf_waccess_ff(reg, bf)  }} <= wready and {{ sig_csr_wen(reg) }};
 {{ process_end() }}
 
         {% if 'r' in bf.access and 'q' in bf.hardware %}
