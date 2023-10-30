@@ -380,10 +380,12 @@ assign {{ port_bf_wen(reg, bf) }} = {{ sig_csr_wen(reg) }};
     end
 end
 
+        {% if 'w' in bf.access %}
 {{ always_begin(sig=port_bf_waccess_ff(reg, bf), width=1, init=0) }} begin
         {{ port_bf_waccess_ff(reg, bf) }} <= wready && {{ sig_csr_wen(reg) }};
     end
 end
+        {% endif %}
 
         {% if 'r' in bf.access and 'q' in bf.hardware %}
 reg {{ sig_bf_rvalid_ff(reg, bf) }};

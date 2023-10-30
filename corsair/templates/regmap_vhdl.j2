@@ -499,9 +499,11 @@ begin
     {% endif %}
 {{ process_end() }}
 
+        {% if 'w' in bf.access %}
 {{ process_begin(sig=port_bf_waccess_ff(reg, bf), width=1, init=0)}}
     {{ port_bf_waccess_ff(reg, bf)  }} <= wready and {{ sig_csr_wen(reg) }};
 {{ process_end() }}
+        {%endif%}
 
         {% if 'r' in bf.access and 'q' in bf.hardware %}
 {{ process_begin(sig=sig_bf_rvalid_ff(reg, bf)) }}
