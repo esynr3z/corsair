@@ -15,7 +15,7 @@
 
 {#- value in hex format #}
 {% macro literal(reset, width) %}
-{{ "0x%0{w}x".format(w=width // 4) % reset }}
+{{ "0x%0{w}x".format(w=(width + 3) // 4) % reset }}
 {%- endmacro %}
 
 {#- TEMPLATE NAMESPACE #}
@@ -77,6 +77,10 @@ Reset value: {{ literal(reg.reset, config['data_width']) }}
 {{ "| %-16s | %-6s | %-15s | %-10s | %s |" % (bf.name, range(bf.msb, bf.lsb), mode(bf), literal(bf.reset, bf.width), bf.description) }}
         {% set tmp.reserved_msb = bf.lsb - 1 %}
     {% endfor %}
+    {#- Check that the LSB is less than zero. If not, add a "reserved" field #}
+    {% if tmp.reserved_msb >= 0 %}
+{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % ('-', range(tmp.reserved_msb, 0), '-', literal(0, tmp.reserved_msb + 1), 'Reserved') }}
+    {% endif %}
     {% for bf in reg %}
         {% if bf.enums %}
 
