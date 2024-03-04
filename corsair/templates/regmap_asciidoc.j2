@@ -59,6 +59,24 @@ Base address: {{ "0x%08x" % config['base_address'] }}
 {% endfor %}
 |==========================
 
+{% if print_lock_parameters %}
+=== Overview lock parameters
+
+The following table gives an overview of all the parameters that are connected to the lock signal.
+When the lock signal is active these parameters are write protected.
+
+[#table-Overview_lock_parameters,cols="1,1", options="header"]
+|==========================
+| Register Name | Parameter Name
+    {% for reg in rmap %}
+        {% for bitfield in reg.bitfields %}
+            {% if 'l' in bitfield.hardware %}
+{{ "| %-10s | %s" % ("<<%s>>" % (reg.name), bitfield.name) }} |
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+|==========================
+{% endif %}
 
 {% for reg in rmap %}
 
