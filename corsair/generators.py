@@ -501,16 +501,19 @@ class Markdown(Generator, Jinja2, Wavedrom):
     :type image_dir: str
     :param print_conventions: Enable generating table with register access modes explained
     :type print_conventions: bool
+    :param print_lock_parameters: Enable generating table with overview of the parameters with lock marking
+    :type print_lock_parameters: bool
     """
 
-    def __init__(self, rmap=None, path='regs.md', title='Register map',
-                 print_images=True, image_dir="regs_img", print_conventions=True, **args):
+    def __init__(self, rmap=None, path='regs.md', title='Register map', print_images=True,
+                 image_dir="regs_img", print_conventions=True, print_lock_parameters=False, **args):
         super().__init__(rmap, **args)
         self.path = path
         self.title = title
         self.print_images = print_images
         self.image_dir = image_dir
         self.print_conventions = print_conventions
+        self.print_lock_parameters = print_lock_parameters
 
     def generate(self):
         filename = utils.get_file_name(self.path)
@@ -523,6 +526,7 @@ class Markdown(Generator, Jinja2, Wavedrom):
         j2_vars['rmap'] = self.rmap
         j2_vars['print_images'] = utils.str2bool(self.print_images)
         j2_vars['print_conventions'] = utils.str2bool(self.print_conventions)
+        j2_vars['print_lock_parameters'] = utils.str2bool(self.print_lock_parameters)
         j2_vars['image_dir'] = self.image_dir
         j2_vars['filename'] = filename
         j2_vars['title'] = self.title
@@ -549,16 +553,19 @@ class Asciidoc(Generator, Jinja2, Wavedrom):
     :type image_dir: str
     :param print_conventions: Enable generating table with register access modes explained
     :type print_conventions: bool
+    :param print_lock_parameters: Enable generating table with overview of the parameters with lock marking
+    :type print_lock_parameters: bool
     """
 
-    def __init__(self, rmap=None, path='regs.adoc', title='Register map',
-                 print_images=True, image_dir="regs_img", print_conventions=True, **args):
+    def __init__(self, rmap=None, path='regs.adoc', title='Register map', print_images=True,
+                 image_dir="regs_img", print_conventions=True, print_lock_parameters=False, **args):
         super().__init__(rmap, **args)
         self.path = path
         self.title = title
         self.print_images = print_images
         self.image_dir = image_dir
         self.print_conventions = print_conventions
+        self.print_lock_parameters = print_lock_parameters
 
     def generate(self):
         filename = utils.get_file_name(self.path)
@@ -571,6 +578,7 @@ class Asciidoc(Generator, Jinja2, Wavedrom):
         j2_vars['rmap'] = self.rmap
         j2_vars['print_images'] = utils.str2bool(self.print_images)
         j2_vars['print_conventions'] = utils.str2bool(self.print_conventions)
+        j2_vars['print_lock_parameters'] = utils.str2bool(self.print_lock_parameters)
         j2_vars['image_dir'] = self.image_dir
         j2_vars['filename'] = filename
         j2_vars['title'] = self.title
