@@ -186,23 +186,25 @@ Parameter  Default       Description
 
 Verilog
 -------
-+-----------------+------------+-----------------------------------------------------+
-| Parameter       | Default    | Description                                         |
-+=================+============+=====================================================+
-| ``path``        | ``regs.v`` | Path to the output file                             |
-+-----------------+------------+-----------------------------------------------------+
-| ``read_filler`` | 0          | Numeric value to return if wrong address was read   |
-+-----------------+------------+-----------------------------------------------------+
-| ``interface``   | ``axil``   | Register map bus protocol                           |
-|                 |            +-----------+-----------------------------------------+
-|                 |            | ``axil``  | AXI4-Lite                               |
-|                 |            +-----------+-----------------------------------------+
-|                 |            | ``amm``   | Avalon-MM                               |
-|                 |            +-----------+-----------------------------------------+
-|                 |            | ``apb``   | APB4                                    |
-|                 |            +-----------+-----------------------------------------+
-|                 |            | ``lb``    | Custom LocalBus interface               |
-+-----------------+------------+-----------+-----------------------------------------+
++-----------------+-----------------------+-----------------------------------------------------+
+| Parameter       | Default               | Description                                         |
++=================+=======================+=====================================================+
+| ``path``        | ``regs.v``            | Path to the output file                             |
++-----------------+-----------------------+-----------------------------------------------------+
+| ``read_filler`` | 0                     | Numeric value to return if wrong address was read   |
++-----------------+-----------------------+-----------------------------------------------------+
+| ``interface``   | ``axil``              | Register map bus protocol                           |
+|                 |                       +-----------+-----------------------------------------+
+|                 |                       | ``axil``  | AXI4-Lite                               |
+|                 |                       +-----------+-----------------------------------------+
+|                 |                       | ``amm``   | Avalon-MM                               |
+|                 |                       +-----------+-----------------------------------------+
+|                 |                       | ``apb``   | APB4                                    |
+|                 |                       +-----------+-----------------------------------------+
+|                 |                       | ``lb``    | Custom LocalBus interface               |
++-----------------+-----------------------+-----------+-----------------------------------------+
+| ``template``    | ``regmap_verilog.j2`` | Template name                                       |
++-----------------+-----------------------+-----------------------------------------------------+
 
 Vhdl
 ----
@@ -265,15 +267,16 @@ Parameter             Default          Description
 
 Asciidoc
 --------
-===================== ================ ================================================================
-Parameter             Default          Description
-===================== ================ ================================================================
-``path``              ``regs.md``      Path to the output file
-``title``             ``Register map`` Document title
-``print_images``      ``True``         Enable generating images for bit fields of a register
-``image_dir``         ``regs_img``     Path to directory where all images will be saved
-``print_conventions`` ``True``         Enable generating table with register access modes explained
-===================== ================ ================================================================
+===================== ====================== ================================================================
+Parameter             Default                Description
+===================== ====================== ================================================================
+``path``              ``regs.md``            Path to the output file
+``title``             ``Register map``       Document title
+``print_images``      ``True``               Enable generating images for bit fields of a register
+``image_dir``         ``regs_img``           Path to directory where all images will be saved
+``print_conventions`` ``True``               Enable generating table with register access modes explained
+``template``          ``regmap_asciidoc.j2`` Template name
+===================== ====================== ================================================================
 
 Python
 ------
