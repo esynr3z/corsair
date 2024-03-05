@@ -539,6 +539,8 @@ class Asciidoc(Generator, Jinja2, Wavedrom):
 
     :param rmap: Register map object
     :type rmap: :class:`corsair.RegisterMap`
+    :param template: Name of template file
+    :type template: str
     :param path: Path to the output file
     :type path: str
     :param title: Document title
@@ -551,9 +553,10 @@ class Asciidoc(Generator, Jinja2, Wavedrom):
     :type print_conventions: bool
     """
 
-    def __init__(self, rmap=None, path='regs.adoc', title='Register map',
+    def __init__(self, rmap=None, template='regmap_asciidoc.j2', path='regs.adoc', title='Register map',
                  print_images=True, image_dir="regs_img", print_conventions=True, **args):
         super().__init__(rmap, **args)
+        self.template = template
         self.path = path
         self.title = title
         self.print_images = print_images
@@ -565,7 +568,7 @@ class Asciidoc(Generator, Jinja2, Wavedrom):
         # validate parameters
         self.validate()
         # prepare jinja2
-        j2_template = 'regmap_asciidoc.j2'
+        j2_template = self.template
         j2_vars = {}
         j2_vars['corsair_ver'] = __version__
         j2_vars['rmap'] = self.rmap
