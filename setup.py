@@ -8,7 +8,13 @@ VERSION = "1.0.4"
 def git_version(version):
     """Return version with local version identifier."""
     import git
-    repo = git.Repo('.git')
+
+    try:
+        repo = git.Repo('.git')
+    except git.NoSuchPathError:
+        # Not in a git repo, assume install through PyPI / source distribution
+        return version
+
     repo.git.status()
     # assert versions are increasing
     latest_tag = repo.git.describe(
