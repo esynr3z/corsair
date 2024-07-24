@@ -17,8 +17,12 @@ def git_version(version):
 
     repo.git.status()
     # assert versions are increasing
-    latest_tag = repo.git.describe(
-        match='v[0-9]*', tags=True, abbrev=0)
+    try:
+        latest_tag = repo.git.describe(
+            match='v[0-9]*', tags=True, abbrev=0)
+    except git.exc.GitCommandError:
+        # No tags found
+        latest_tag = version
     assert parse_version(latest_tag) <= parse_version(version), (
         latest_tag, version)
     sha = repo.head.commit.hexsha[:8]
