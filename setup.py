@@ -8,11 +8,21 @@ VERSION = "1.0.4"
 def git_version(version):
     """Return version with local version identifier."""
     import git
-    repo = git.Repo('.git')
+
+    try:
+        repo = git.Repo('.git')
+    except git.NoSuchPathError:
+        # Not in a git repo, assume install through PyPI / source distribution
+        return version
+
     repo.git.status()
     # assert versions are increasing
-    latest_tag = repo.git.describe(
-        match='v[0-9]*', tags=True, abbrev=0)
+    try:
+        latest_tag = repo.git.describe(
+            match='v[0-9]*', tags=True, abbrev=0)
+    except git.exc.GitCommandError:
+        # No tags found
+        latest_tag = version
     assert parse_version(latest_tag) <= parse_version(version), (
         latest_tag, version)
     sha = repo.head.commit.hexsha[:8]
