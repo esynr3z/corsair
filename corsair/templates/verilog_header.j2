@@ -29,7 +29,7 @@
 // {{ reg.name }}.{{ bf.name }} - {{ bf.description }}
 `define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_WIDTH {{ bf.width }}
 `define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_LSB {{ bf.lsb }}
-`define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_MASK {{ "%d'h%x" % (config['data_width'], reg.address) }}
+`define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_MASK {{ "%d'h%x" % (config['data_width'], bf.mask) }}
 `define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_RESET {{ "%d'h%x" % (bf.width, bf.reset) }}
         {% for enum in bf %}
 `define {{ module_prefix()|upper }}{{ reg.name.upper() }}_{{ bf.name.upper() }}_{{ enum.name.upper() }} {{ "%d'h%x" % (bf.width, enum.value) }} //{{ enum.description }}
