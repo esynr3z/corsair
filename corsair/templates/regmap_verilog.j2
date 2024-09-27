@@ -420,6 +420,8 @@ assign wready = 1'b1;
 // Read address decoder
 //------------------------------------------------------------------------------
 reg {{ range_decl(config['data_width'] - 1) }} rdata_ff;
+
+{% if interface == 'amm' %}
 {{ always_begin(sig='rdata_ff', width=config['data_width'], init=read_filler
 )}} if (ren) begin
         case (raddr_int)
@@ -432,6 +434,22 @@ reg {{ range_decl(config['data_width'] - 1) }} rdata_ff;
         rdata_ff <= {{ literal(read_filler, config['data_width']) }};
     end
 end
+{% else %}
+{{ always_begin(sig='rdata_ff', width=config['data_width'], init=read_filler
+)}} if (ren) begin
+        case (raddr)
+{% for reg in rmap %}
+            {{ literal(reg.address, config['address_width']) }}: rdata_ff <= {{ sig_csr_rdata(reg) }};
+{% endfor %}
+            default: rdata_ff <= {{ literal(read_filler, config['data_width']) }};
+        endcase
+    end else begin
+        rdata_ff <= {{ literal(read_filler, config['data_width']) }};
+    end
+end
+{% endif %}
+
+
 assign rdata = rdata_ff;
 
 //------------------------------------------------------------------------------

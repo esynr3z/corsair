@@ -3,6 +3,71 @@
 // Avalon-MM to Local Bus bridge
 //
 
+{# MACRO #}
+{#- vector range for select operations #}
+{% macro range(msb, lsb, is_vector=true) %}
+    {% if is_vector %}
+        {% if msb == lsb %}
+[{{ msb }}]
+        {%- else %}
+[{{ msb }}:{{ lsb }}]
+        {%- endif %}
+    {%- endif %}
+{%- endmacro %}
+{#- literal #}
+{% macro literal(val, width=1) %}
+    {% if width == 1 %}
+1'b{{ val }}
+    {%- else %}
+{{ width}}'h{{ '%x' % val }}
+    {%- endif %}
+{%- endmacro %}
+
+{#- special literal for all zeros #}
+{% macro zeros(width=1) %}
+    {% if width == 1 %}
+1'b0
+    {%- else %}
+{{ width }}'h0
+    {%- endif %}
+{%- endmacro %}
+
+{#- special literal for all ones #}
+{% macro ones(width=1) %}
+    {% if width == 1 %}
+1'b1
+    {%- else %}
+{{ "{%d{1'b1}}" % width }}
+    {%- endif %}
+{%- endmacro %}
+
+{% macro range_decl(msb, is_vector=true) %}
+    {% if is_vector %}
+[{{ msb }}:0]
+    {%- endif %}
+{%- endmacro %}
+
+{#- 'always' header with reset logic #}
+{% macro always_begin(sig='', width=1, init=0) %}
+    {% set rst_type = config['register_reset']%}
+    {% if rst_type == 'sync_pos' %}
+always @(posedge clk) begin
+    if (rst) begin
+    {% elif rst_type == 'sync_neg' %}
+always @(posedge clk) begin
+    if (!rst) begin
+    {% elif rst_type == 'async_pos' %}
+always @(posedge clk or posedge rst) begin
+    if (rst) begin
+    {% elif rst_type == 'async_neg' %}
+always @(posedge clk or negedge rst) begin
+    if (!rst) begin
+    {% endif %}
+        {{ sig }} <= {{ literal(init, width) }};
+    end else
+{%- endmacro %}
+
+
 module {{ module_name }} #(
     parameter ADDR_W = {{ config['address_width'] }},
     parameter DATA_W = {{ config['data_width'] }},
@@ -78,8 +143,8 @@ wire              ren;
     end
   end
 
-  reg {{ range_decl(config['data_width'] - 1) }} raddr_int;
-  {{ always_begin(sig='raddr_int', width=config['data_width'], init=read_filler
+  reg {{ range_decl(config['address_width'] - 1) }} raddr_int;
+  {{ always_begin(sig='raddr_int', width=config['address_width'], init=0
   )}} if (read) begin
         raddr_int <= address;
       end

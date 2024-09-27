@@ -527,6 +527,7 @@ wready <= '1';
 --------------------------------------------------------------------------------
 -- Read address decoder
 --------------------------------------------------------------------------------
+{% if interface == 'amm' %}
 {{ process_begin(sig='rdata_ff', width=config['data_width'], init=read_filler)}}
     if (ren = '1') then
 {% set loop_ns = namespace(first_reg = True) %}
@@ -547,6 +548,30 @@ wready <= '1';
         rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
     end if;
 {{ process_end() }}
+{% else %}
+{{ process_begin(sig='rdata_ff', width=config['data_width'], init=read_filler)}}
+    if (ren = '1') then
+{% set loop_ns = namespace(first_reg = True) %}
+{% for reg in rmap %}
+    {% if loop_ns.first_reg %}
+        if raddr = {{ literal(reg.address, "ADDR_W", width_is_param=1)}} then {{ literal_comment(reg.address) }}
+            rdata_ff <= {{ sig_csr_rdata(reg) }};
+    {% else %}
+        elsif raddr = {{ literal(reg.address, "ADDR_W", width_is_param=1)}} then {{ literal_comment(reg.address) }}
+            rdata_ff <= {{ sig_csr_rdata(reg) }};
+    {% endif %}
+    {% set loop_ns.first_reg = False %}
+{% endfor %}
+        else 
+            rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
+        end if;
+    else
+        rdata_ff <= {{ literal(read_filler, config['data_width']) }}; {{ literal_comment(read_filler) }}
+    end if;
+{{ process_end() }}
+
+{% endif %}
+
 rdata <= rdata_ff;
 
 --------------------------------------------------------------------------------
