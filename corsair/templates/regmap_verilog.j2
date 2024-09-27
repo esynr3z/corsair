@@ -422,7 +422,7 @@ assign wready = 1'b1;
 reg {{ range_decl(config['data_width'] - 1) }} rdata_ff;
 {{ always_begin(sig='rdata_ff', width=config['data_width'], init=read_filler
 )}} if (ren) begin
-        case (raddr)
+        case (raddr_int)
 {% for reg in rmap %}
             {{ literal(reg.address, config['address_width']) }}: rdata_ff <= {{ sig_csr_rdata(reg) }};
 {% endfor %}

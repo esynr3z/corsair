@@ -532,10 +532,10 @@ wready <= '1';
 {% set loop_ns = namespace(first_reg = True) %}
 {% for reg in rmap %}
     {% if loop_ns.first_reg %}
-        if raddr = {{ literal(reg.address, "ADDR_W", width_is_param=1)}} then {{ literal_comment(reg.address) }}
+        if raddr_int = {{ literal(reg.address, "ADDR_W", width_is_param=1)}} then {{ literal_comment(reg.address) }}
             rdata_ff <= {{ sig_csr_rdata(reg) }};
     {% else %}
-        elsif raddr = {{ literal(reg.address, "ADDR_W", width_is_param=1)}} then {{ literal_comment(reg.address) }}
+        elsif raddr_int = {{ literal(reg.address, "ADDR_W", width_is_param=1)}} then {{ literal_comment(reg.address) }}
             rdata_ff <= {{ sig_csr_rdata(reg) }};
     {% endif %}
     {% set loop_ns.first_reg = False %}

@@ -78,6 +78,13 @@ wire              ren;
     end
   end
 
+  reg {{ range_decl(config['data_width'] - 1) }} raddr_int;
+  {{ always_begin(sig='raddr_int', width=config['data_width'], init=read_filler
+  )}} if (read) begin
+        raddr_int <= address;
+      end
+  end
+
   assign ren = ren_int;
 {% endmacro %}
 {{ amm_core() }}
