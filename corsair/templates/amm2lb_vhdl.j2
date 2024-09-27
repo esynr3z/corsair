@@ -95,6 +95,7 @@ signal raddr  : std_logic_vector(ADDR_W-1 downto 0);
 signal ren    : std_logic;
     {% endif %}
 signal ren_int   : std_logic;
+signal raddr_int : std_logic_vector(ADDR_W-1 downto 0);
 {% endmacro %}
 {{ amm_signals() }}
 begin
@@ -117,6 +118,12 @@ wstrb <= byteenable;
         ren_int <= '1';
     elsif (rvalid = '1') then
         ren_int <= '0';
+    end if;
+{{ process_end() }}
+
+{{ process_begin("raddr_int", "(others => '0')") }}
+    if (read = '1') then
+        raddr_int <= address;
     end if;
 {{ process_end() }}
 
