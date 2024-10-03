@@ -17,6 +17,7 @@ task test_ro_i;
     addr = CSR_REGRO_ADDR;
     `ifdef DBG
         $display("address %0x", addr);
+    `endif
     // read
     mst.read(addr, data);
     if (data[CSR_REGRO_BFI_LSB+:CSR_REGRO_BFI_WIDTH] != 0)
