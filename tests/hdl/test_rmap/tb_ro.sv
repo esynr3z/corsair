@@ -23,7 +23,7 @@ task test_ro_i;
     if (data[CSR_REGRO_BFI_LSB+:CSR_REGRO_BFI_WIDTH] != 0)
     begin    
         errors++;
-        $display("%0t, Expected 0, got %0x", data);
+        $display("%0t, Expected 0, got %0x", $time, data);
     end    
     // update hardware value
     @(posedge clk);
@@ -33,7 +33,7 @@ task test_ro_i;
     if (data[CSR_REGRO_BFI_LSB+:CSR_REGRO_BFI_WIDTH] != 100)
     begin    
         errors++;
-        $display("%0t, Expected 100, got %0x", data);
+        $display("%0t, Expected 100, got %0x", $time, data);
     end    
     // write has no effect
     data = 200 << CSR_REGRO_BFI_LSB;
@@ -42,7 +42,7 @@ task test_ro_i;
     if (data[CSR_REGRO_BFI_LSB+:CSR_REGRO_BFI_WIDTH] != 100)
     begin
         errors++;
-        $display("%0t, Expected 100, got %0x", data);
+        $display("%0t, Expected 100, got %0x", $time, data);
     end    
     $display("%0t, %0d errors", $time, errors);
 endtask
