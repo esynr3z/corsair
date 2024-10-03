@@ -28,3 +28,10 @@ jobs:
     - name: Test package
       run: |
         pytest -v -n auto
+    - name: Archive build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: "debug"
+          path: |
+            /tmp
+          retention-days: 2
