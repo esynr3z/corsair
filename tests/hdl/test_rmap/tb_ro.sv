@@ -21,20 +21,29 @@ task test_ro_i;
     // read
     mst.read(addr, data);
     if (data[CSR_REGRO_BFI_LSB+:CSR_REGRO_BFI_WIDTH] != 0)
+    begin    
         errors++;
+        $display("%0t, Expected 0, got %0x", data);
+    end    
     // update hardware value
     @(posedge clk);
     csr_regro_bfi_in = 100;
     // read again
     mst.read(addr, data);
     if (data[CSR_REGRO_BFI_LSB+:CSR_REGRO_BFI_WIDTH] != 100)
+    begin    
         errors++;
+        $display("%0t, Expected 100, got %0x", data);
+    end    
     // write has no effect
     data = 200 << CSR_REGRO_BFI_LSB;
     mst.write(addr, data);
     mst.read(addr, data);
     if (data[CSR_REGRO_BFI_LSB+:CSR_REGRO_BFI_WIDTH] != 100)
+    begin
         errors++;
+        $display("%0t, Expected 100, got %0x", data);
+    end    
     $display("%0t, %0d errors", $time, errors);
 endtask
 
