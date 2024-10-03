@@ -29,7 +29,7 @@ jobs:
       run: |
         pytest -v -n auto
     - name: Upload build artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-output
-          path: build/output.txt
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-output
+        path: /tmp
