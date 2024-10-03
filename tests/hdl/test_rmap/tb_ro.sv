@@ -4,7 +4,8 @@ module tb_ro;
 
 // Test environment with DUT and bridge to LocalBus
 `include "env.svh"
-
+`define DBG 1
+    
 // Test body
 int errors = 0;
 logic [ADDR_W-1:0] addr;
@@ -14,6 +15,8 @@ logic [STRB_W-1:0] strb;
 task test_ro_i;
     $display("%0t, Start RO+I tests!", $time);
     addr = CSR_REGRO_ADDR;
+    `ifdef DBG
+        $display("address %0x", addr)
     // read
     mst.read(addr, data);
     if (data[CSR_REGRO_BFI_LSB+:CSR_REGRO_BFI_WIDTH] != 0)
