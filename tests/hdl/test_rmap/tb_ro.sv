@@ -16,7 +16,7 @@ task test_ro_i;
     $display("%0t, Start RO+I tests!", $time);
     addr = CSR_REGRO_ADDR;
     `ifdef DBG
-        $display("address %0x", addr)
+        $display("address %0x", addr);
     // read
     mst.read(addr, data);
     if (data[CSR_REGRO_BFI_LSB+:CSR_REGRO_BFI_WIDTH] != 0)
