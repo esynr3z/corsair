@@ -1,0 +1,46 @@
+fail_fast: true
+repos:
+- repo: local
+  hooks:
+    - id: ruff_format
+      name: Python format check
+      entry: poetry run ruff format --check --diff
+      language: system
+      types: [file, python]
+      stages: [pre-commit]
+    - id: ruff_lint
+      name: Python lint check
+      entry: poetry run ruff check
+      language: system
+      types: [file, python]
+      stages: [pre-commit]
+    - id: pyright
+      name: Python type check
+      entry: poetry run pyright
+      language: system
+      types: [file, python]
+      stages: [pre-commit]
+    - id: check-yaml
+      name: YAML check
+      entry: poetry run check-yaml
+      language: python
+      types: [yaml]
+      stages: [pre-commit]
+    - id: check-toml
+      name: TOML check
+      entry: poetry run check-toml
+      language: python
+      types: [toml]
+      stages: [pre-commit]
+    - id: check-json
+      name: JSON check
+      entry: poetry run check-json
+      language: python
+      types: [json]
+      stages: [pre-commit]
+    - id: commitizen
+      name: Commit style check
+      stages: [commit-msg]
+      entry: cz check --commit-msg-file .git/COMMIT_EDITMSG
+      pass_filenames: false
+      language: system

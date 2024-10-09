@@ -1,0 +1,97 @@
+[tool.poetry]
+name = "corsair"
+version = "0.0.0"
+description = "Control and Status Register map generator for FPGA/ASIC projects"
+authors = ["esynr3z <esynr3z@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/esynr3z/corsair"
+documentation = "https://corsair.readthedocs.io/"
+keywords = [
+    "CSR",
+    "registers",
+    "generator",
+    "Verilog",
+    "SystemVerilog",
+    "Verilog",
+    "RAL",
+    "FPGA",
+    "ASIC",
+]
+classifiers = [
+    "Environment :: Console",
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+]
+
+[tool.poetry.scripts]
+corsair = "corsair.__main__:main"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pyyaml = "^6.0.2"
+jinja2 = "^3.1.4"
+wavedrom = "^2.0.3.post3"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.6.9"
+pre-commit = "^3.5.0"
+commitizen = "^3.29.1"
+pyright = "^1.1.383"
+pre-commit-hooks = "^5.0.0"
+pytest = "^8.3.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "semver"
+
+[tool.ruff]
+line-length = 120
+extend-exclude = ["*"] # need to relax this as codebase is improved
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D203", # incompatible with D211
+    "D213", # incompatible with D212
+    # Offical guide recommends disable these to avoid conflicts with formatter
+    "W191",   # tab-indentation
+    "E111",   # indentation-with-invalid-multiple
+    "E114",   # indentation-with-invalid-multiple-comment
+    "E117",   # over-indented
+    "D206",   # indent-with-spaces
+    "D300",   # triple-single-quotes
+    "Q000",   # bad-quotes-inline-string
+    "Q001",   # bad-quotes-multiline-string
+    "Q002",   # bad-quotes-docstring
+    "Q003",   # avoidable-escaped-quote
+    "COM812", # missing-trailing-comma
+    "COM819", # prohibited-trailing-comma
+    "ISC001", # single-line-implicit-string-concatenation
+    "ISC002", # multi-line-implicit-string-concatenation
+]
+
+[tool.ruff.lint.isort]
+required-imports = ["from __future__ import annotations"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.pyright]
+exclude = ["*"]  # need to relax this as codebase is improved

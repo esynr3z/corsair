@@ -1,0 +1,2 @@
+poetry==1.8.3
+poetry-dynamic-versioning[plugin]==1.4.1
