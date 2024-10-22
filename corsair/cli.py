@@ -1,101 +1,118 @@
-"""Command-line interface of Corsair."""
+"""CLI of the Corsair application."""
 
 from __future__ import annotations
 
-import argparse
-from dataclasses import dataclass
+import os
 from pathlib import Path
+from typing import Annotated
 
-from . import utils
-from .project import ProjectKind
+import typer
+
+from . import input, log, utils
 from .version import __version__
 
+# Get loger singleton
+logger = log.get_logger()
 
-@dataclass
-class Args:
-    """Application CLI arguments."""
+# Create Typer appication. This is also an entry point for the application.
+app = typer.Typer(
+    no_args_is_help=True,
+    invoke_without_command=True,
+    help=f"CorSaiR v{__version__} -- CSR map generator for HDL projects.",
+    epilog="""
+        Pass --help after any COMMAND to get additional help.\n
+        Set DEBUG=1 environment variable to enable verbose output for debugging.\n
+        Set NO_COLOR=1 environment variable to disable any color in output.\n
+        Set TERM=dumb or TERM=unknown environment variable to enable plain text output (disables colors as well).""",
+)
 
-    workdir: Path
-    regmap: Path | None
-    config: Path | None
-    targets: list[str]
-    init_project: ProjectKind | None
-    debug: bool
-    no_color: bool
+# Disable any color output if user wish
+if os.getenv("NO_COLOR"):
+    # https://no-color.org/
+    log.set_color(False)
+    # rich output is uncolorized automatically
+else:
+    log.set_color(True)
+
+# Disable any rich formated output if user wish (disables color as well)
+if os.getenv("TERM") in ("dumb", "unknown"):
+    # Values above are from rich package documentation, but for typer we need to apply them manually
+    typer.core.rich = None
+    app.pretty_exceptions_enable = False
+
+# Enable verbose output for debugging if user wish
+if os.getenv("DEBUG"):
+    app.pretty_exceptions_short = False
+    log.set_debug(True)
 
 
-class ArgumentParser(argparse.ArgumentParser):
-    """Corsair CLI argument parser."""
-
-    def __init__(self) -> None:
-        """Parser constructor."""
-        super().__init__(
-            prog="corsair",
-            description="Control and status register (CSR) map generator for HDL projects.",
-        )
-
-        self.add_argument("-v", "--version", action="version", version=f"%(prog)s v{__version__}")
-        self.add_argument(
-            "--debug",
-            action="store_true",
-            dest="debug",
-            help="increase logging verbosity level",
-        )
-        self.add_argument(
-            "--no-color",
-            action="store_true",
-            dest="no_color",
-            help="disable use of colors for logging",
-        )
-        self.add_argument(
-            metavar="WORKDIR",
-            nargs="?",
-            dest="workdir",
-            type=Path,
-            default=Path(),
-            help="working directory (default is the current directory)",
-        )
-        self.add_argument(
-            "-r",
-            metavar="PATH",
-            dest="regmap",
-            type=Path,
-            help="register map file",
-        )
-        self.add_argument(
-            "-c",
-            "--cfg",
-            metavar="PATH",
-            type=Path,
-            dest="config",
-            help="configuration file",
-        )
-        self.add_argument(
-            "-t",
+@app.command()
+def build(
+    spec: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to a build specification file.",
+        ),
+    ] = Path("corsair.toml"),
+    targets: Annotated[
+        list[str] | None,
+        typer.Option(
             "--target",
-            nargs="*",
+            "-t",
             metavar="NAME",
-            type=str,
-            dest="targets",
-            default=[],
-            help="make ony selected target(s) from configuration file",
-        )
-        self.add_argument(
-            "-i",
-            "--init",
-            metavar="KIND",
-            type=ProjectKind,
-            choices=[k.value for k in ProjectKind],
-            dest="init_project",
-            help="initialize simple project from template and exit",
-        )
+            show_default=False,
+            help="""Select targets to build.\n
+                Option can be applied multiple times.\n
+                Special option 'all' can be used to build every target.""",
+        ),
+    ] = None,
+) -> None:
+    """Build all the targets according to the provided specification."""
+    logger.debug("cmd build args: %s", locals())
+    if targets is None:
+        targets = ["all"]
+    raise NotImplementedError("build command is not implemented yet!")
 
 
-def parse_args() -> Args:
-    """Parse CLI arguments."""
-    parser = ArgumentParser()
+@app.command()
+def check(
+    spec: Annotated[
+        Path,
+        typer.Argument(
+            help="Path to a build specification file.",
+        ),
+    ] = Path("corsair.toml"),
+) -> None:
+    """Check integrity of user input files."""
+    logger.debug("cmd check args: %s", locals())
+    raise NotImplementedError("check command is not implemented yet!")
 
-    args = parser.parse_args()
-    args.workdir = utils.resolve_path(args.workdir)
 
-    return Args(**vars(args))
+@app.command()
+def init() -> None:
+    """Initialize a simple project."""
+    logger.debug("cmd init args: %s", locals())
+    raise NotImplementedError("init command is not implemented yet!")
+
+
+@app.command()
+def schemas(outdir: Annotated[Path, typer.Argument(help="Path for output files.")] = Path()) -> None:
+    """Dump JSON schemas for all possible user input files."""
+    logger.debug("cmd schemas args: %s", locals())
+    with utils.chdir(outdir):
+        buildspec_schema = outdir / "corsair.buildspec.json"
+        logger.info("Dump schema for the build specification: %s", buildspec_schema)
+        input.buildspec.BuildSpecification.to_json_schema_file(buildspec_schema)
+
+
+@app.callback()
+def main(
+    version: Annotated[
+        bool,
+        typer.Option("--version", help="Show the application's version and exit."),
+    ] = False,
+) -> None:
+    """CSR map generator for HDL projects."""
+    if version:
+        typer.echo(f"v{__version__}")
+        raise typer.Exit

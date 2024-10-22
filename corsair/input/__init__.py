@@ -1,35 +1,22 @@
-#!/usr/bin/env python3
-
-"""Corsair is a control and status register (CSR) map generator for HDL projects.
-
-It generates HDL code, documentation and other artifacts from CSR map description file.
-"""
+"""Data models, parsers and validators for all input files of corsair."""
 
 from __future__ import annotations
 
-__title__ = "corsair"
-__description__ = "Control and status register (CSR) map generator for HDL projects."
-
-
-from .input import (
+from .buildspec import BuildSpecification
+from .config import ForceNameCase, GlobalConfig, RegisterReset
+from .target import (
     AnyTarget,
     BaseTarget,
-    BuildSpecification,
     CustomTarget,
-    ForceNameCase,
-    GlobalConfig,
     MapCHeaderTarget,
     MapMarkdownTarget,
     MapSvPackageTarget,
     MapVerilogHeaderTarget,
     MapVerilogTarget,
     MapVhdlTarget,
-    RegisterReset,
 )
-from .version import __version__
 
-__all__ = (
-    "__version__",
+__all__ = [
     # specification
     "BuildSpecification",
     # targets
@@ -46,4 +33,4 @@ __all__ = (
     "ForceNameCase",
     "RegisterReset",
     "GlobalConfig",
-)
+]

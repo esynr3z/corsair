@@ -1,4 +1,4 @@
-"""Application level logger."""
+"""Package level logger."""
 
 from __future__ import annotations
 

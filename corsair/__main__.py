@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from . import app
+from . import cli
 
 if __name__ == "__main__":
-    app.main()
+    cli.app()
