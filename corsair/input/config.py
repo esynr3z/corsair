@@ -3,10 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from pathlib import Path
+from pathlib import Path
 
 from pydantic import (
     BaseModel,
@@ -50,10 +47,10 @@ class ForceNameCase(str, Enum):
 class GlobalConfig(BaseModel):
     """Global configuration parameters of the Corsair build specification."""
 
-    regmap: Path
+    regmap: Path = Path("csrmap.yaml")
     """Path to a register map to be processed."""
 
-    regmap_parser: str | None = Field(pattern=r"^.*\.py::\w+$", examples=["foo.py::FooParser"])
+    regmap_parser: str | None = Field(default=None, pattern=r"^.+\.py::\w+$", examples=["foo.py::FooParser"])
     """Select register map parser class explicitly.
 
     Parser is selected automatically based on file extension if value is not provided.

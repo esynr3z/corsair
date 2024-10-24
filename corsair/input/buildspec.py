@@ -9,10 +9,10 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from .config import GlobalConfig
-    from .target import AnyTarget
-
 from pydantic import BaseModel, Field
+
+from .config import GlobalConfig
+from .target import AnyTarget
 
 if sys.version_info >= (3, 11):
     import tomllib as tomlib

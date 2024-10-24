@@ -74,11 +74,11 @@ repos:
         pass_filenames: false
         files: ^(.*/)?(poetry\.lock|pyproject\.toml)$
 
-      - id: poetry-install
-        name: poetry-install
-        description: Run poetry install to install dependencies from the lock file
-        entry: poetry install
-        language: python
+      - id: pytest
+        name: Pytest smoke testing
+        description: Run pytest to execute all smoke tests
+        entry: poetry run pytest -m "smoke"
+        language: system
         pass_filenames: false
-        stages: [post-checkout, post-merge]
+        stages: [pre-commit]
         always_run: true

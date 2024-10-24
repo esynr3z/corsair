@@ -37,7 +37,7 @@ else:
 # Disable any rich formated output if user wish (disables color as well)
 if os.getenv("TERM") in ("dumb", "unknown"):
     # Values above are from rich package documentation, but for typer we need to apply them manually
-    typer.core.rich = None
+    typer.core.rich = None  # pyright: ignore [reportAttributeAccessIssue]
     app.pretty_exceptions_enable = False
 
 # Enable verbose output for debugging if user wish
@@ -49,11 +49,13 @@ if os.getenv("DEBUG"):
 @app.command()
 def build(
     spec: Annotated[
-        Path,
+        Path | None,
         typer.Argument(
-            help="Path to a build specification file.",
+            show_default=False,
+            help="Optional path to a build specification file. "
+            "By default, 'crsbuild.toml' or '*.csrbuild.toml' are expected.",
         ),
-    ] = Path("corsair.toml"),
+    ] = Path("csrbuild.toml"),
     targets: Annotated[
         list[str] | None,
         typer.Option(
@@ -100,7 +102,7 @@ def schemas(outdir: Annotated[Path, typer.Argument(help="Path for output files."
     """Dump JSON schemas for all possible user input files."""
     logger.debug("cmd schemas args: %s", locals())
     with utils.chdir(outdir):
-        buildspec_schema = outdir / "corsair.buildspec.json"
+        buildspec_schema = outdir / "csrbuild.schema.json"
         logger.info("Dump schema for the build specification: %s", buildspec_schema)
         input.buildspec.BuildSpecification.to_json_schema_file(buildspec_schema)
 

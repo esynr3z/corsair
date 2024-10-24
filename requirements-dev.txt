@@ -1,2 +1,4 @@
 poetry==1.8.3
 poetry-dynamic-versioning[plugin]==1.4.1
+poethepoet==0.29.0
+poetry-dotenv-plugin==0.2.0
