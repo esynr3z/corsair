@@ -1,4 +1,4 @@
-"""Enumeration for hardare modes of a bitfield."""
+"""Data models and types to represent bitfield within CSR."""
 
 from __future__ import annotations
 

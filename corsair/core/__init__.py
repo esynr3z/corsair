@@ -2,6 +2,6 @@
 
 from __future__ import annotations
 
-from .hwmode import HwMode
+from .bitfield import HwMode
 
 __all__ = ("HwMode",)

@@ -7,6 +7,9 @@ from pydantic import BaseModel
 
 from corsair import HwMode
 
+# All tests below can be used in smoke testing
+pytestmark = pytest.mark.smoke
+
 
 def test_aliases() -> None:
     """Test for aliases."""
