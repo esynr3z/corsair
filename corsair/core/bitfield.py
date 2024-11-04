@@ -2,16 +2,62 @@
 
 from __future__ import annotations
 
-from enum import Flag
+import enum
 from typing import TYPE_CHECKING, Iterable, Iterator
 
-if TYPE_CHECKING:
-    from enum import Enum
+from pydantic import (
+    NonNegativeInt,
+    PositiveInt,
+    model_validator,
+)
 
+from .item import StrictBaseItem
+
+if TYPE_CHECKING:
     from typing_extensions import Self
 
 
-class HwMode(str, Flag):
+class Access(str, enum.Enum):
+    """Access mode for the field.
+
+    It is related to the bus accesses of the field and possible side-effects.
+    """
+
+    RW = "rw"
+    """Read and Write. The field can be read or written."""
+
+    RW1C = "rw1c"
+    """Read and Write 1 to Clear. The field can be read, and when 1 is written field is cleared."""
+
+    RW1S = "rw1s"
+    """	Read and Write 1 to Set. The field can be read, and when 1 is written field is set."""
+
+    RO = "ro"
+    """Read Only. Write has no effect."""
+
+    ROC = "roc"
+    """Read Only to Clear. The field is cleared after every read."""
+
+    ROLL = "roll"
+    """Read Only + Latch Low. The field capture hardware active low pulse signal and stuck in 0.
+    The field is set after every read."""
+
+    ROLH = "rolh"
+    """Read Only + Latch High. The field capture hardware active high pulse signal and stuck in 1.
+    Read the field to clear it."""
+
+    WO = "wo"
+    """Write Only. Zeros are always read."""
+
+    WOSC = "wosc"
+    """Write Only + Self Clear. The field is cleared on the next clock tick after write."""
+
+    def __str__(self) -> str:
+        """Convert enumeration mamber into string."""
+        return self.value
+
+
+class Hardware(str, enum.Flag):
     """Hardware mode for a bitfield.
 
     Mode reflects hardware possibilities and interfaces to observe and modify bitfield value.
@@ -81,7 +127,7 @@ class HwMode(str, Flag):
     _value_: str  # pyright: ignore [reportIncompatibleVariableOverride]
 
     @classmethod
-    def _missing_(cls, value: object) -> Enum:
+    def _missing_(cls, value: object) -> enum.Enum:
         """Return member if one can be found for value, otherwise create a composite member.
 
         Composite member is created only iff value contains only members, else `ValueError` is raised.
@@ -118,8 +164,8 @@ class HwMode(str, Flag):
     def _split_flags(cls, value: str) -> Iterator[str]:
         """Split string into flag values."""
         # For legacy reasons there could be a string without separators, where all flags are single chars.
-        # Code below allows "ioe" and "i|o|e" as well.
-        raw_flags = set(value.split("|") if "|" in value else value)
+        # Code below allows "ioe" and "i-o-e" as well.
+        raw_flags = set(value.split("-") if "-" in value else value)
 
         # Collect all known flags in order of declaration
         self_flags = [member._value_ for member in cls]
@@ -139,7 +185,11 @@ class HwMode(str, Flag):
         """Concatenate all flag values into single string."""
         # For input strings flags without separators are allowed (refer to `_split_flags`),
         # but all other representations always use separators.
-        return "|".join(flags)
+        return "-".join(flags)
+
+    def __len__(self) -> int:
+        """Return number of combined flags."""
+        return sum(1 for _ in self)
 
     def __repr__(self) -> str:
         """Represent flags as a string in the same style as in `enum.Flag.__repr__()`."""
@@ -207,3 +257,179 @@ class HwMode(str, Flag):
         if not isinstance(other, cls):
             raise TypeError(f"Can't compare {type(self)} with {type(other)}")
         return self._value_ != other._value_ and self.__ge__(other)
+
+
+class StrictEnumMember(StrictBaseItem):
+    """Member of a bitfield enumeration.
+
+    This is an internal strict immutable representation to be used with output generators.
+    Consider using `EnumMember` for user side code as a much more flexible analog.
+    """
+
+    value: NonNegativeInt
+    """Enumeration value."""
+
+
+class StrictBitField(StrictBaseItem):
+    """Bitfield inside a register.
+
+    This is an internal strict immutable representation to be used with output generators.
+    Consider using `BitField` for user side code as a much more flexible analog.
+    """
+
+    reset: NonNegativeInt
+    """Reset value."""
+
+    width: PositiveInt
+    """Bit width."""
+
+    offset: NonNegativeInt
+    """Bit offset."""
+
+    access: Access
+    """Access mode."""
+
+    hardware: Hardware
+    """Hardware interaction options."""
+
+    enum: tuple[StrictEnumMember, ...]
+    """Enumeration values."""
+
+    def __len__(self) -> int:
+        """Get number of bits in a bitfield."""
+        return self.width
+
+    @property
+    def bit_indices(self) -> Iterator[int]:
+        """Iterate over field bit positions inside register from LSB to MSB."""
+        yield from range(self.offset, self.offset + self.width)
+
+    @property
+    def byte_indices(self) -> Iterator[int]:
+        """Iterate over field byte indices inside register from lower to higher."""
+        yield from range(self.offset // 8, (self.offset + self.width - 1) // 8 + 1)
+
+    @property
+    def lsb(self) -> int:
+        """Position of the least significant bit (LSB) inside register."""
+        return self.offset
+
+    @property
+    def msb(self) -> int:
+        """Position of the most significant bit (MSB) inside register."""
+        return self.lsb + self.width - 1
+
+    @property
+    def mask(self) -> int:
+        """Bit mask for the bitfield inside register."""
+        return (2 ** (self.width) - 1) << self.offset
+
+    @property
+    def is_multibit(self) -> bool:
+        """Bitfield has more than one bit width."""
+        return self.width > 1
+
+    def byte_select(self, byte_idx: int) -> tuple[int, int]:
+        """Return register bit slice infomation (MSB, LSB) for a field projection into Nth byte of a register.
+
+        This method facilates organization of "byte select" logic within HDL templates.
+
+        Example for `offset=3` and `width=7` bitfield:
+
+        ```
+                           6     3     0  <-- field bits
+                           |     |     |
+        field:             1 1 1 1 1 1 1
+        reg:   0 0 0 0 0 0 1 1 1 1 1 1 1 0 0 0
+               |    byte 1     |   byte 0    |
+               15              7             0  <-- register bits
+        ```
+
+        For `byte_idx=0` result is `(7, 3)`, for `byte_idx=1` -- `(9, 8)`
+        """
+        byte_indices = tuple(self.byte_indices)
+        if byte_idx not in byte_indices:
+            raise ValueError(f"Provided {byte_idx=} has to be one of {byte_indices} for the field.")
+
+        lsb = self.lsb if byte_idx == byte_indices[0] else byte_idx * 8
+        msb = (byte_idx + 1) * 8 - 1 if ((byte_idx + 1) * 8 - 1 - self.msb) < 0 else self.msb
+
+        return (msb, lsb)
+
+    def byte_select_self(self, byte_idx: int) -> tuple[int, int]:
+        """Return field bit slice infomation for field projection into Nth byte of a register.
+
+        Refer to `byte_select` to get the idea. The only difference is
+        that current method returns non-ofsetted bit slice to represent positions within bitfield itself.
+        """
+        msb, lsb = self.byte_select(byte_idx)
+        return (msb - self.offset, lsb - self.offset)
+
+    @model_validator(mode="after")
+    def check_hardware_constraints(self) -> Self:
+        """Check that `hardware` field follows expected constraints."""
+        # Check exclusive hardware flags
+        for flag in (Hardware.NA, Hardware.QUEUE, Hardware.FIXED):
+            if flag in self.hardware and len(self.hardware) > 1:
+                raise ValueError(f"Harware mode '{flag}' must be exclusive, but current mode is '{self.hardware}'")
+
+        # Hardware queue mode can be only combined with specific access values
+        if Hardware.QUEUE in self.hardware:
+            q_access_allowed = [Access.RW, Access.RO, Access.WO]
+            if self.access not in q_access_allowed:
+                raise ValueError(
+                    f"Hardware mode 'q' is allowed to use only with '{q_access_allowed}', "
+                    f"but current access mode is '{self.access}'"
+                )
+
+        # Enable must be used with Input
+        if Hardware.ENABLE in self.hardware and Hardware.INPUT not in self.hardware:
+            raise ValueError(
+                f"Hardware mode 'e' is allowed to use only with 'i', " f"but current hardware mode is '{self.hardware}'"
+            )
+        return self
+
+    @model_validator(mode="after")
+    def check_reset_width(self) -> Self:
+        """Check that reset value width less or equal field width."""
+        reset_value_width = self.reset.bit_length()
+        if reset_value_width > self.width:
+            raise ValueError(
+                f"Reset value 0x{self.reset:x} requires {reset_value_width} bits to represent,"
+                f" but field is {self.width} bits wide"
+            )
+        return self
+
+    @model_validator(mode="after")
+    def check_enum_values_width(self) -> Self:
+        """Check that enumeration members has values, which width fit field width."""
+        for e in self.enum:
+            enum_value_width = e.value.bit_length()
+            if enum_value_width > self.width:
+                raise ValueError(
+                    f"Reset value 0x{self.reset:x} requires {enum_value_width} bits to represent,"
+                    f" but field is {self.width} bits wide"
+                )
+        return self
+
+    @model_validator(mode="after")
+    def check_enum_unique_values(self) -> Self:
+        """Check that all values inside enumeration are unique."""
+        if len({member.value for member in self.enum}) != len(self.enum):
+            raise ValueError(f"Enumeration member values are not unique: {self.enum}")
+        return self
+
+    @model_validator(mode="after")
+    def check_enum_unique_names(self) -> Self:
+        """Check that all names inside enumeration are unique."""
+        if len({member.name for member in self.enum}) != len(self.enum):
+            raise ValueError(f"Enumeration member names are not unique: {self.enum}")
+        return self
+
+    @model_validator(mode="after")
+    def check_enum_members_order(self) -> Self:
+        """Check that all enum members are sorted by value."""
+        for idx, member in enumerate(sorted(self.enum, key=lambda e: e.value)):
+            if member != self.enum[idx]:
+                raise ValueError(f"Enumeration members has to be sorted by value: {self.enum}")
+        return self

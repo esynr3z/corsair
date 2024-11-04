@@ -14,6 +14,8 @@ from pydantic import (
     StrictBool,
 )
 
+from corsair.core import PyClassPathStr
+
 
 class RegisterReset(str, Enum):
     """Flip-flop reset style."""
@@ -31,26 +33,13 @@ class RegisterReset(str, Enum):
     """Asynchronous active low reset."""
 
 
-class ForceNameCase(str, Enum):
-    """Force case for all names."""
-
-    CURRENT = "current"
-    """Do not change case."""
-
-    LOWER = "lower"
-    """Force lower case for names."""
-
-    UPPER = "upper"
-    """Force upper case for names."""
-
-
 class GlobalConfig(BaseModel):
     """Global configuration parameters of the Corsair build specification."""
 
     regmap: Path = Path("csrmap.yaml")
     """Path to a register map to be processed."""
 
-    regmap_parser: str | None = Field(default=None, pattern=r"^.+\.py::\w+$", examples=["foo.py::FooParser"])
+    regmap_parser: PyClassPathStr | None = Field(default=None, examples=["foo.py::FooParser"])
     """Select register map parser class explicitly.
 
     Parser is selected automatically based on file extension if value is not provided.
@@ -83,12 +72,6 @@ class GlobalConfig(BaseModel):
         * False - no checks
         * True - do checks based on `data_width` field
         * integer - do checks based on provided number of bytes
-    """
-
-    force_name_case: ForceNameCase = ForceNameCase.CURRENT
-    """Force case for all the names (registers, bitfields, enums, etc.).
-
-    Case transformations are done for the internal register map representation and may not affect specific generator.
     """
 
     model_config = ConfigDict(

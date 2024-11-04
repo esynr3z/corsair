@@ -11,13 +11,17 @@ __title__ = "corsair"
 __description__ = "Control and status register (CSR) map generator for HDL projects."
 
 
-from .core import HwMode
+from .core import (
+    Access,
+    Hardware,
+    StrictBitField,
+    StrictEnumMember,
+)
 from .input import (
     AnyTarget,
     BaseTarget,
     BuildSpecification,
     CustomTarget,
-    ForceNameCase,
     GlobalConfig,
     MapCHeaderTarget,
     MapMarkdownTarget,
@@ -44,9 +48,11 @@ __all__ = (
     "MapMarkdownTarget",
     "MapCHeaderTarget",
     # configuration
-    "ForceNameCase",
     "RegisterReset",
     "GlobalConfig",
     # core
-    "HwMode",
+    "Hardware",
+    "Access",
+    "StrictEnumMember",
+    "StrictBitField",
 )

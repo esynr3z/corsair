@@ -7,9 +7,9 @@ from __future__ import annotations
 
 from typing import Annotated, Literal, Union
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field
 
-_VAR_NAME_RE = r"^[A-Za-z_][A-Za-z0-9_]*$"
+from corsair.core import IdentifierStr, PyClassPathStr, SingleLineStr
 
 
 class BaseTarget(BaseModel):
@@ -28,13 +28,7 @@ class CustomTarget(BaseTarget):
     kind: Literal["custom"]
     """Target kind discriminator."""
 
-    generator: Annotated[
-        str,
-        StringConstraints(
-            strip_whitespace=True,
-            pattern=r"^.*\.py::\w+$",
-        ),
-    ] = Field(examples=["bar.py::BarGenerator"])
+    generator: PyClassPathStr = Field(..., examples=["bar.py::BarGenerator"])
     """Path to a custom generator class to be used."""
 
 
@@ -58,14 +52,7 @@ class MapVerilogHeaderTarget(BaseTarget):
     kind: Literal["map_verilog_header"]
     """Target kind discriminator."""
 
-    prefix: Annotated[
-        str,
-        StringConstraints(
-            strip_whitespace=True,
-            to_lower=True,
-            pattern=_VAR_NAME_RE,
-        ),
-    ] = "csr"
+    prefix: IdentifierStr = "csr"
     """Prefix for all defines. Case does not matter."""
 
 
@@ -75,14 +62,7 @@ class MapCHeaderTarget(BaseTarget):
     kind: Literal["map_c_header"]
     """Target kind discriminator."""
 
-    prefix: Annotated[
-        str,
-        StringConstraints(
-            strip_whitespace=True,
-            to_lower=True,
-            pattern=_VAR_NAME_RE,
-        ),
-    ] = "csr"
+    prefix: IdentifierStr = "csr"
     """Prefix for all defines. Case does not matter."""
 
 
@@ -92,14 +72,7 @@ class MapSvPackageTarget(BaseTarget):
     kind: Literal["map_sv_package"]
     """Target kind discriminator."""
 
-    prefix: Annotated[
-        str,
-        StringConstraints(
-            strip_whitespace=True,
-            to_lower=True,
-            pattern=_VAR_NAME_RE,
-        ),
-    ] = "csr"
+    prefix: IdentifierStr = "csr"
     """Prefix for all parameters. Case does not matter."""
 
 
@@ -109,7 +82,7 @@ class MapMarkdownTarget(BaseTarget):
     kind: Literal["map_markdown"]
     """Target kind discriminator."""
 
-    title: str = "Register map"
+    title: SingleLineStr = "Register map"
     """Document title."""
 
     print_images: bool = True
@@ -131,4 +104,4 @@ AnyTarget = Annotated[
     ],
     Field(discriminator="kind"),
 ]
-"""Any known target."""
+"""Any known build target for Corsair."""

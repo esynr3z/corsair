@@ -1,1 +1,1 @@
-"""Tests for register map internal representation."""
+"""Tests for register map internal strict representation."""

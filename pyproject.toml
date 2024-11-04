@@ -115,6 +115,7 @@ ignore = [
     "S101",    # assert
     "PLR2004", # magic-value-comparison
     "E712",    # true-false-comparison
+    "ANN401",  # any-type
 ]
 
 [tool.ruff.lint.flake8-type-checking]

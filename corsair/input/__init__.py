@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from .buildspec import BuildSpecification
-from .config import ForceNameCase, GlobalConfig, RegisterReset
+from .config import GlobalConfig, RegisterReset
 from .target import (
     AnyTarget,
     BaseTarget,
@@ -30,7 +30,6 @@ __all__ = [
     "MapMarkdownTarget",
     "MapCHeaderTarget",
     # configuration
-    "ForceNameCase",
     "RegisterReset",
     "GlobalConfig",
 ]

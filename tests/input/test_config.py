@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from corsair import ForceNameCase, GlobalConfig, RegisterReset
+from corsair import GlobalConfig, RegisterReset
 
 # All tests below can be used in smoke testing
 pytestmark = pytest.mark.smoke
@@ -24,7 +24,6 @@ def test_default_config() -> None:
     assert config.register_reset == RegisterReset.SYNC_POS
     assert config.address_increment == False
     assert config.address_alignment == True
-    assert config.force_name_case == ForceNameCase.CURRENT
 
 
 def test_valid_config() -> None:
@@ -38,7 +37,6 @@ def test_valid_config() -> None:
         register_reset=RegisterReset.SYNC_POS,
         address_increment=4,
         address_alignment=True,
-        force_name_case=ForceNameCase.CURRENT,
     )
     assert config.regmap == Path("path/to/regmap")
     assert config.regmap_parser == "parser.py::ParserClass"
@@ -48,7 +46,6 @@ def test_valid_config() -> None:
     assert config.register_reset == RegisterReset.SYNC_POS
     assert config.address_increment == 4
     assert config.address_alignment == True
-    assert config.force_name_case == ForceNameCase.CURRENT
 
 
 def test_regmap_parser_none() -> None:
@@ -175,21 +172,3 @@ def test_register_reset_invalid_value() -> None:
     """Test that register_reset rejects invalid values."""
     with pytest.raises(ValidationError):
         GlobalConfig(register_reset="invalid_rst")  # pyright: ignore [reportArgumentType]
-
-
-def test_force_name_case_enum() -> None:
-    """Test that force_name_case accepts valid enum values."""
-    config = GlobalConfig(force_name_case=ForceNameCase.CURRENT)
-    assert config.force_name_case == "current"
-
-    config = GlobalConfig(force_name_case=ForceNameCase.LOWER)
-    assert config.force_name_case == "lower"
-
-    config = GlobalConfig(force_name_case=ForceNameCase.UPPER)
-    assert config.force_name_case == "upper"
-
-
-def test_force_name_case_invalid_value() -> None:
-    """Test that force_name_case rejects invalid values."""
-    with pytest.raises(ValidationError):
-        GlobalConfig(force_name_case="invalid")  # pyright: ignore [reportArgumentType]
