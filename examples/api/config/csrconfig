@@ -1,9 +1,0 @@
-[globcfg]
-data_width = 128
-address_width = 64
-register_reset = async_neg
-the_answer = 42
-
-[target_bar]
-parameter_eggs = spam
-generator = FooGenerator
