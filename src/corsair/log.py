@@ -10,7 +10,7 @@ from typing import Any
 class _ColorFormatter(logging.Formatter):
     """Record formatter with color support."""
 
-    def __init__(self, *args: tuple[Any], **kwargs: dict[str, Any]) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.use_colors = False
         super().__init__(*args, **kwargs)
 

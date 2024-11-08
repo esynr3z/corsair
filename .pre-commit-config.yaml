@@ -5,7 +5,7 @@ repos:
       - id: ruff-format
         name: Python format
         description: Run Python code formatting with ruff
-        entry: poetry run ruff format
+        entry: uv run ruff format
         language: system
         types: [file, python]
         stages: [pre-commit]
@@ -13,7 +13,7 @@ repos:
       - id: ruff-lint
         name: Python lint check
         description: Run Python code linting with ruff
-        entry: poetry run ruff check --fix
+        entry: uv run ruff check --fix
         language: system
         types: [file, python]
         stages: [pre-commit]
@@ -21,7 +21,7 @@ repos:
       - id: pyright
         name: Python type check
         description: Run Python code type checking with pyright
-        entry: poetry run pyright
+        entry: uv run pyright
         language: system
         types: [file, python]
         stages: [pre-commit]
@@ -29,7 +29,7 @@ repos:
       - id: check-yaml
         name: YAML check
         description: Validate all changed YAML files
-        entry: poetry run check-yaml
+        entry: uv run check-yaml
         language: python
         types: [yaml]
         stages: [pre-commit]
@@ -37,7 +37,7 @@ repos:
       - id: check-toml
         name: TOML check
         description: Validate all changed TOML files
-        entry: poetry run check-toml
+        entry: uv run check-toml
         language: python
         types: [toml]
         stages: [pre-commit]
@@ -45,7 +45,7 @@ repos:
       - id: check-json
         name: JSON check
         description: Validate all changed JSON files
-        entry: poetry run check-json
+        entry: uv run check-json
         language: python
         types: [json]
         stages: [pre-commit]
@@ -54,30 +54,22 @@ repos:
         name: Commit style check
         description: Run commitizen to validate commit message
         stages: [commit-msg]
-        entry: cz check --commit-msg-file .git/COMMIT_EDITMSG
+        entry: uv run cz check --commit-msg-file .git/COMMIT_EDITMSG
         pass_filenames: false
         language: system
 
-      - id: poetry-check
-        name: Poetry configuration check
-        description: Run poetry check to validate config
-        entry: poetry check
+      - id: uv-lock
+        name: UV lock update
+        description: Run uv lock to update lock file
+        entry: uv lock
         language: python
         pass_filenames: false
-        files: ^(.*/)?(poetry\.lock|pyproject\.toml)$
-
-      - id: poetry-lock
-        name: Poetry lock update
-        description: Run poetry lock to update lock file
-        entry: poetry lock
-        language: python
-        pass_filenames: false
-        files: ^(.*/)?(poetry\.lock|pyproject\.toml)$
+        files: ^(.*/)?(uv\.lock|pyproject\.toml)$
 
       - id: pytest
         name: Pytest smoke testing
         description: Run pytest to execute all smoke tests
-        entry: poetry run pytest -m "smoke"
+        entry: uv run pytest -m "smoke"
         language: system
         pass_filenames: false
         stages: [pre-commit]

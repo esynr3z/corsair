@@ -2,4 +2,4 @@
 
 from __future__ import annotations
 
-__version__ = "0.0.0"  # 0.0.0 is standard placeholder for poetry-dynamic-versioning
+__version__ = "1.0.0"  # 0.0.0 is standard placeholder for poetry-dynamic-versioning

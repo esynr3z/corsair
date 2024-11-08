@@ -1,12 +1,9 @@
-[tool.poetry]
+[project]
 name = "corsair"
-version = "0.0.0"
+version = "2.0.0"
 description = "Control and Status Register map generator for FPGA/ASIC projects"
-authors = ["esynr3z <esynr3z@gmail.com>"]
-license = "MIT"
+authors = [{ name = "esynr3z", email = "esynr3z@gmail.com" }]
 readme = "README.md"
-repository = "https://github.com/esynr3z/corsair"
-documentation = "https://corsair.readthedocs.io/"
 keywords = [
     "CSR",
     "registers",
@@ -34,33 +31,40 @@ classifiers = [
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
 ]
+requires-python = ">=3.10"
+dependencies = [
+    "jinja2>=3.1.4",
+    "pydantic>=2.9.2",
+    "pyyaml>=6.0.2",
+    "tomli>=2.0.2 ; python_full_version < '3.11'",
+    "typer>=0.13.0",
+]
 
-[tool.poetry.scripts]
-corsair = "corsair.cli:app"
-
-[tool.poetry.dependencies]
-python = "^3.8"
-pyyaml = "^6.0.2"
-jinja2 = "^3.1.4"
-wavedrom = "^2.0.3.post3"
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.6.9"
-pre-commit = "^3.5.0"
-commitizen = "^3.29.1"
-pyright = "^1.1.383"
-pre-commit-hooks = "^5.0.0"
-pytest = "^8.3.3"
-pytest-cov = "^5.0.0"
+[project.urls]
+Homepage = "https://github.com/esynr3z/corsair"
+Documentation = "https://corsair.readthedocs.io"
+Repository = "https://github.com/esynr3z/corsair.git"
+Issues = "https://github.com/esynr3z/corsair/issues"
+Changelog = "https://github.com/esynr3z/corsair/blob/master/CHANGELOG.md"
 
 [build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
-build-backend = "poetry_dynamic_versioning.backend"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry-dynamic-versioning]
-enable = true
-vcs = "git"
-style = "semver"
+[project.scripts]
+corsair = "corsair.cli:app"
+
+[dependency-groups]
+dev = [
+    "commitizen>=3.30.0",
+    "poethepoet>=0.29.0",
+    "pre-commit-hooks>=5.0.0",
+    "pre-commit>=4.0.1",
+    "pyright>=1.1.388",
+    "pytest-cov>=6.0.0",
+    "pytest>=8.3.3",
+    "ruff>=0.7.2",
+]
 
 [tool.ruff]
 line-length = 120
@@ -73,8 +77,6 @@ exclude = [
     "_build",
     "build",
     "dist",
-    "docs",           # FIXME: need to remove before meging to master
-    "examples",       # FIXME: need to remove before meging to master
 ]
 include = ["*.py", "**/*.py"]
 
@@ -107,6 +109,7 @@ ignore = [
     "FBT",    # flake8-boolean-trap
     "TRY003", # raise-vanilla-args
     "E741",   # ambiguous-variable-name
+    "ANN401", # any-type
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -115,7 +118,6 @@ ignore = [
     "S101",    # assert
     "PLR2004", # magic-value-comparison
     "E712",    # true-false-comparison
-    "ANN401",  # any-type
 ]
 
 [tool.ruff.lint.flake8-type-checking]
@@ -139,41 +141,40 @@ exclude = [
     "_build",
     "build",
     "dist",
-    "docs",           # FIXME: need to remove before meging to master
-    "examples",       # FIXME: need to remove before meging to master
 ]
-
-[tool.poe]
-poetry_command = "poe"
 
 [tool.poe.tasks.clean]
 help = "Clean project directory from temporary files and folders"
 cmd = "rm -rf .ruff_cache .pytest_cache **/__pycache__ dist htmlcov .coverage"
 
+[tool.poe.tasks.install-hooks]
+help = "Install Git pre-commit hooks"
+cmd = "pre-commit install --hook-type commit-msg --hook-type pre-commit"
+
 [tool.poe.tasks.format]
-help = "Format all the Python code"
+help = "Format all the Python code with Ruff"
 cmd = "ruff format"
 
 [tool.poe.tasks.lint]
-help = "Lint all the Python code and try to fix thigs automatically"
-cmd = "ruff check --fix"
-
-[tool.poe.tasks.check-format]
-help = "Check format of all the Python code"
-cmd = "ruff format --check"
-
-[tool.poe.tasks.check-lint]
-help = "Check lints for all the Python code"
+help = "Lint all the Python code with Ruff"
 cmd = "ruff check"
 
+[tool.poe.tasks.check-format]
+help = "Check format for all the Python code with Ruff"
+cmd = "ruff format --check"
+
 [tool.poe.tasks.check-types]
-help = "Do type checking for all the Python code"
+help = "Do type checking for all the Python code with Pyright"
 cmd = "pyright"
 
 [tool.poe.tasks.test]
-help = "Run all tests"
+help = "Run all tests via pytest"
 cmd = "pytest -v"
 
 [tool.poe.tasks.test-cov]
-help = "Run all tests with coverage collection"
+help = "Run all tests via pytest with coverage collection"
 cmd = "pytest -v --cov=corsair --no-cov-on-fail --cov-report term-missing --cov-report html"
+
+[tool.poe.tasks.check-commits]
+help = "Do commit message checking for the current branch"
+cmd = "cz check --rev-range master..HEAD"

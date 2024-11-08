@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import enum
-from typing import TYPE_CHECKING, Iterable, Iterator
+from typing import TYPE_CHECKING
 
 from pydantic import (
     NonNegativeInt,
@@ -14,6 +14,8 @@ from pydantic import (
 from .item import StrictBaseItem
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable, Iterator
+
     from typing_extensions import Self
 
 

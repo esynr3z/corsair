@@ -5,7 +5,7 @@ These data models act as a data validation frontend for options for output gener
 
 from __future__ import annotations
 
-from typing import Annotated, Literal, Union
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -93,15 +93,13 @@ class MapMarkdownTarget(BaseTarget):
 
 
 AnyTarget = Annotated[
-    Union[
-        CustomTarget,
-        MapVerilogTarget,
-        MapVhdlTarget,
-        MapVerilogHeaderTarget,
-        MapCHeaderTarget,
-        MapSvPackageTarget,
-        MapMarkdownTarget,
-    ],
+    CustomTarget
+    | MapVerilogTarget
+    | MapVhdlTarget
+    | MapVerilogHeaderTarget
+    | MapCHeaderTarget
+    | MapSvPackageTarget
+    | MapMarkdownTarget,
     Field(discriminator="kind"),
 ]
 """Any known build target for Corsair."""

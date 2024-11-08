@@ -1,0 +1,54 @@
+name: Tests & Checks
+
+on:
+  pull_request:
+    branches:
+    - '**'
+
+env:
+  PY_COLORS: "1"
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+        - ubuntu-latest
+        - windows-latest
+        - macos-latest
+        python-version:
+        - '3.10'
+        - '3.11'
+        - '3.12'
+        - '3.13'
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+          version: "0.5.0"
+
+    - name: Install the project
+      run: uv sync --all-extras --dev
+
+    - name: Check branch commits
+      run: uv run poe check-commits
+
+    - name: Check Python code format
+      run: uv run poe check-format
+
+    - name: Lint Python code
+      run: uv run poe lint
+
+    - name: Do type checking for Python code
+      run: uv run poe check-types
+
+    - name: Run tests
+      run: uv run poe test
