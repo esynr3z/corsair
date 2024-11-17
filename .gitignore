@@ -5,3 +5,6 @@ build
 dist
 *.egg-info
 .coverage
+site
+.cache
+*.bkp

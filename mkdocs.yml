@@ -1,0 +1,145 @@
+site_name: Corsair
+site_url: https://corsair.synrez.xyz/
+site_description: Corsair navigates you through the CSR seas. No more mismatches between hardware, software, and documentation.
+repo_url: https://github.com/esynr3z/corsair
+
+plugins:
+  - search
+  - social
+  - blog
+  - git-revision-date-localized:
+      enable_creation_date: true
+  - exclude:
+      glob:
+        - "assets/private/*"
+
+extra:
+  version:
+    provider: mike
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  logo: assets/images/logo-white-outline.svg
+  favicon: assets/images/favicon.png
+
+  features:
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.indexes
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - toc.integrate
+    - content.action.edit
+    - search.suggest
+    - search.highlight
+    - search.share
+
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      primary: black
+      accent: indigo
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      primary: black
+      accent: indigo
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - toc:
+      permalink: true
+  - tables
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      linenums: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      options:
+        custom_icons:
+          - overrides/.icons
+
+nav:
+  - Getting Started:
+      - index.md
+      - installation.md
+      - first-steps.md
+      - contributing.md
+      - changelog.md
+  - Cookbook:
+      - cookbook/index.md
+      - Using CLI:
+          - cookbook/cli/create-project.md
+      - Using API:
+          - cookbook/api/custom-flow.md
+  - Concepts:
+      - concepts/index.md
+      - concepts/philosophy.md
+      - concepts/workflow.md
+      - concepts/build-specification.md
+      - concepts/register-model.md
+      - concepts/parsers.md
+      - concepts/generators.md
+      - concepts/customization.md
+      - concepts/file-confidence.md
+  - Build File:
+      - build-file/index.md
+      - build-file/config.md
+      - Targets:
+          - build-file/targets/sv.md
+          - build-file/targets/sv-package.md
+          - build-file/targets/verilog.md
+          - build-file/targets/verilog-header.md
+          - build-file/targets/vhdl.md
+          - build-file/targets/markdown.md
+          - build-file/targets/asciidoc.md
+          - build-file/targets/c-header.md
+          - build-file/targets/custom.md
+  - Register File:
+      - register-file/index.md
+      - register-file/yaml.md
+      - register-file/json.md
+      - register-file/toml.md
+      - register-file/custom.md
+  - CLI:
+      - cli/index.md
+  - API:
+      - api/index.md
+  - Hardware:
+      - hardware/index.md
+      - Fields:
+          - hardware/fields/index.md
+      - Protocols:
+          - hardware/protocols/index.md
+  - Blog:
+      - blog/index.md

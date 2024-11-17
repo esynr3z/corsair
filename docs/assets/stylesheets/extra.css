@@ -1,0 +1,7 @@
+img.invert-on-slate {
+    filter: invert(0);
+}
+
+[data-md-color-scheme="slate"] img.invert-on-slate {
+    filter: invert(1);
+}

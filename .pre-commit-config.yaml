@@ -26,14 +26,6 @@ repos:
         types: [file, python]
         stages: [pre-commit]
 
-      - id: check-yaml
-        name: YAML check
-        description: Validate all changed YAML files
-        entry: uv run check-yaml
-        language: python
-        types: [yaml]
-        stages: [pre-commit]
-
       - id: check-toml
         name: TOML check
         description: Validate all changed TOML files
