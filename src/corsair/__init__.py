@@ -14,8 +14,9 @@ __description__ = "Control and status register (CSR) map generator for HDL proje
 from .core import (
     Access,
     Hardware,
-    StrictBitField,
+    StrictEnum,
     StrictEnumMember,
+    StrictField,
 )
 from .input import (
     AnyTarget,
@@ -51,8 +52,9 @@ __all__ = (
     "RegisterReset",
     "GlobalConfig",
     # core
+    "StrictEnum",
+    "StrictEnumMember",
     "Hardware",
     "Access",
-    "StrictEnumMember",
-    "StrictBitField",
+    "StrictField",
 )

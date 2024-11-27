@@ -19,7 +19,7 @@ IdentifierStr = Annotated[
         pattern=r"^[A-Za-z_][A-Za-z0-9_]*$",
     ),
 ]
-"""A string that represents a valid identifier/name."""
+"""A lowercase string that represents a valid identifier/name."""
 
 SingleLineStr = Annotated[
     str,

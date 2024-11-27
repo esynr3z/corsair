@@ -5,17 +5,17 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from corsair.core.item import StrictBaseItem
+from corsair.core.item import StrictModelItem
 
 # All tests below can be used in smoke testing
 pytestmark = pytest.mark.smoke
 
 
-class ItemWrapper(StrictBaseItem):
+class ItemWrapper(StrictModelItem):
     """Wrapper to be able to construct an object."""
 
 
-def default_item(
+def build_item(
     name: str = "some_name",
     doc: str = "Some description.",
     metadata: dict | None = None,
@@ -28,77 +28,100 @@ def default_item(
     )
 
 
+def test_parent() -> None:
+    """Test `parent` field."""
+
+    class Parent(StrictModelItem):
+        child: ItemWrapper
+
+    child = build_item(name="child")
+    parent = Parent(name="parent", doc="", metadata={}, child=child)
+    child._assign_parent(parent)
+
+    assert child.parent == parent
+
+    # cannot be changed anymore
+    parent2 = Parent(name="parent2", doc="", metadata={}, child=child)
+    child._assign_parent(parent2)
+    assert child.parent == parent
+
+    assert str(child.path) == f"{parent.name}/{child.name}"
+
+
 def test_validation_success() -> None:
     """Test successful validation."""
-    item = default_item()
+    item = build_item()
     assert isinstance(item, ItemWrapper)
-    assert isinstance(item, StrictBaseItem)
+    assert isinstance(item, StrictModelItem)
     assert item.name == "some_name"
     assert item.doc == "Some description."
     assert isinstance(item.metadata, dict)
     assert len(item.metadata) == 0
+    with pytest.raises(AttributeError):
+        assert item.parent is None
+    assert str(item.path) == item.name
 
 
 def test_invalid_name_empty() -> None:
     """Test name is empty."""
     with pytest.raises(ValidationError, match="at least 1 character"):
-        default_item(name="")
+        build_item(name="")
 
 
 def test_invalid_name_pattern() -> None:
     """Test name is bad pattern."""
     with pytest.raises(ValidationError, match="should match pattern"):
-        default_item(name="123foo")
+        build_item(name="123foo")
     with pytest.raises(ValidationError, match="should match pattern"):
-        default_item(name="foo-bar")
+        build_item(name="foo-bar")
     with pytest.raises(ValidationError, match="should match pattern"):
-        default_item(name="!baz")
+        build_item(name="!baz")
     with pytest.raises(ValidationError, match="should match pattern"):
-        default_item(name="FOO?")
+        build_item(name="FOO?")
 
 
 def test_brief() -> None:
     """Test valid brief."""
-    item = default_item(doc="First line\n\nSecond line")
+    item = build_item(doc="First line\n\nSecond line")
     assert item.brief == "First line"
 
-    item = default_item(doc="First line\nSecond line")
+    item = build_item(doc="First line\nSecond line")
     assert item.brief == "First line"
 
-    item = default_item(doc="First line")
+    item = build_item(doc="First line")
     assert item.brief == "First line"
 
-    item = default_item(doc="   First line   \n\nSecond line")
+    item = build_item(doc="   First line   \n\nSecond line")
     assert item.brief == "First line"
 
 
 def test_description() -> None:
     """Test valid description."""
-    item = default_item(doc="First line\n\nSecond line")
+    item = build_item(doc="First line\n\nSecond line")
     assert item.description == "Second line"
 
-    item = default_item(doc="First line\n\nSecond line\nThird line\n")
+    item = build_item(doc="First line\n\nSecond line\nThird line\n")
     assert item.description == "Second line\nThird line"
 
-    item = default_item(doc="First line\nSecond line")
+    item = build_item(doc="First line\nSecond line")
     assert item.description == "Second line"
 
-    item = default_item(doc="First line")
+    item = build_item(doc="First line")
     assert item.description == "First line"
 
-    item = default_item(doc="   First line   \n\nSecond line   \n")
+    item = build_item(doc="   First line   \n\nSecond line   \n")
     assert item.description == "Second line"
 
 
 def test_metadata() -> None:
     """Test metadata is attached."""
-    item = default_item(metadata={"foo": 42})
+    item = build_item(metadata={"foo": 42})
     assert item.metadata["foo"] == 42
 
 
 def test_string_preprocessing() -> None:
     """Test whitespace stripping and lowercase conversion for string fields."""
-    item = default_item(
+    item = build_item(
         name="  ValidName  ",
         doc="  Valid doc \n\n with spaces  ",
     )
@@ -106,9 +129,9 @@ def test_string_preprocessing() -> None:
     assert item.doc == "Valid doc \n\n with spaces"  # Whitespace stripped only
 
 
-def test_immatability() -> None:
-    """Test item immatability."""
-    item = default_item()
+def test_immutability() -> None:
+    """Test item immutability."""
+    item = build_item()
     with pytest.raises(ValidationError, match="Instance is frozen"):
         item.name = "bar"
 

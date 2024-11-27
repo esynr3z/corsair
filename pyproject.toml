@@ -121,11 +121,15 @@ ignore = [
     "S101",    # assert
     "PLR2004", # magic-value-comparison
     "E712",    # true-false-comparison
+    "SLF001",  # private-member-access
 ]
 
 [tool.ruff.lint.flake8-type-checking]
 # Prevent models from being moved into type-checking blocks
-runtime-evaluated-base-classes = ["pydantic.BaseModel"]
+runtime-evaluated-base-classes = [
+    "pydantic.BaseModel",
+    "corsair.core.item.StrictModelItem",
+]
 
 [tool.ruff.lint.isort]
 required-imports = ["from __future__ import annotations"]

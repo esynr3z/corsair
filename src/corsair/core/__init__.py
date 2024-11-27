@@ -2,12 +2,8 @@
 
 from __future__ import annotations
 
-from .bitfield import (
-    Access,
-    Hardware,
-    StrictBitField,
-    StrictEnumMember,
-)
+from .enum import StrictEnum, StrictEnumMember
+from .field import Access, Hardware, StrictField
 from .types import (
     IdentifierStr,
     PyClassPathStr,
@@ -16,10 +12,11 @@ from .types import (
 )
 
 __all__ = (
+    "StrictEnum",
+    "StrictEnumMember",
     "Hardware",
     "Access",
-    "StrictEnumMember",
-    "StrictBitField",
+    "StrictField",
     "IdentifierStr",
     "SingleLineStr",
     "TextStr",
