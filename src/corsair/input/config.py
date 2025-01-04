@@ -14,7 +14,7 @@ from pydantic import (
     StrictBool,
 )
 
-from corsair.core import PyClassPathStr
+from corsair import PyClassPathStr
 
 
 class RegisterReset(str, Enum):

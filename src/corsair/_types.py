@@ -4,11 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from pydantic import (
-    NonNegativeInt,
-    StringConstraints,
-    TypeAdapter,
-)
+from pydantic import AfterValidator, StringConstraints
 
 IdentifierStr = Annotated[
     str,
@@ -48,5 +44,12 @@ PyClassPathStr = Annotated[
 """A string that represents a path to a class within some python file."""
 
 
-non_negative_int_adapter = TypeAdapter(NonNegativeInt)
-"""Type adapter for `NonNegativeInt` type to validation of objects of that type."""
+def _is_power_of_two(value: int) -> int:
+    """Check if a number is a power of two."""
+    if not (value > 0 and (value & (value - 1)) == 0):
+        raise ValueError(f"Value {value} is not a power of two")
+    return value
+
+
+Pow2Int = Annotated[int, AfterValidator(_is_power_of_two)]
+"""An integer that is a power of two."""

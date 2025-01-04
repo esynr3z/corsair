@@ -1,48 +1,55 @@
-"""Tests base register map item."""
+"""Tests for base register map item."""
 
 from __future__ import annotations
 
-import pytest
-from pydantic import ValidationError
+from typing import TYPE_CHECKING, Any
 
-from corsair.core.item import StrictModelItem
+import pytest
+from pydantic import ValidationError, model_validator
+
+import corsair.model as csr
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 # All tests below can be used in smoke testing
 pytestmark = pytest.mark.smoke
 
 
-class ItemWrapper(StrictModelItem):
+class ItemWrapper(csr.Item):
     """Wrapper to be able to construct an object."""
 
+    child: ItemWrapper | None
 
-def build_item(
-    name: str = "some_name",
-    doc: str = "Some description.",
-    metadata: dict | None = None,
-) -> ItemWrapper:
+    @model_validator(mode="after")
+    def _update_backlinks(self) -> Self:
+        """Update backlinks."""
+        if self.child is not None:
+            self.child._assign_parent(self)
+        return self
+
+
+def build_item(**kwargs: Any) -> ItemWrapper:
     """Create default item."""
-    return ItemWrapper(
-        name=name,
-        doc=doc,
-        metadata=metadata if metadata else {},
-    )
+    defaults = {
+        "name": "some_name",
+        "doc": "Some description.",
+        "metadata": {},
+        "child": None,
+    }
+    defaults.update(kwargs)
+    return ItemWrapper(**defaults)
 
 
 def test_parent() -> None:
     """Test `parent` field."""
-
-    class Parent(StrictModelItem):
-        child: ItemWrapper
-
     child = build_item(name="child")
-    parent = Parent(name="parent", doc="", metadata={}, child=child)
-    child._assign_parent(parent)
+    parent = build_item(name="parent", child=child)
 
     assert child.parent == parent
 
     # cannot be changed anymore
-    parent2 = Parent(name="parent2", doc="", metadata={}, child=child)
-    child._assign_parent(parent2)
+    _ = build_item(name="parent2", child=child)
     assert child.parent == parent
 
     assert str(child.path) == f"{parent.name}/{child.name}"
@@ -51,12 +58,10 @@ def test_parent() -> None:
 def test_validation_success() -> None:
     """Test successful validation."""
     item = build_item()
-    assert isinstance(item, ItemWrapper)
-    assert isinstance(item, StrictModelItem)
+    assert isinstance(item, csr.Item)
     assert item.name == "some_name"
     assert item.doc == "Some description."
-    assert isinstance(item.metadata, dict)
-    assert len(item.metadata) == 0
+    assert isinstance(item.metadata, csr.Metadata)
     with pytest.raises(AttributeError):
         assert item.parent is None
     assert str(item.path) == item.name
@@ -116,7 +121,7 @@ def test_description() -> None:
 def test_metadata() -> None:
     """Test metadata is attached."""
     item = build_item(metadata={"foo": 42})
-    assert item.metadata["foo"] == 42
+    assert item.metadata.foo == 42  # type: ignore reportAttributeAccessIssue
 
 
 def test_string_preprocessing() -> None:

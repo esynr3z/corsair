@@ -10,13 +10,12 @@ from __future__ import annotations
 __title__ = "corsair"
 __description__ = "Control and status register (CSR) map generator for HDL projects."
 
-
-from .core import (
-    Access,
-    Hardware,
-    StrictEnum,
-    StrictEnumMember,
-    StrictField,
+from ._types import (
+    IdentifierStr,
+    Pow2Int,
+    PyClassPathStr,
+    SingleLineStr,
+    TextStr,
 )
 from .input import (
     AnyTarget,
@@ -36,6 +35,12 @@ from .version import __version__
 
 __all__ = (
     "__version__",
+    # types
+    "IdentifierStr",
+    "SingleLineStr",
+    "TextStr",
+    "PyClassPathStr",
+    "Pow2Int",
     # specification
     "BuildSpecification",
     # targets
@@ -51,10 +56,4 @@ __all__ = (
     # configuration
     "RegisterReset",
     "GlobalConfig",
-    # core
-    "StrictEnum",
-    "StrictEnumMember",
-    "Hardware",
-    "Access",
-    "StrictField",
 )
