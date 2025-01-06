@@ -17,6 +17,7 @@ from ._types import (
     SingleLineStr,
     TextStr,
 )
+from ._version import VERSION
 from .input import (
     AnyTarget,
     BaseTarget,
@@ -31,10 +32,11 @@ from .input import (
     MapVhdlTarget,
     RegisterReset,
 )
-from .version import __version__
+
+__version__ = VERSION
 
 __all__ = (
-    "__version__",
+    "VERSION",
     # types
     "IdentifierStr",
     "SingleLineStr",
