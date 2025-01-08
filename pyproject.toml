@@ -113,7 +113,8 @@ ignore = [
     "TRY003", # raise-vanilla-args
     "E741",   # ambiguous-variable-name
     "ANN401", # any-type
-    "TID252",
+    "S607",   # start-process-with-partial-path
+    "S603",   # subprocess-without-shell-equals-true
 ]
 
 [tool.ruff.lint.per-file-ignores]

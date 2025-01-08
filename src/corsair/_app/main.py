@@ -99,3 +99,16 @@ def main(
         no_rich=no_rich,
         logfile=logfile,
     )
+
+
+@app.command()
+def test_logging() -> None:
+    """Hidden command for testing logging configuration."""
+    log.debug("I must not fear.")
+    log.debug("Fear is the mind-killer.")
+    log.info("Fear is the little-death that brings total obliteration.")
+    log.info("I will face my fear.")
+    log.warning("I will permit it to pass over me and through me.")
+    log.error("And when it has gone past, I will turn the inner eye to see its path.")
+    log.critical("Where the fear has gone there will be nothing.")
+    raise RuntimeError("Only I will remain.")

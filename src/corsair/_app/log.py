@@ -7,7 +7,7 @@ import os
 import sys
 from typing import TYPE_CHECKING, Any
 
-import typer  # noqa: TCH002
+import typer
 from rich.console import Console
 from rich.logging import RichHandler
 
@@ -89,10 +89,18 @@ def _create_stream_handler(no_color: bool, is_debug: bool) -> logging.Handler:
 
 def _create_file_handler(logfile: Path, is_debug: bool) -> logging.Handler:
     """Create FileHandler for logging to a file."""
-    formatter = logging.Formatter(_get_format_string(is_debug))
-    handler = logging.FileHandler(logfile, mode="w", encoding="utf-8")
-    handler.setFormatter(formatter)
-    return handler
+    try:
+        logfile.parent.mkdir(parents=True, exist_ok=True)
+        formatter = logging.Formatter(_get_format_string(is_debug))
+        handler = logging.FileHandler(logfile, mode="w", encoding="utf-8")
+        handler.setFormatter(formatter)
+        handler.setLevel(logging.DEBUG)  # Log everything to file
+    except OSError as e:
+        # Print error message using typer.echo
+        typer.echo(f"Failed to create log file: {e}", err=True)
+        raise typer.Exit(code=1) from e
+    else:
+        return handler
 
 
 def is_no_color_env() -> bool:

@@ -9,7 +9,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from .._types import IdentifierStr, PyClassPathStr, SingleLineStr
+from corsair import IdentifierStr, PyClassPathStr, SingleLineStr
 
 
 class BaseTarget(BaseModel):
