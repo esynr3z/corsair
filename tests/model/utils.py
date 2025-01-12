@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-import corsair.model as csr
+import corsair as csr
 
 
 def build_enum_member(**kwargs: Any) -> csr.EnumMember:

@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import BaseModel, ValidationError
 
-from corsair.model import AccessCategory, AccessMode
+from corsair import AccessCategory, AccessMode
 
 # All tests below can be used in smoke testing
 pytestmark = pytest.mark.smoke

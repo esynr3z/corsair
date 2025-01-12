@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import BaseModel, ValidationError
 
-from corsair.model import HardwareMode
+from corsair import HardwareMode
 
 # All tests below can be used in smoke testing
 pytestmark = pytest.mark.smoke

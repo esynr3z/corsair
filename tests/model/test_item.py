@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 import pytest
 from pydantic import ValidationError, model_validator
 
-import corsair.model as csr
+import corsair as csr
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 pytestmark = pytest.mark.smoke
 
 
-class ItemWrapper(csr.Item):
+class ItemWrapper(csr.NamedItem):
     """Wrapper to be able to construct an object."""
 
     child: ItemWrapper | None
@@ -58,10 +58,10 @@ def test_parent() -> None:
 def test_validation_success() -> None:
     """Test successful validation."""
     item = build_item()
-    assert isinstance(item, csr.Item)
+    assert isinstance(item, csr.NamedItem)
     assert item.name == "some_name"
     assert item.doc == "Some description."
-    assert isinstance(item.metadata, csr.Metadata)
+    assert isinstance(item.metadata, csr.ItemMetadata)
     with pytest.raises(AttributeError):
         assert item.parent is None
     assert str(item.path) == item.name

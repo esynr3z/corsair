@@ -25,27 +25,6 @@ if TYPE_CHECKING:
 
     from typing_extensions import Self
 
-__all__ = (
-    "AccessMode",
-    "AccessCategory",
-    "MemoryStyle",
-    "HardwareMode",
-    "Metadata",
-    "Item",
-    "MapableItem",
-    "ArrayItem",
-    "EnumMember",
-    "Enum",
-    "Field",
-    "Register",
-    "Memory",
-    "Map",
-    "FieldArray",
-    "RegisterArray",
-    "MemoryArray",
-    "MapArray",
-)
-
 
 class AccessMode(str, enum.Enum):
     """Access mode for a field.
@@ -401,7 +380,7 @@ class HardwareMode(str, enum.Flag):
         return self._value_ != other._value_ and self.__ge__(other)
 
 
-class Metadata(BaseModel):
+class ItemMetadata(BaseModel):
     """Metadata for an item."""
 
     # All fields are created by user
@@ -414,7 +393,7 @@ class Metadata(BaseModel):
     )
 
 
-class Item(BaseModel, ABC):
+class NamedItem(BaseModel, ABC):
     """Base data structure for all CSR model internal items: map, register, field, etc.
 
     Its strictness and immutability allows to provide solid contract for generators, when they traverse the model.
@@ -445,7 +424,7 @@ class Item(BaseModel, ABC):
     then optionally, empty line following detailed multiline description.
     """
 
-    metadata: Metadata = Metadata()
+    metadata: ItemMetadata = ItemMetadata()
     """Optional user metadata attached to an item."""
 
     @property
@@ -470,7 +449,7 @@ class Item(BaseModel, ABC):
         return self._description
 
     @property
-    def parent(self) -> Item:
+    def parent(self) -> NamedItem:
         """Parent for register model item."""
         if not hasattr(self, "_parent"):
             msg = self._err_fmt("Parent is not set")
@@ -488,7 +467,7 @@ class Item(BaseModel, ABC):
         """Format error message properly."""
         return f"{self.path}: {message}"
 
-    def _assign_parent(self, item: Item) -> None:
+    def _assign_parent(self, item: NamedItem) -> None:
         """Set `parent` property.
 
         This one-time method has to be used, because model is frozen and parent field is empty after creation.
@@ -505,8 +484,8 @@ class Item(BaseModel, ABC):
         """Update backlinks to current parent in all child items."""
 
 
-class MapableItem(Item):
-    """Item that can be mappend into global address space.
+class MapableItem(NamedItem):
+    """NamedItem that can be mappend into global address space.
 
     This class add properties to work with address space and get address of the item.
     """
@@ -548,8 +527,8 @@ class MapableItem(Item):
         return self
 
 
-class ArrayItem(Item):
-    """Item that can describe array of items with common properties following some repeatable pattern."""
+class ArrayItem(NamedItem):
+    """NamedItem that can describe array of items with common properties following some repeatable pattern."""
 
     num: PositiveInt
     """Number of elements within the array."""
@@ -578,14 +557,14 @@ class ArrayItem(Item):
     """
 
     @property
-    def generated_items(self) -> tuple[Item, ...]:
+    def generated_items(self) -> tuple[NamedItem, ...]:
         """Concrete items in array created by following the pattern."""
         if not hasattr(self, "_generated_items"):
             self._generated_items = self._generate_items()
         return self._generated_items
 
     @abstractmethod
-    def _generate_items(self) -> tuple[Item, ...]:
+    def _generate_items(self) -> tuple[NamedItem, ...]:
         """Generate concrete items in the array."""
 
     @field_validator("indices", mode="after")
@@ -645,7 +624,7 @@ class ArrayItem(Item):
         return self
 
 
-class EnumMember(Item):
+class EnumMember(NamedItem):
     """Member of a bit field enumeration."""
 
     value: NonNegativeInt
@@ -675,7 +654,7 @@ class EnumMember(Item):
         return self
 
 
-class Enum(Item):
+class Enum(NamedItem):
     """Enumeration of a bit field."""
 
     members: tuple[EnumMember, ...]
@@ -748,7 +727,7 @@ class Enum(Item):
         return self
 
 
-class Field(Item):
+class Field(NamedItem):
     """Bit field inside a register."""
 
     reset: NonNegativeInt | None
@@ -1180,7 +1159,7 @@ class FieldArray(Field, ArrayItem):
         # _generate_items creates tuple of `Field` items, so waiver is safe here
         return self.generated_items  # type: ignore reportReturnType
 
-    def _generate_items(self) -> tuple[Item, ...]:
+    def _generate_items(self) -> tuple[NamedItem, ...]:
         """Generate concrete fields in the array."""
         raise NotImplementedError
 
@@ -1194,7 +1173,7 @@ class RegisterArray(Register, ArrayItem):
         # _generate_items creates tuple of `Register` items, so waiver is safe here
         return self.generated_items  # type: ignore reportReturnType
 
-    def _generate_items(self) -> tuple[Item, ...]:
+    def _generate_items(self) -> tuple[NamedItem, ...]:
         """Generate concrete items in the array."""
         raise NotImplementedError
 
@@ -1208,7 +1187,7 @@ class MemoryArray(Memory, ArrayItem):
         # _generate_items creates tuple of `Memory` items, so waiver is safe here
         return self.generated_items  # type: ignore reportReturnType
 
-    def _generate_items(self) -> tuple[Item, ...]:
+    def _generate_items(self) -> tuple[NamedItem, ...]:
         """Generate concrete items in the array."""
         raise NotImplementedError
 
@@ -1222,6 +1201,6 @@ class MapArray(Map, ArrayItem):
         # _generate_items creates tuple of `Map` items, so waiver is safe here
         return self.generated_items  # type: ignore reportReturnType
 
-    def _generate_items(self) -> tuple[Item, ...]:
+    def _generate_items(self) -> tuple[NamedItem, ...]:
         """Generate concrete items in the array."""
         raise NotImplementedError

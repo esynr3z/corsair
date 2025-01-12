@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-import corsair.model as csr
+import corsair as csr
 
 from .utils import build_enum, build_enum_member, build_field
 

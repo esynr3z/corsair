@@ -1,11 +1,11 @@
-"""Tests for enumeration of a bitfield."""
+"""Tests enumeration of a bitfield."""
 
 from __future__ import annotations
 
 import pytest
 from pydantic import ValidationError
 
-from corsair import model as csr
+import corsair as csr
 
 from .utils import build_enum, build_enum_member
 
@@ -19,7 +19,7 @@ def test_validation_success() -> None:
     assert member.name == "ok"
     assert member.doc == "Indicates status is OK"
     assert member.value == 0
-    assert isinstance(member.metadata, csr.Metadata)
+    assert isinstance(member.metadata, csr.ItemMetadata)
 
 
 def test_invalid_value() -> None:
