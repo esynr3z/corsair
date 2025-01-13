@@ -10,6 +10,7 @@ from __future__ import annotations
 __title__ = "corsair"
 __description__ = "Control and status register (CSR) map generator for HDL projects."
 
+from ._build import BuildSpecification
 from ._generators import (
     AnyGeneratorConfig,
     CustomGeneratorConfig,
@@ -67,6 +68,8 @@ __all__ = (
     "TextStr",
     "PyClassPathStr",
     "Pow2Int",
+    # Build
+    "BuildSpecification",
     # Parsers
     "Parser",
     "ParserConfig",
