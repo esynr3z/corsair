@@ -46,6 +46,7 @@ from ._parsers import (
     Parser,
     ParserConfig,
 )
+from ._templates import TemplateEnvironment, TemplateKind
 from ._types import (
     IdentifierStr,
     Pow2Int,
@@ -99,4 +100,7 @@ __all__ = (
     "AnyGeneratorConfig",
     "VerilogGenerator",
     "VhdlGenerator",
+    # Templates
+    "TemplateEnvironment",
+    "TemplateKind",
 )
