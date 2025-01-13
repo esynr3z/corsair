@@ -12,13 +12,16 @@ if TYPE_CHECKING:
 
     from corsair._model import Map
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
-from corsair._types import PyClassPathStr
+from corsair._types import IdentifierStr, PyClassPathStr
 
 
 class GeneratorConfig(BaseModel, ABC):
     """Base configuration for a generator."""
+
+    label: IdentifierStr = ""
+    """Unique label of the generator."""
 
     use_map: str
     """Name of the map to use for the generation."""
@@ -27,6 +30,14 @@ class GeneratorConfig(BaseModel, ABC):
         extra="allow",
         use_attribute_docstrings=True,
     )
+
+    @field_validator("label")
+    @classmethod
+    def _derive_label(cls, v: str, info: ValidationInfo) -> str:
+        """Derive the label from the generator kind."""
+        if v == "":
+            v = info.data.get("kind", "").lower()
+        return v
 
 
 class CustomGeneratorConfig(GeneratorConfig):

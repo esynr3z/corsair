@@ -10,8 +10,7 @@ from .base import CustomParserConfig, Parser, ParserConfig
 from .deserializer import Deserializer
 
 AnyParserConfig = Annotated[
-    CustomParserConfig,
-    Deserializer.Config,
+    CustomParserConfig | Deserializer.Config,
     Field(discriminator="kind"),
 ]
 

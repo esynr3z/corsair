@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -19,8 +19,11 @@ if TYPE_CHECKING:
 class ParserConfig(BaseModel, ABC):
     """Base configuration for a parser."""
 
-    mapfile: Path
+    mapfile: Path = Path("csrmap.yaml")
     """Path to the register map file to parse."""
+
+    overrides: dict[str, Any] = {}
+    """Overrides to apply to the register map."""
 
     model_config = ConfigDict(
         extra="allow",
