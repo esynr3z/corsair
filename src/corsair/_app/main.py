@@ -14,7 +14,7 @@ from .build import build
 from .check import check
 from .init import init
 from .log import init_logging, is_term_dumb_env
-from .schemas import schemas
+from .schema import schema
 from .version import version
 
 # Get logger singleton
@@ -36,7 +36,7 @@ app = typer.Typer(
 app.command()(init)
 app.command()(build)
 app.command()(check)
-app.command()(schemas)
+app.command()(schema)
 app.command()(version)
 
 if is_term_dumb_env():
