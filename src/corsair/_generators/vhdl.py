@@ -13,5 +13,5 @@ class VhdlGenerator(Generator):
     class Config(GeneratorConfig):
         """Configuration for the VHDL generator."""
 
-        kind: Literal["vhdl"]
+        kind: Literal["vhdl"] = "vhdl"
         """Generator kind discriminator."""

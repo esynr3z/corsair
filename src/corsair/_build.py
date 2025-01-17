@@ -6,7 +6,7 @@ import json
 import sys
 from typing import TYPE_CHECKING
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ._generators import AnyGeneratorConfig
 from ._parsers import AnyParserConfig, Deserializer
@@ -19,6 +19,8 @@ else:
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from typing_extensions import Self
+
 
 class BuildSpecification(BaseModel):
     """Specification that describes how to build everything."""
@@ -28,6 +30,14 @@ class BuildSpecification(BaseModel):
 
     generators: list[AnyGeneratorConfig] = Field(..., min_length=1)
     """Configuration for the generators to build all required files."""
+
+    @model_validator(mode="after")
+    def _validate_generators_labels(self) -> Self:
+        """Validate that generators labels are unique."""
+        labels = [g.label for g in self.generators]
+        if len(labels) != len(set(labels)):
+            raise ValueError(f"Generator labels must be unique: {labels}")
+        return self
 
     @classmethod
     def from_toml_file(cls, path: Path) -> BuildSpecification:

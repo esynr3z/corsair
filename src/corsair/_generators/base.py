@@ -10,9 +10,11 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from pathlib import Path
 
+    from typing_extensions import Self
+
     from corsair._model import Map
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from corsair._types import IdentifierStr, PyClassPathStr
 
@@ -23,27 +25,27 @@ class GeneratorConfig(BaseModel, ABC):
     label: IdentifierStr = ""
     """Unique label of the generator."""
 
-    use_map: str
-    """Name of the map to use for the generation."""
+    use_map: str | None = None
+    """Name of the map to use for the generation. Root map is used if not specified."""
 
     model_config = ConfigDict(
         extra="allow",
         use_attribute_docstrings=True,
     )
 
-    @field_validator("label")
-    @classmethod
-    def _derive_label(cls, v: str, info: ValidationInfo) -> str:
+    @model_validator(mode="after")
+    def _derive_label(self) -> Self:
         """Derive the label from the generator kind."""
-        if v == "":
-            v = info.data.get("kind", "").lower()
-        return v
+        if self.label == "":
+            # field `kind` is going to present in any child class
+            self.label = self.kind  # type: ignore reportCallIssue
+        return self
 
 
 class CustomGeneratorConfig(GeneratorConfig):
     """Custom configuration that is used by custom generator class."""
 
-    kind: Literal["custom"]
+    kind: Literal["custom"] = "custom"
     """Generator kind discriminator."""
 
     generator: PyClassPathStr = Field(..., examples=["bar.py::BarGenerator"])

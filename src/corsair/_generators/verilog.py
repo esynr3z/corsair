@@ -13,5 +13,5 @@ class VerilogGenerator(Generator):
     class Config(GeneratorConfig):
         """Configuration for the Verilog generator."""
 
-        kind: Literal["verilog"]
+        kind: Literal["verilog"] = "verilog"
         """Generator kind discriminator."""
