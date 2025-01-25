@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+import importlib.util
 from abc import ABC, abstractmethod
 from enum import Enum
+from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from pathlib import Path
 
     from typing_extensions import Self
 
@@ -33,6 +34,11 @@ class GeneratorConfig(BaseModel, ABC):
         use_attribute_docstrings=True,
     )
 
+    @property
+    @abstractmethod
+    def generator_cls(self) -> type[Generator]:
+        """Related generator class."""
+
     @model_validator(mode="after")
     def _derive_label(self) -> Self:
         """Derive the label from the generator kind."""
@@ -54,8 +60,29 @@ class CustomGeneratorConfig(GeneratorConfig):
     @property
     def generator_cls(self) -> type[Generator]:
         """Generator class to use."""
-        # TODO: implement dynamic loading of generator class
-        raise NotImplementedError
+        if hasattr(self, "_generator_cls"):
+            return self._generator_cls
+
+        module_path, class_name = self.generator.split("::")
+
+        full_path = Path(module_path).resolve()
+        spec = importlib.util.spec_from_file_location(full_path.stem, str(full_path))
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Could not load module from {full_path}")
+
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        try:
+            loaded_cls = getattr(module, class_name)
+        except AttributeError as e:
+            raise ImportError(f"Generator class '{class_name}' not found in module '{full_path}'") from e
+
+        if not issubclass(loaded_cls, Generator):
+            raise TypeError(f"Class '{class_name}' must be a subclass of 'Generator'")
+
+        self._generator_cls = loaded_cls
+        return loaded_cls
 
 
 class Generator(ABC):
