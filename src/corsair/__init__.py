@@ -20,6 +20,14 @@ from ._generators import (
     VerilogGenerator,
     VhdlGenerator,
 )
+from ._loaders import (
+    AnyLoaderConfig,
+    CustomLoaderConfig,
+    Loader,
+    LoaderConfig,
+    PyModuleLoader,
+    SerializedLoader,
+)
 from ._model import (
     AccessCategory,
     AccessMode,
@@ -40,18 +48,11 @@ from ._model import (
     Register,
     RegisterArray,
 )
-from ._parsers import (
-    AnyParserConfig,
-    CustomParserConfig,
-    Deserializer,
-    Parser,
-    ParserConfig,
-)
 from ._templates import TemplateEnvironment, TemplateKind
 from ._types import (
     IdentifierStr,
     Pow2Int,
-    PyClassPathStr,
+    PyAttrPathStr,
     SingleLineStr,
     TextStr,
 )
@@ -66,16 +67,17 @@ __all__ = (
     "IdentifierStr",
     "SingleLineStr",
     "TextStr",
-    "PyClassPathStr",
+    "PyAttrPathStr",
     "Pow2Int",
     # Build
     "BuildSpecification",
-    # Parsers
-    "Parser",
-    "ParserConfig",
-    "CustomParserConfig",
-    "AnyParserConfig",
-    "Deserializer",
+    # Loaders
+    "Loader",
+    "LoaderConfig",
+    "CustomLoaderConfig",
+    "AnyLoaderConfig",
+    "SerializedLoader",
+    "PyModuleLoader",
     # CSR model
     "AccessMode",
     "AccessCategory",

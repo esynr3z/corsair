@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from corsair._types import IdentifierStr, PyClassPathStr
+from corsair._types import IdentifierStr, PyAttrPathStr
 
 
 class GeneratorConfig(BaseModel, ABC):
@@ -54,7 +54,7 @@ class CustomGeneratorConfig(GeneratorConfig):
     kind: Literal["custom"] = "custom"
     """Generator kind discriminator."""
 
-    generator: PyClassPathStr = Field(..., examples=["bar.py::BarGenerator"])
+    generator: PyAttrPathStr = Field(..., examples=["bar.py::BarGenerator"])
     """Path to a custom generator class to be used."""
 
     @property

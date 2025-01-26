@@ -34,14 +34,14 @@ TextStr = Annotated[
 ]
 """A string that represent a generic text (can be multiline)."""
 
-PyClassPathStr = Annotated[
+PyAttrPathStr = Annotated[
     str,
     StringConstraints(
         strip_whitespace=True,
-        pattern=r"^.+\.py::[A-Za-z0-9_]+$",
+        pattern=r"^.+\.py::[A-Za-z_][A-Za-z0-9_]*$",
     ),
 ]
-"""A string that represents a path to a class within some python file."""
+"""A string that represents a path to an attribute (class, function, object) within some python module."""
 
 
 def _is_power_of_two(value: int) -> int:

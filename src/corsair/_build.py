@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from ._generators import AnyGeneratorConfig
-from ._parsers import AnyParserConfig, Deserializer
+from ._loaders import AnyLoaderConfig, SerializedLoader
 
 if sys.version_info >= (3, 11):
     import tomllib as tomlib
@@ -25,8 +25,8 @@ if TYPE_CHECKING:
 class BuildSpecification(BaseModel):
     """Specification that describes how to build everything."""
 
-    parser: AnyParserConfig = Deserializer.Config(kind="yaml")
-    """Configuration for the parser."""
+    loader: AnyLoaderConfig = SerializedLoader.Config(kind="yaml")
+    """Configuration for the loader."""
 
     generators: list[AnyGeneratorConfig] = Field(..., min_length=1)
     """Configuration for the generators to build all required files."""
