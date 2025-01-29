@@ -24,7 +24,7 @@ class LoaderConfig(BaseModel, ABC):
     """Overrides to apply to the register map."""
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         use_attribute_docstrings=True,
     )
 
@@ -37,6 +37,11 @@ class CustomLoaderConfig(LoaderConfig):
 
     loader: PyAttrPathStr = Field(..., examples=["bar.py::BarLoader"])
     """Path to a custom loader class to be used."""
+
+    model_config = ConfigDict(
+        extra="allow",
+        use_attribute_docstrings=True,
+    )
 
     @property
     def loader_cls(self) -> type[Loader]:
@@ -52,9 +57,27 @@ class Loader(ABC):
         """Initialize the loader."""
         self.config = config
 
-    @abstractmethod
     def __call__(self) -> Map:
         """Load the register map."""
+        if not isinstance(self.config, self.get_config_cls()):
+            raise TypeError(
+                f"Configuration instance is not of the expected type of "
+                f"{self.__class__.__name__}.{self.get_config_cls().__name__}"
+            )
+
+        regmap = self._load()
+        if self.config.overrides:
+            self._apply_overrides(regmap)
+
+        return regmap
+
+    @abstractmethod
+    def _load(self) -> Map:
+        """Load the register map."""
+
+    def _apply_overrides(self, regmap: Map) -> None:
+        """Apply overrides to the register map."""
+        raise NotImplementedError
 
     @classmethod
     @abstractmethod

@@ -54,6 +54,10 @@ build-backend = "hatchling.build"
 [project.scripts]
 corsair = "corsair.__main__:app"
 
+[project.optional-dependencies]
+hjson = ["hjson>=3.1.0"]
+full = ["hjson"]
+
 [dependency-groups]
 dev = [
     "commitizen>=3.30.0",
