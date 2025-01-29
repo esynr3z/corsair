@@ -30,7 +30,7 @@ class GeneratorConfig(BaseModel, ABC):
     """Name of the map to use for the generation. Root map is used if not specified."""
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         use_attribute_docstrings=True,
     )
 
@@ -56,6 +56,11 @@ class CustomGeneratorConfig(GeneratorConfig):
 
     generator: PyAttrPathStr = Field(..., examples=["bar.py::BarGenerator"])
     """Path to a custom generator class to be used."""
+
+    model_config = ConfigDict(
+        extra="allow",
+        use_attribute_docstrings=True,
+    )
 
     @property
     def generator_cls(self) -> type[Generator]:
