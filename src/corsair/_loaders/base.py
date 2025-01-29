@@ -28,6 +28,11 @@ class LoaderConfig(BaseModel, ABC):
         use_attribute_docstrings=True,
     )
 
+    @property
+    @abstractmethod
+    def loader_cls(self) -> type[Loader]:
+        """Related loader class."""
+
 
 class CustomLoaderConfig(LoaderConfig):
     """Custom configuration that is used by custom loader class."""

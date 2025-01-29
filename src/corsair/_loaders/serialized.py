@@ -27,6 +27,11 @@ class SerializedLoader(Loader):
         kind: Literal["json", "yaml", "hjson", "toml"]
         """Loader kind discriminator."""
 
+        @property
+        def loader_cls(self) -> type[Loader]:
+            """Related loader class."""
+            return SerializedLoader
+
     @classmethod
     def get_config_cls(cls) -> type[LoaderConfig]:
         """Get the configuration class for the loader."""
