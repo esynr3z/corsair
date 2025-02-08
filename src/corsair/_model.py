@@ -7,7 +7,7 @@ import math
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from pathlib import PurePath
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Annotated, Literal, Union
 
 from pydantic import (
     BaseModel,
@@ -15,6 +15,9 @@ from pydantic import (
     ValidationInfo,
     field_validator,
     model_validator,
+)
+from pydantic import (
+    Field as PydanticField,
 )
 from pydantic.types import NonNegativeInt, PositiveInt
 
@@ -516,8 +519,8 @@ class MapableItem(NamedItem):
         """Number of bytes `offset` has to be aligned to."""
 
     @model_validator(mode="after")
-    def _check_offset_alignment(self) -> Self:
-        """Check that offset is properly aligned."""
+    def _validate_offset_alignment(self) -> Self:
+        """Validate that offset is properly aligned."""
         if self.offset & (self._offset_alignment - 1):
             msg = self._err_fmt(
                 f"Address offset 0x{self.offset:x} is not aligned "
@@ -576,8 +579,8 @@ class ArrayItem(NamedItem):
         return values
 
     @model_validator(mode="after")
-    def _check_minimum_num(self) -> Self:
-        """Check that array has at least two elements."""
+    def _validate_minimum_num(self) -> Self:
+        """Validate that array has at least two elements."""
         min_num = 2
         if self.num < min_num:
             msg = self._err_fmt(
@@ -588,24 +591,24 @@ class ArrayItem(NamedItem):
         return self
 
     @model_validator(mode="after")
-    def _check_indices_unique(self) -> Self:
-        """Check that all indices are unique."""
+    def _validate_indices_unique(self) -> Self:
+        """Validate that all indices are unique."""
         if len(set(self.indices)) != len(self.indices):
             msg = self._err_fmt(f"Indices are not unique: {self.indices}")
             raise ValueError(msg)
         return self
 
     @model_validator(mode="after")
-    def _check_indices_length(self) -> Self:
-        """Check that number of indices is greater or equal to number of elements."""
+    def _validate_indices_length(self) -> Self:
+        """Validate that number of indices is greater or equal to number of elements."""
         if len(self.indices) < self.num:
             msg = self._err_fmt(f"Number of indices {len(self.indices)} is less than number of elements {self.num}")
             raise ValueError(msg)
         return self
 
     @model_validator(mode="after")
-    def _check_naming(self) -> Self:
-        """Check that naming pattern is valid."""
+    def _validate_naming(self) -> Self:
+        """Validate that naming pattern is valid."""
         try:
             self.naming.format_map(defaultdict(str, index="0"))
         except KeyError as e:
@@ -696,24 +699,24 @@ class Enum(NamedItem):
         return tuple(sorted(values, key=lambda v: v.value))
 
     @model_validator(mode="after")
-    def _check_members_provided(self) -> Self:
-        """Check that at least one member is provided."""
+    def _validate_members_provided(self) -> Self:
+        """Validate that at least one member is provided."""
         if len(self.members) == 0:
             msg = self._err_fmt("Empty enumeration is not allowed, at least one member has to be provided")
             raise ValueError(msg)
         return self
 
     @model_validator(mode="after")
-    def _check_members_unique_values(self) -> Self:
-        """Check that all values inside enumeration are unique."""
+    def _validate_members_unique_values(self) -> Self:
+        """Validate that all values inside enumeration are unique."""
         if len({member.value for member in self.members}) != len(self.members):
             msg = self._err_fmt(f"Some enumeration member values are not unique: {self.members}")
             raise ValueError(msg)
         return self
 
     @model_validator(mode="after")
-    def _check_members_unique_names(self) -> Self:
-        """Check that all names inside enumeration are unique."""
+    def _validate_members_unique_names(self) -> Self:
+        """Validate that all names inside enumeration are unique."""
         if len({member.name for member in self.members}) != len(self.members):
             msg = self._err_fmt(f"Some enumeration member names are not unique: {self.members}")
             raise ValueError(msg)
@@ -747,8 +750,6 @@ class Field(NamedItem):
 
     enum: Enum | None
     """Optional enumeration for the field."""
-
-    # TODO: volatile if updated by hardware
 
     @property
     def bit_indices(self) -> Iterator[int]:
@@ -826,8 +827,8 @@ class Field(NamedItem):
         return (msb - self.offset, lsb - self.offset)
 
     @model_validator(mode="after")
-    def _check_hardware_constraints(self) -> Self:
-        """Check that `hardware` field follows expected constraints."""
+    def _validate_hardware_constraints(self) -> Self:
+        """Validate that `hardware` field follows expected constraints."""
         # Check exclusive hardware flags
         for flag in (HardwareMode.NA, HardwareMode.QUEUE, HardwareMode.FIXED):
             if flag in self.hardware and len(self.hardware) > 1:
@@ -853,8 +854,8 @@ class Field(NamedItem):
         return self
 
     @model_validator(mode="after")
-    def _check_reset_width(self) -> Self:
-        """Check that reset value width less or equal field width."""
+    def _validate_reset_width(self) -> Self:
+        """Validate that reset value width less or equal field width."""
         if self.reset:
             reset_value_width = self.reset.bit_length()
             if reset_value_width > self.width:
@@ -866,8 +867,8 @@ class Field(NamedItem):
         return self
 
     @model_validator(mode="after")
-    def _check_enum_members_width(self) -> Self:
-        """Check that enumeration members has values, which width fit field width."""
+    def _validate_enum_members_width(self) -> Self:
+        """Validate that enumeration members has values, which width fit field width."""
         if self.enum and self.enum.width > self.width:
             msg = self._err_fmt(
                 f"Enumeration {self.enum} requires {self.enum.width} bits to represent,"
@@ -887,6 +888,9 @@ class Field(NamedItem):
 class Register(MapableItem):
     """Control and Status Register."""
 
+    kind: Literal["register"] = "register"
+    """Item kind discriminator."""
+
     fields: tuple[Field, ...]
     """Bit fields inside a register.
 
@@ -894,10 +898,17 @@ class Register(MapableItem):
     """
 
     @property
+    def parent_map(self) -> Map:
+        """Parent field."""
+        if isinstance(self.parent, Map):
+            return self.parent
+        msg = self._err_fmt("Parent is not an instance of `Map`")
+        raise TypeError(msg)
+
+    @property
     def width(self) -> PositiveInt:
         """Register bit width."""
-        # TODO: get width from parent map
-        raise NotImplementedError
+        return self.parent_map.register_width
 
     @property
     def access(self) -> AccessCategory:
@@ -965,8 +976,8 @@ class Register(MapableItem):
         return tuple(sorted(values, key=lambda v: v.lsb))
 
     @model_validator(mode="after")
-    def _check_fields_unique_names(self) -> Self:
-        """Check that all field names inside register are unique."""
+    def _validate_fields_unique_names(self) -> Self:
+        """Validate that all field names inside register are unique."""
         names = [field.name for field in self.fields]
         duplicates = {name for name in names if names.count(name) > 1}
         if duplicates:
@@ -975,8 +986,8 @@ class Register(MapableItem):
         return self
 
     @model_validator(mode="after")
-    def _check_fields_overlapping(self) -> Self:
-        """Check that no fields overlap other ones."""
+    def _validate_fields_overlapping(self) -> Self:
+        """Validate that no fields overlap other ones."""
         field_bits = {field.name: set(field.bit_indices) for field in self.fields}
 
         for field in self.fields:
@@ -991,8 +1002,8 @@ class Register(MapableItem):
         return self
 
     @model_validator(mode="after")
-    def _check_fields_width(self) -> Self:
-        """Check that all fields fit register width."""
+    def _validate_fields_width(self) -> Self:
+        """Validate that all fields fit register width."""
         last_field = self.fields[-1]
         if last_field.msb >= self.width:
             msg = self._err_fmt(
@@ -1012,6 +1023,9 @@ class Register(MapableItem):
 
 class Memory(MapableItem):
     """Memory block."""
+
+    kind: Literal["memory"] = "memory"
+    """Item kind discriminator."""
 
     address_width: PositiveInt
     """Memory address bit width."""
@@ -1034,7 +1048,7 @@ class Memory(MapableItem):
         return 2**self.address_width
 
     @property
-    def granularity(self) -> Pow2Int:
+    def granularity(self) -> PositiveInt:
         """Memory granularity in bytes."""
         return math.ceil(self.data_width / 8)
 
@@ -1044,20 +1058,40 @@ class Memory(MapableItem):
         return self.style.access
 
 
+AnyMapableItem = Annotated[
+    Union["Map", "Register", "Memory"],
+    PydanticField(discriminator="kind"),
+]
+"""Union of all known mapable items."""
+
+
 class Map(MapableItem):
     """Collection of memory-mapped items."""
 
-    size: Pow2Int
-    """Byte size of address space that map covers."""
+    kind: Literal["map"] = "map"
+    """Item kind discriminator."""
 
-    granularity: Pow2Int
-    """Byte size of a single register within map."""
+    address_width: PositiveInt
+    """Map address bit width."""
 
-    items: tuple[MapableItem, ...]
+    register_width: Pow2Int
+    """Map register bit width."""
+
+    items: tuple[AnyMapableItem, ...]
     """Items within the map. Should be not empty.
 
     Items are sorted by offsets.
     """
+
+    @property
+    def size(self) -> Pow2Int:
+        """Byte size of address space that map covers."""
+        return 2**self.address_width
+
+    @property
+    def granularity(self) -> Pow2Int:
+        """Byte size of a single register within map."""
+        return math.ceil(self.register_width / 8)
 
     @property
     def maps(self) -> Iterator[Map]:
@@ -1073,16 +1107,6 @@ class Map(MapableItem):
     def memories(self) -> Iterator[Memory]:
         """Iterate through all memories within map. Iterator might be empty."""
         return (item for item in self.items if isinstance(item, Memory))
-
-    @property
-    def address_width(self) -> PositiveInt:
-        """Address bit width."""
-        return int(math.log2(self.size))
-
-    @property
-    def register_width(self) -> PositiveInt:
-        """Register data bit width."""
-        return self.granularity * 8
 
     @property
     def is_root(self) -> bool:
@@ -1117,8 +1141,19 @@ class Map(MapableItem):
         return tuple(sorted(values, key=lambda v: v.offset))
 
     @model_validator(mode="after")
-    def _check_items_unique_names(self) -> Self:
-        """Check that all item names inside map are unique."""
+    def _validate_min_register_width(self) -> Self:
+        """Validate that register width is at least single byte."""
+        min_width = 8
+        if self.register_width < min_width:
+            msg = self._err_fmt(
+                f"Minimal allowed 'register_width' for a map is {min_width}, but {self.register_width} provided"
+            )
+            raise ValueError(msg)
+        return self
+
+    @model_validator(mode="after")
+    def _validate_items_unique_names(self) -> Self:
+        """Validate that all item names inside map are unique."""
         names = [item.name for item in self.items]
         duplicates = {name for name in names if names.count(name) > 1}
         if duplicates:
@@ -1127,8 +1162,8 @@ class Map(MapableItem):
         return self
 
     @model_validator(mode="after")
-    def _check_items_unique_offsets(self) -> Self:
-        """Check that all item offsets inside map are unique."""
+    def _validate_items_unique_offsets(self) -> Self:
+        """Validate that all item offsets inside map are unique."""
         offsets = [item.offset for item in self.items]
         duplicates = {offset for offset in offsets if offsets.count(offset) > 1}
         if duplicates:
@@ -1136,10 +1171,23 @@ class Map(MapableItem):
             raise ValueError(msg)
         return self
 
-    # TODO: check that all offsets are aligned to map granularity
+    @model_validator(mode="after")
+    def _validate_items_offset_alignment(self) -> Self:
+        """Validate that all item offsets are aligned to the map granularity."""
+        for item in self.items:
+            if item.offset % self.granularity != 0:
+                msg = self._err_fmt(
+                    f"Item {item.name} offset 0x{item.offset:x} is not aligned to map granularity {self.granularity}"
+                )
+                raise ValueError(msg)
+        return self
+
     # TODO: check that there is no address collisions between items
+
     # TODO: check that all maps/memories within map has proper `address_width` (less or equal to map address width)
+
     # TODO: check that all array items within map has correct `increment`
+
     # TODO: check that no register is falling out of the root map address space
 
     @model_validator(mode="after")
@@ -1152,6 +1200,9 @@ class Map(MapableItem):
 
 class FieldArray(Field, ArrayItem):
     """Logical collection of similar fields with common properties."""
+
+    kind: Literal["field_array"] = "field_array"  # type: ignore reportIncompatibleVariableOverride
+    """Item kind discriminator."""
 
     @property
     def generated_fields(self) -> tuple[Field, ...]:
@@ -1167,6 +1218,9 @@ class FieldArray(Field, ArrayItem):
 class RegisterArray(Register, ArrayItem):
     """Logical collection of similar registers with common properties."""
 
+    kind: Literal["register_array"] = "register_array"  # type: ignore reportIncompatibleVariableOverride
+    """Item kind discriminator."""
+
     @property
     def generated_registers(self) -> tuple[Register, ...]:
         """Concrete registers in the array."""
@@ -1181,6 +1235,9 @@ class RegisterArray(Register, ArrayItem):
 class MemoryArray(Memory, ArrayItem):
     """Logical collection of similar memory blocks with common properties."""
 
+    kind: Literal["memory_array"] = "memory_array"  # type: ignore reportIncompatibleVariableOverride
+    """Item kind discriminator."""
+
     @property
     def generated_memories(self) -> tuple[Memory, ...]:
         """Generated memories in the array."""
@@ -1194,6 +1251,9 @@ class MemoryArray(Memory, ArrayItem):
 
 class MapArray(Map, ArrayItem):
     """Logical collection of similar maps with common properties."""
+
+    kind: Literal["map_array"] = "map_array"  # type: ignore reportIncompatibleVariableOverride
+    """Item kind discriminator."""
 
     @property
     def generated_maps(self) -> tuple[Map, ...]:
