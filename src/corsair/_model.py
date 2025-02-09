@@ -7,17 +7,16 @@ import math
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from pathlib import PurePath
-from typing import TYPE_CHECKING, Annotated, Literal, Union
+from typing import TYPE_CHECKING, Annotated, Literal
 
 from pydantic import (
     BaseModel,
     ConfigDict,
+    Discriminator,
+    Tag,
     ValidationInfo,
     field_validator,
     model_validator,
-)
-from pydantic import (
-    Field as PydanticField,
 )
 from pydantic.types import NonNegativeInt, PositiveInt
 
@@ -513,22 +512,6 @@ class MapableItem(NamedItem):
             self._address = self.base_address + self.offset
         return self._address
 
-    @property
-    @abstractmethod
-    def _offset_alignment(self) -> Pow2Int:
-        """Number of bytes `offset` has to be aligned to."""
-
-    @model_validator(mode="after")
-    def _validate_offset_alignment(self) -> Self:
-        """Validate that offset is properly aligned."""
-        if self.offset & (self._offset_alignment - 1):
-            msg = self._err_fmt(
-                f"Address offset 0x{self.offset:x} is not aligned "
-                f"to expected value of {self._offset_alignment} bytes"
-            )
-            raise ValueError(msg)
-        return self
-
 
 class ArrayItem(NamedItem):
     """NamedItem that can describe array of items with common properties following some repeatable pattern."""
@@ -899,16 +882,18 @@ class Register(MapableItem):
 
     @property
     def parent_map(self) -> Map:
-        """Parent field."""
+        """Parent map."""
         if isinstance(self.parent, Map):
             return self.parent
         msg = self._err_fmt("Parent is not an instance of `Map`")
         raise TypeError(msg)
 
     @property
-    def width(self) -> PositiveInt:
-        """Register bit width."""
-        return self.parent_map.register_width
+    def width(self) -> NonNegativeInt:
+        """Minimum number of bits required to represent the register."""
+        if not hasattr(self, "_width"):
+            self._width = max(f.msb for f in self.fields) + 1
+        return self._width
 
     @property
     def access(self) -> AccessCategory:
@@ -959,14 +944,14 @@ class Register(MapableItem):
         Examples: 0002bca, x2ax
         """
         if not hasattr(self, "_reset_hexstr"):
-            nibbles = ["0"] * (self.width // 4)
+            nibbles = ["0"] * math.ceil(self.width / 4)
             for i in range(len(nibbles)):
-                bit_slice = self.reset_binstr[i * 4 : i * 4 + 4]
+                bit_slice = self.reset_binstr[::-1][i * 4 : i * 4 + 4]
                 if "x" in bit_slice:
                     nibbles[i] = "x"
                 else:
-                    nibbles[i] = f"{int(bit_slice):x}"
-            self._reset_hexstr = "".join(reversed(nibbles))
+                    nibbles[i] = f"{int(bit_slice, 2):x}"
+            self._reset_hexstr = "".join(nibbles)
         return self._reset_hexstr
 
     @field_validator("fields", mode="after")
@@ -1002,19 +987,7 @@ class Register(MapableItem):
         return self
 
     @model_validator(mode="after")
-    def _validate_fields_width(self) -> Self:
-        """Validate that all fields fit register width."""
-        last_field = self.fields[-1]
-        if last_field.msb >= self.width:
-            msg = self._err_fmt(
-                f"Field {last_field.name} (lsb={last_field.lsb} msb={last_field.msb}) "
-                f"exceeds size {self.width} of the register"
-            )
-            raise ValueError(msg)
-        return self
-
-    @model_validator(mode="after")
-    def _update_refs(self) -> Self:
+    def _update_backlinks(self) -> Self:
         """Update references to parent in all child items."""
         for field in self.fields:
             field._assign_parent(self)  # noqa: SLF001
@@ -1058,9 +1031,20 @@ class Memory(MapableItem):
         return self.style.access
 
 
+def _get_discriminator_for_mapable_item(v: MapableItem | dict) -> str:
+    """Get discriminator value for mapable item.
+
+    When discriminator is not present in the item,
+    it is assumed to be a register.
+    """
+    if isinstance(v, dict):
+        return v.get("kind", "register")
+    return getattr(v, "kind", "register")
+
+
 AnyMapableItem = Annotated[
-    Union["Map", "Register", "Memory"],
-    PydanticField(discriminator="kind"),
+    Annotated["Map", Tag("map")] | Annotated[Register, Tag("register")] | Annotated[Memory, Tag("memory")],
+    Discriminator(_get_discriminator_for_mapable_item),
 ]
 """Union of all known mapable items."""
 
@@ -1191,7 +1175,20 @@ class Map(MapableItem):
     # TODO: check that no register is falling out of the root map address space
 
     @model_validator(mode="after")
-    def _update_refs(self) -> Self:
+    def _validate_register_fields_width(self) -> Self:
+        """Validate that all fields fit register width."""
+        for reg in self.registers:
+            last_field = reg.fields[-1]
+            if last_field.msb >= self.register_width:
+                msg = self._err_fmt(
+                    f"Field {last_field.name} (lsb={last_field.lsb} msb={last_field.msb}) "
+                    f"exceeds size {self.register_width} of the register within map"
+                )
+                raise ValueError(msg)
+        return self
+
+    @model_validator(mode="after")
+    def _update_backlinks(self) -> Self:
         """Update references to parent in all child items."""
         for item in self.items:
             item._assign_parent(self)  # noqa: SLF001

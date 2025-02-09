@@ -43,3 +43,29 @@ def build_field(**kwargs: Any) -> csr.Field:
     }
     defaults.update(kwargs)
     return csr.Field(**defaults)
+
+
+def build_register(**kwargs: Any) -> csr.Register:
+    """Return a default Register instance with optional overrides."""
+    defaults = {
+        "name": "test_register",
+        "doc": "Test register.",
+        "offset": 0,
+        "fields": (build_field(),),
+    }
+    defaults.update(kwargs)
+    return csr.Register(**defaults)
+
+
+def build_map(**kwargs: Any) -> csr.Map:
+    """Return a default Map instance with optional overrides."""
+    defaults = {
+        "name": "test_map",
+        "doc": "Test map.",
+        "offset": 0,
+        "address_width": 12,
+        "register_width": 32,
+        "items": (build_register(),),
+    }
+    defaults.update(kwargs)
+    return csr.Map(**defaults)
