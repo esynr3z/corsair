@@ -24,6 +24,6 @@ class PyModuleLoader(Loader):
         """Get the configuration class for the loader."""
         return cls.Config
 
-    def __call__(self) -> Map:
-        """Load the register map from a module."""
+    def _load(self) -> Map:
+        """Load the register map."""
         raise NotImplementedError

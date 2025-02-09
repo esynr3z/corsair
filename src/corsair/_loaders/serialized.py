@@ -37,8 +37,8 @@ class SerializedLoader(Loader):
         """Get the configuration class for the loader."""
         return cls.Config
 
-    def __call__(self) -> Map:
-        """Load the register map from a module."""
+    def _load(self) -> Map:
+        """Load the register map."""
         if not isinstance(self.config, self.Config):
             raise TypeError("Configuration instance is not of the expected type of SerializedLoader.Config")
 
