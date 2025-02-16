@@ -1152,6 +1152,14 @@ class Map(MapableItem):
         return tuple(sorted(values, key=lambda v: v.offset))
 
     @model_validator(mode="after")
+    def _validate_items_provided(self) -> Self:
+        """Validate that at least one item is provided."""
+        if len(self.items) == 0:
+            msg = self._err_fmt("Empty map is not allowed, at least one item has to be provided")
+            raise ValueError(msg)
+        return self
+
+    @model_validator(mode="after")
     def _validate_min_register_width(self) -> Self:
         """Validate that register width is at least single byte."""
         min_width = 8
@@ -1193,13 +1201,49 @@ class Map(MapableItem):
                 raise ValueError(msg)
         return self
 
-    # TODO: check that there is no address collisions between items
+    @model_validator(mode="after")
+    def _validate_items_address_width(self) -> Self:
+        """Validate that all items have address width less or equal to map address width."""
+        for item in self.items:
+            if isinstance(item, Map | Memory) and item.address_width > self.address_width:
+                msg = self._err_fmt(
+                    f"Item {item.name} address width {item.address_width} is "
+                    f"greater than map address width {self.address_width}"
+                )
+                raise ValueError(msg)
+        return self
 
-    # TODO: check that all maps/memories within map has proper `address_width` (less or equal to map address width)
+    @model_validator(mode="after")
+    def _validate_items_address_collisions(self) -> Self:
+        """Validate that there is no address collisions between items."""
+        item_address_ranges: dict[AnyMapableItem, tuple[NonNegativeInt, NonNegativeInt]] = {}
+        for item in self.items:
+            if isinstance(item, Map | Memory):
+                item_address_ranges[item] = (item.offset, item.offset + item.size - 1)
+            elif isinstance(item, Register):
+                item_address_ranges[item] = (
+                    item.offset,
+                    item.offset + self.granularity - 1,
+                )
 
-    # TODO: check that all array items within map has correct `increment`
+        # Check for collisions
+        for item, (start, end) in item_address_ranges.items():
+            for other_item, (other_start, other_end) in item_address_ranges.items():
+                if item is other_item:
+                    continue
+                if start <= other_end and end >= other_start:
+                    msg = self._err_fmt(f"Address collision between {item.name} and {other_item.name}")
+                    raise ValueError(msg)
 
-    # TODO: check that no register is falling out of the root map address space
+        # Check that no item is falling out of the root map address space
+        for item, (start, end) in item_address_ranges.items():
+            if end >= self.size:
+                msg = self._err_fmt(
+                    f"Item {item.name} address range [0x{start:x};0x{end+1:x}) is "
+                    f"falling out of the root map address space [0x0;0x{self.size:x})"
+                )
+                raise ValueError(msg)
+        return self
 
     @model_validator(mode="after")
     def _validate_register_fields_width(self) -> Self:
@@ -1212,6 +1256,12 @@ class Map(MapableItem):
                     f"exceeds size {self.register_width} of the register within map"
                 )
                 raise ValueError(msg)
+        return self
+
+    @model_validator(mode="after")
+    def _validate_array_items_increment(self) -> Self:
+        """Validate that all array items within map has correct `increment`."""
+        # TODO: implement
         return self
 
     @model_validator(mode="after")
