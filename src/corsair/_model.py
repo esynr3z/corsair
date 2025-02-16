@@ -1012,13 +1012,18 @@ class Memory(MapableItem):
     initial_values: tuple[tuple[NonNegativeInt, NonNegativeInt], ...]
     """Initial values for selected memory locations.
 
-    Each tuple contains address and value.
+    Each tuple contains memory word index (address within memory) and value.
     """
+
+    @property
+    def capacity(self) -> Pow2Int:
+        """Memory capacity in memory words."""
+        return 2**self.address_width
 
     @property
     def size(self) -> Pow2Int:
         """Memory size in bytes."""
-        return 2**self.address_width
+        return self.capacity * self.granularity
 
     @property
     def granularity(self) -> PositiveInt:
@@ -1029,6 +1034,28 @@ class Memory(MapableItem):
     def access(self) -> AccessCategory:
         """Memory access rights for CSR map."""
         return self.style.access
+
+    @model_validator(mode="after")
+    def _validate_initial_values(self) -> Self:
+        """Validate that initial values are valid."""
+        for i, (addr, value) in enumerate(self.initial_values):
+            if addr >= self.capacity:
+                msg = self._err_fmt(
+                    f"Initial value {i} address 0x{addr:x} is out of memory capacity 0x{self.capacity:x}"
+                )
+                raise ValueError(msg)
+            if value >= 2**self.data_width:
+                msg = self._err_fmt(
+                    f"Initial value {i} data 0x{value:x} is out of memory data width {self.data_width} bits"
+                )
+                raise ValueError(msg)
+        return self
+
+    @model_validator(mode="after")
+    def _update_backlinks(self) -> Self:
+        """Update references to parent in all child items."""
+        # Not needed for Memory
+        return self
 
 
 def _get_discriminator_for_mapable_item(v: MapableItem | dict) -> str:

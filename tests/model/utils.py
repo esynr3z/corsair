@@ -69,3 +69,18 @@ def build_map(**kwargs: Any) -> csr.Map:
     }
     defaults.update(kwargs)
     return csr.Map(**defaults)
+
+
+def build_memory(**kwargs: Any) -> csr.Memory:
+    """Return a default Memory instance with optional overrides."""
+    defaults = {
+        "name": "test_memory",
+        "doc": "Test memory.",
+        "offset": 0,
+        "address_width": 12,
+        "data_width": 32,
+        "style": csr.MemoryStyle.INTERNAL_RW,
+        "initial_values": (),
+    }
+    defaults.update(kwargs)
+    return csr.Memory(**defaults)
