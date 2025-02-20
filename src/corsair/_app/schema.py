@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 log = logging.getLogger("corsair")
 
 
-class _SchemaKind(str, Enum):
+class SchemaKind(str, Enum):
     """Schema kind."""
 
     BUILD = "build"
@@ -35,7 +35,7 @@ class _SchemaKind(str, Enum):
 
 
 def schema(
-    kind: Annotated[_SchemaKind, typer.Argument(help="Schema kind.", show_choices=True, show_default=False)],
+    kind: Annotated[SchemaKind, typer.Argument(help="Schema kind.", show_choices=True, show_default=False)],
     indent: Annotated[
         int | None,
         typer.Option(
@@ -60,9 +60,9 @@ def schema(
     log.debug("cmd 'schema' args: %s", locals())
 
     model: type[BaseModel]
-    if kind == _SchemaKind.BUILD:
+    if kind == SchemaKind.BUILD:
         model = csr.BuildSpecification
-    elif kind == _SchemaKind.MAP:
+    elif kind == SchemaKind.MAP:
         model = csr.Map
     else:
         raise ValueError(f"Invalid schema kind: {kind}")

@@ -32,19 +32,20 @@ def test_default_logging() -> None:
     result = invoke_corsair(["test-logging"])
     assert result.returncode == 1
     verify_log_format(result.stderr.decode(), has_ansi_color=False, has_rich=True)
-    verify_log_level(result.stderr.decode(), logging.WARNING)
+    verify_log_level(result.stderr.decode(), logging.INFO)
 
 
 @pytest.mark.parametrize(
     ("flag", "expected_level"),
     [
-        ("-v", "INFO"),
+        ("-v", "DEBUG"),
         ("-vv", "DEBUG"),
         ("-vvv", "DEBUG"),
-        ("-q", "ERROR"),
-        ("-qq", "CRITICAL"),
-        ("-v -q", "WARNING"),
-        ("-vv -q", "INFO"),
+        ("-q", "WARNING"),
+        ("-qq", "ERROR"),
+        ("-qqq", "CRITICAL"),
+        ("-v -q", "INFO"),
+        ("-vv -q", "DEBUG"),
     ],
 )
 def test_verbosity_control(flag: str, expected_level: str) -> None:
@@ -57,7 +58,7 @@ def test_verbosity_control(flag: str, expected_level: str) -> None:
 
 def test_max_quiet() -> None:
     """Test maximum quiet level."""
-    result = invoke_corsair(["-qqq", "test-logging"])
+    result = invoke_corsair(["-qqqq", "test-logging"])
     assert result.returncode == 1
     assert "INFO" not in result.stderr.decode(), "No INFO message is expected"
     assert "WARNING" not in result.stderr.decode(), "No WARNING message is expected"
@@ -71,7 +72,7 @@ def test_no_rich() -> None:
     result = invoke_corsair(["--no-rich", "test-logging"])
     assert result.returncode == 1
     verify_log_format(result.stderr.decode(), has_rich=False, has_ansi_color=True)
-    verify_log_level(result.stderr.decode(), logging.WARNING)
+    verify_log_level(result.stderr.decode(), logging.INFO)
 
 
 def test_no_rich_no_color() -> None:
@@ -79,7 +80,7 @@ def test_no_rich_no_color() -> None:
     result = invoke_corsair(["--no-rich", "--no-color", "test-logging"])
     assert result.returncode == 1
     verify_log_format(result.stderr.decode(), has_rich=False, has_ansi_color=False)
-    verify_log_level(result.stderr.decode(), logging.WARNING)
+    verify_log_level(result.stderr.decode(), logging.INFO)
 
 
 def test_log_file(temp_log_file: Path) -> None:
@@ -90,7 +91,7 @@ def test_log_file(temp_log_file: Path) -> None:
 
     content = temp_log_file.read_text()
     verify_log_format(content, has_rich=False, has_ansi_color=False)
-    verify_log_level(content, logging.WARNING)
+    verify_log_level(content, logging.INFO)
 
 
 # Environment variable tests
@@ -118,6 +119,20 @@ def test_env_log_level(monkeypatch: pytest.MonkeyPatch) -> None:
     verify_log_level(result.stderr.decode(), logging.DEBUG)
 
 
+def test_stacktrace_enabled() -> None:
+    """Test stacktrace logging is enabled when DEBUG level is set."""
+    result = invoke_corsair(["-v", "test-logging"])
+    assert result.returncode == 1
+    assert "Traceback" in result.stderr.decode(), "Traceback is expected"
+
+
+def test_stacktrace_disabled() -> None:
+    """Test stacktrace logging is disabled by default."""
+    result = invoke_corsair(["test-logging"])
+    assert result.returncode == 1
+    assert "Traceback" not in result.stderr.decode(), "Traceback is not expected"
+
+
 def verify_log_format(
     output: str,
     has_ansi_color: bool = True,
@@ -133,7 +148,10 @@ def verify_log_format(
         "INFO" in output or "WARNING" in output or "ERROR" in output or "DEBUG" in output or "CRITICAL" in output
     ), "Missing level name"
 
-    assert has_rich == ("────" in output), "Missing exception table border"
+    if has_rich:
+        assert "🔥".encode() in output.encode(), "Missing rich rendered emoji"
+    else:
+        assert ":fire:" in output, "Emoji should not be rendered!"
 
 
 def verify_log_level(output: str, min_level: int) -> None:

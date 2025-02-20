@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path  # noqa: TCH003
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 
@@ -20,8 +20,25 @@ from .version import version
 # Get logger singleton
 log = logging.getLogger("corsair")
 
+
+class Typer(typer.Typer):
+    def __call__(self, *args: Any, **kwargs: Any) -> int:
+        try:
+            super().__call__(*args, **kwargs)
+        except Exception as e:
+            if getattr(self, "is_under_debug", False):
+                raise
+            log.critical(
+                "%s\nRun again with -v flag or set environment variable LOG_LEVEL=DEBUG to get more information.",
+                e,
+            )
+            return 1
+        else:
+            return 0
+
+
 # Create Typer application. This is also an entry point for the application.
-app = typer.Typer(
+app = Typer(
     no_args_is_help=True,
     invoke_without_command=True,
     help=f"CorSaiR v{VERSION} -- CSR map generator for HDL projects.",
@@ -104,6 +121,8 @@ def main(
 @app.command()
 def test_logging() -> None:
     """Hidden command for testing logging configuration."""
+    log.critical(":fire:", extra={"markup": True})
+
     log.debug("I must not fear.")
     log.debug("Fear is the mind-killer.")
     log.info("Fear is the little-death that brings total obliteration.")

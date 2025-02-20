@@ -57,7 +57,7 @@ def _get_format_string(is_debug: bool) -> str:
 
 def _get_logging_level(verbosity_change: int) -> tuple[int, bool]:
     """Determine logging level and debug mode."""
-    env_log_level = os.getenv("LOG_LEVEL", "WARNING").upper()
+    env_log_level = os.getenv("LOG_LEVEL", "INFO").upper()
     base_level: int = getattr(logging, env_log_level)
     current_level = base_level - verbosity_change * 10
     is_debug = current_level <= logging.DEBUG
@@ -74,6 +74,7 @@ def _create_rich_handler(no_color: bool, is_debug: bool) -> logging.Handler:
         show_level=True,
         show_path=is_debug,
         enable_link_path=False,
+        omit_repeated_times=False,
     )
     handler.setFormatter(formatter)
     return handler
@@ -124,6 +125,7 @@ def init_logging(
     current_level, is_debug = _get_logging_level(verbosity_change)
     if is_debug:
         app.pretty_exceptions_short = False
+        app.is_under_debug = True  # type: ignore reportAttributeAccessIssue
 
     # Determine if colors are used (https://no-color.org/)
     no_color = is_no_color_env() or no_color

@@ -6,7 +6,7 @@ import json
 import logging
 from enum import Enum
 from pathlib import Path  # noqa: TCH003
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer  # noqa: TCH002
 
@@ -16,28 +16,28 @@ import corsair as csr
 log = logging.getLogger("corsair")
 
 
-class _LoaderKind(str, Enum):
+class LoaderKind(str, Enum):
     """Input file loader kind."""
 
     BUILD = "build"
     """Loader for build specification file."""
 
-    MAP_JSON = "map_json"
+    MAP_JSON = "json"
     """Loader for map description file in JSON format."""
 
-    MAP_YAML = "map_yaml"
+    MAP_YAML = "yaml"
     """Loader for map description file in YAML format."""
 
-    MAP_HJSON = "map_hjson"
+    MAP_HJSON = "hjson"
     """Loader for map description file in HJSON format."""
 
-    MAP_TOML = "map_toml"
+    MAP_TOML = "toml"
     """Loader for map description file in TOML format."""
 
-    MAP_PY = "map_py"
+    MAP_PY = "py"
     """Loader for map description file in Python format."""
 
-    MAP_CUSTOM = "map_custom"
+    MAP_CUSTOM = "custom"
     """Loader for map description file in custom format."""
 
     def __str__(self) -> str:
@@ -54,13 +54,13 @@ def check(
         ),
     ],
     loader_kind: Annotated[
-        _LoaderKind,
+        LoaderKind,
         typer.Option(
             "--loader",
             help="Loader to use to read the input file.",
             show_choices=True,
         ),
-    ] = _LoaderKind.BUILD,
+    ] = LoaderKind.BUILD,
     loader_cfg: Annotated[
         str,
         typer.Option(
@@ -74,30 +74,41 @@ def check(
     """Check integrity of user input files."""
     log.debug("cmd check args: %s", locals())
 
-    # Prepare configuration for the loader
-    cfg_data = json.loads(loader_cfg)
-    cfg_data["mapfile"] = input_file
-
-    if loader_kind == _LoaderKind.BUILD:
+    if loader_kind == LoaderKind.BUILD:
+        log.info("Loading build specification from TOML file: %s", input_file)
         csr.BuildSpecification.from_toml_file(input_file)
-    elif loader_kind in (
-        _LoaderKind.MAP_JSON,
-        _LoaderKind.MAP_YAML,
-        _LoaderKind.MAP_HJSON,
-        _LoaderKind.MAP_TOML,
-    ):
-        cfg = csr.SerializedLoader.Config.model_validate_json(loader_cfg)
-        loader = csr.SerializedLoader(config=cfg)
-        loader()
-    elif loader_kind == _LoaderKind.MAP_PY:
-        cfg = csr.PyModuleLoader.Config.model_validate_json(loader_cfg)
-        loader = csr.PyModuleLoader(config=cfg)
-        loader()
-    elif loader_kind == _LoaderKind.MAP_CUSTOM:
-        cfg = csr.CustomLoaderConfig.model_validate_json(loader_cfg)
-        loader = cfg.loader_cls(config=cfg)
-        loader()
     else:
-        raise ValueError(f"Unsupported loader kind: {loader_kind}")
+        log.info("Preparing %s loader", loader_kind.value)
+        cfg = _prepare_loader_cfg(loader_kind, input_file, loader_cfg)
+        loader = cfg.loader_cls(config=cfg)
+
+        log.info("Loading %s file and validating its content", input_file)
+        loader()
 
     log.info("No errors found")
+
+
+def _prepare_loader_cfg(loader_kind: LoaderKind, input_file: Path, loader_cfg: str) -> csr.LoaderConfig:
+    """Prepare loader configuration."""
+    cfg_data: dict[str, Any] = {}
+
+    if loader_cfg:
+        log.info("Loading loader configuration from JSON string")
+        cfg_data.update(json.loads(loader_cfg))
+
+    cfg_data["mapfile"] = input_file
+    cfg_data["kind"] = loader_kind.value
+
+    log.info("Validating configuration for loader")
+    if loader_kind in (
+        LoaderKind.MAP_JSON,
+        LoaderKind.MAP_YAML,
+        LoaderKind.MAP_HJSON,
+        LoaderKind.MAP_TOML,
+    ):
+        return csr.SerializedLoader.Config.model_validate(cfg_data)
+    if loader_kind == LoaderKind.MAP_PY:
+        return csr.PyModuleLoader.Config.model_validate(cfg_data)
+    if loader_kind == LoaderKind.MAP_CUSTOM:
+        return csr.CustomLoaderConfig.model_validate(cfg_data)
+    raise ValueError(f"Unsupported loader kind to load configuration: {loader_kind}")
