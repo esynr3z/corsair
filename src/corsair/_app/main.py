@@ -118,7 +118,7 @@ def main(
     )
 
 
-@app.command()
+@app.command(hidden=True)
 def test_logging() -> None:
     """Hidden command for testing logging configuration."""
     log.critical(":fire:", extra={"markup": True})
