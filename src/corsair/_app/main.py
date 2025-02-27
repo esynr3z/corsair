@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from pathlib import Path  # noqa: TCH003
 from typing import Annotated, Any
 
@@ -19,6 +20,9 @@ from .version import version
 
 # Get logger singleton
 log = logging.getLogger("corsair")
+
+# Disable URL in Pydantic validation errors
+os.environ["PYDANTIC_ERRORS_INCLUDE_URL"] = "0"
 
 
 class Typer(typer.Typer):
@@ -50,10 +54,10 @@ app = Typer(
 )
 
 # Add commands located in other files
-app.command()(init)
-app.command()(build)
-app.command()(check)
-app.command()(schema)
+app.command(no_args_is_help=True)(init)
+app.command(no_args_is_help=True)(build)
+app.command(no_args_is_help=True)(check)
+app.command(no_args_is_help=True)(schema)
 app.command()(version)
 
 if is_term_dumb_env():

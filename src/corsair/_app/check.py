@@ -60,7 +60,7 @@ def check(
             help="Loader to use to read the input file.",
             show_choices=True,
         ),
-    ] = LoaderKind.BUILD,
+    ],
     loader_cfg: Annotated[
         str,
         typer.Option(
