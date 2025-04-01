@@ -1,0 +1,21 @@
+# doc: This map has no `address_width` and should raise validation error
+# exception: ValidationError
+# msg_match: address_width\s*Field required
+---
+name: "default_map"
+doc: "Default map"
+offset: 0
+register_width: 32
+items:
+  - name: "reg0"
+    doc: "Register 0"
+    offset: 0
+    fields:
+      - name: "a"
+        doc: "Field A"
+        offset: 0
+        width: 32
+        reset: 0
+        access: "rw"
+        hardware: "i"
+        enum: null

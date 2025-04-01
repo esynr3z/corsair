@@ -409,7 +409,7 @@ class ItemMetadata(BaseModel):
 class NamedItem(BaseModel, ABC):
     """Base data structure for all CSR model internal items: map, register, field, etc.
 
-    Its strictness and immutability allows to provide solid contract for generators, when they traverse the model.
+    Its immutability allows to provide solid contract for generators, when they traverse the model.
     Immutability also allows to cache properties to avoid recalculations and use model hashing.
 
     This class provides basic functionality to differentiate an item from other items
@@ -421,8 +421,6 @@ class NamedItem(BaseModel, ABC):
         use_attribute_docstrings=True,
         # Model is faux-immutable
         frozen=True,
-        # Strict validation (no coercion) is applied to all fields on the model
-        strict=True,
         # Extra values are not permitted
         extra="forbid",
         # Hide input in errors

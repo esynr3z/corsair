@@ -1,5 +1,4 @@
 # doc: This map is empty and should raise validation error
 # exception: ValidationError
-# msg_match: items\s*Field required
+# msg_match: Input should be a valid dictionary or instance of Map
 ---
-name: "no_itemsmap"

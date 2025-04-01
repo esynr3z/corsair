@@ -1,0 +1,18 @@
+# doc: This map has no `doc` field and should raise validation error
+# exception: ValidationError
+# msg_match: doc\s*Field required
+---
+name: "default_map"
+offset: 0
+address_width: 32
+register_width: 32
+items:
+  - name: "reg0"
+    doc: "Register 0"
+    fields:
+      - name: "a"
+        doc: "Field A"
+        offset: 0
+        width: 32
+        access: "rw"
+        hardware: "i"

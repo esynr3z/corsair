@@ -1,0 +1,22 @@
+# doc: This map has wrong `register_width` and should raise validation error
+# exception: ValidationError
+# msg_match: register_width\s*.*for a map is 8, but 1 provided
+---
+name: "default_map"
+doc: "Default map"
+offset: 0
+address_width: 32
+register_width: 1
+items:
+  - name: "reg0"
+    doc: "Register 0"
+    offset: 0
+    fields:
+      - name: "a"
+        doc: "Field A"
+        offset: 0
+        width: 32
+        reset: 0
+        access: "rw"
+        hardware: "i"
+        enum: null

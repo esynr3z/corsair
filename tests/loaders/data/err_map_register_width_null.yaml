@@ -1,0 +1,22 @@
+# doc: This map has null `register_width` and should raise validation error
+# exception: ValidationError
+# msg_match: register_width\s*Input should be a valid integer
+---
+name: "default_map"
+doc: "Default map"
+offset: 0
+address_width: 32
+register_width: null
+items:
+  - name: "reg0"
+    doc: "Register 0"
+    offset: 0
+    fields:
+      - name: "a"
+        doc: "Field A"
+        offset: 0
+        width: 32
+        reset: 0
+        access: "rw"
+        hardware: "i"
+        enum: null
