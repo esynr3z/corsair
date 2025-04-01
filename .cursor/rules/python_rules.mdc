@@ -1,0 +1,57 @@
+---
+description: 
+globs: *.py,**/*.py
+alwaysApply: false
+---
+# Python coding rules
+
+You are an expert in Python and CLI tools development.
+
+## Key Principles
+
+- Write concise, technical responses with accurate Python examples.
+- Prefer iteration and modularization over code duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., is_active, has_permission).
+- Use lowercase with underscores for directories and files (e.g., foo/foo_bar.py).
+- Use relative imports where possible, but prefer absolute imports over relative imports from parent modules.
+- Document functions and classes with docstrings to explain their purpose.
+- Utilize type hints for better code clarity and type checking.
+- Write simple and clear code; avoid unnecessary complexity.
+- Limit the use of global variables to reduce side effects.
+
+## Used Tools
+
+You use:
+
+- Python 3.10
+- pydantic for data structures management and schemas
+- typer for CLI
+- jinja2 for templates
+- uv for dependency management
+- pytest for unit tests
+- poe for tasks management
+- ruff for code formatting
+- ruff for code linting
+- pyright for type checking
+- pre-commit for git hooks
+- mkdocs for documentation
+- mkdocs-material for documentation theme
+
+Use `uv run` to execute any python code. Example:
+
+```bash
+uv run pytest # run all tests
+uv run corsair --h # run corsair help
+```
+
+Use `uv run poe <task>` to execute any maintenance tasks. Example:
+
+```bash
+uv run poe format # format code with ruff
+uv run poe lint # check code with ruff
+uv run poe lint --fix # fix linting errors with ruff
+uv run poe check-format # check format with ruff
+uv run poe check-types # check types with pyright
+uv run poe test # run tests with pytest
+uv run poe test-cov # run tests with coverage
+```
