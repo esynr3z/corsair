@@ -147,5 +147,14 @@ def init_logging(
     if logfile is not None:
         handlers.append(_create_file_handler(logfile, is_debug))
 
-    # Initialize logging with all handlers
-    logging.basicConfig(level=current_level, handlers=handlers)
+    # Configure the root logger
+    root_logger = logging.getLogger()
+    root_logger.setLevel(current_level)
+
+    # Remove existing handlers that might interfere
+    for handler in root_logger.handlers[:]:
+        root_logger.removeHandler(handler)
+
+    # Add our configured handlers
+    for handler in handlers:
+        root_logger.addHandler(handler)

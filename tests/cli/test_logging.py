@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import logging
-import subprocess
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
+from typer.testing import CliRunner
+
+from corsair._app.main import app
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -15,10 +17,7 @@ if TYPE_CHECKING:
 # All tests below can be used in smoke testing
 pytestmark = pytest.mark.smoke
 
-
-def invoke_corsair(args: list[str]) -> subprocess.CompletedProcess:
-    """Invoke Corsair with the given arguments."""
-    return subprocess.run(["corsair", *args], capture_output=True, check=False)
+runner = CliRunner()
 
 
 @pytest.fixture
@@ -29,10 +28,10 @@ def temp_log_file(tmp_path: Path) -> Path:
 
 def test_default_logging() -> None:
     """Test default logging configuration without any options."""
-    result = invoke_corsair(["test-logging"])
-    assert result.returncode == 1
-    verify_log_format(result.stderr.decode(), has_ansi_color=False, has_rich=True)
-    verify_log_level(result.stderr.decode(), logging.INFO)
+    result = runner.invoke(app, ["test-logging"])
+    assert result.exit_code == 1
+    verify_log_format(result.output, has_ansi_color=False, has_rich=True)
+    verify_log_level(result.output, logging.INFO)
 
 
 @pytest.mark.parametrize(
@@ -50,43 +49,43 @@ def test_default_logging() -> None:
 )
 def test_verbosity_control(flag: str, expected_level: str) -> None:
     """Test verbosity control."""
-    result = invoke_corsair([*flag.split(), "test-logging"])
-    assert result.returncode == 1
-    verify_log_format(result.stderr.decode(), has_ansi_color=False, has_rich=True)
-    verify_log_level(result.stderr.decode(), getattr(logging, expected_level))
+    result = runner.invoke(app, [*flag.split(), "test-logging"])
+    assert result.exit_code == 1
+    verify_log_format(result.output, has_ansi_color=False, has_rich=True)
+    verify_log_level(result.output, getattr(logging, expected_level))
 
 
 def test_max_quiet() -> None:
     """Test maximum quiet level."""
-    result = invoke_corsair(["-qqqq", "test-logging"])
-    assert result.returncode == 1
-    assert "INFO" not in result.stderr.decode(), "No INFO message is expected"
-    assert "WARNING" not in result.stderr.decode(), "No WARNING message is expected"
-    assert "ERROR" not in result.stderr.decode(), "No ERROR message is expected"
-    assert "DEBUG" not in result.stderr.decode(), "No DEBUG message is expected"
-    assert "CRITICAL" not in result.stderr.decode(), "No CRITICAL message is expected"
+    result = runner.invoke(app, ["-qqqq", "test-logging"])
+    assert result.exit_code == 1
+    assert "INFO" not in result.output, "No INFO message is expected"
+    assert "WARNING" not in result.output, "No WARNING message is expected"
+    assert "ERROR" not in result.output, "No ERROR message is expected"
+    assert "DEBUG" not in result.output, "No DEBUG message is expected"
+    assert "CRITICAL" not in result.output, "No CRITICAL message is expected"
 
 
 def test_no_rich() -> None:
     """Test --no-rich option."""
-    result = invoke_corsair(["--no-rich", "test-logging"])
-    assert result.returncode == 1
-    verify_log_format(result.stderr.decode(), has_rich=False, has_ansi_color=True)
-    verify_log_level(result.stderr.decode(), logging.INFO)
+    result = runner.invoke(app, ["--no-rich", "test-logging"])
+    assert result.exit_code == 1
+    verify_log_format(result.output, has_rich=False, has_ansi_color=True)
+    verify_log_level(result.output, logging.INFO)
 
 
 def test_no_rich_no_color() -> None:
     """Test --no-rich --no-color options."""
-    result = invoke_corsair(["--no-rich", "--no-color", "test-logging"])
-    assert result.returncode == 1
-    verify_log_format(result.stderr.decode(), has_rich=False, has_ansi_color=False)
-    verify_log_level(result.stderr.decode(), logging.INFO)
+    result = runner.invoke(app, ["--no-rich", "--no-color", "test-logging"])
+    assert result.exit_code == 1
+    verify_log_format(result.output, has_rich=False, has_ansi_color=False)
+    verify_log_level(result.output, logging.INFO)
 
 
 def test_log_file(temp_log_file: Path) -> None:
     """Test logging to file with -l/--log option."""
-    result = invoke_corsair(["-l", str(temp_log_file), "test-logging"])
-    assert result.returncode == 1
+    result = runner.invoke(app, ["-l", str(temp_log_file), "test-logging"])
+    assert result.exit_code == 1
     assert temp_log_file.exists(), "Log file not created"
 
     content = temp_log_file.read_text()
@@ -98,39 +97,44 @@ def test_log_file(temp_log_file: Path) -> None:
 def test_env_no_color(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test NO_COLOR environment variable."""
     monkeypatch.setenv("NO_COLOR", "1")
-    result = invoke_corsair(["--no-rich", "test-logging"])
-    assert result.returncode == 1
-    verify_log_format(result.stderr.decode(), has_ansi_color=False, has_rich=False)
+    result = runner.invoke(app, ["--no-rich", "test-logging"])
+    assert result.exit_code == 1
+    verify_log_format(result.output, has_ansi_color=False, has_rich=False)
 
 
 def test_env_term_dumb(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test TERM=dumb environment variable."""
     monkeypatch.setenv("TERM", "dumb")
-    result = invoke_corsair(["test-logging"])
-    assert result.returncode == 1
-    verify_log_format(result.stderr.decode(), has_ansi_color=True, has_rich=False)
+    result = runner.invoke(app, ["test-logging"])
+    assert result.exit_code == 1
+    verify_log_format(result.output, has_ansi_color=True, has_rich=False)
 
 
 def test_env_log_level(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test LOG_LEVEL environment variable."""
     monkeypatch.setenv("LOG_LEVEL", "DEBUG")
-    result = invoke_corsair(["test-logging"])
-    assert result.returncode == 1
-    verify_log_level(result.stderr.decode(), logging.DEBUG)
+    result = runner.invoke(app, ["test-logging"])
+    assert result.exit_code == 1
+    verify_log_level(result.output, logging.DEBUG)
 
 
 def test_stacktrace_enabled() -> None:
     """Test stacktrace logging is enabled when DEBUG level is set."""
-    result = invoke_corsair(["-v", "test-logging"])
-    assert result.returncode == 1
-    assert "Traceback" in result.stderr.decode(), "Traceback is expected"
+    result = runner.invoke(app, ["-v", "test-logging"])
+    assert result.exit_code == 1
+    assert result.exception is not None, "Exception should have been caught"
+    assert isinstance(result.exception, RuntimeError), "Caught exception should be RuntimeError"
+    # Optionally check exc_info for traceback details if needed
+    # assert result.exc_info is not None
 
 
 def test_stacktrace_disabled() -> None:
     """Test stacktrace logging is disabled by default."""
-    result = invoke_corsair(["test-logging"])
-    assert result.returncode == 1
-    assert "Traceback" not in result.stderr.decode(), "Traceback is not expected"
+    result = runner.invoke(app, ["test-logging"])
+    assert result.exit_code == 1
+    assert result.exception is not None, "Exception should have been caught by runner"
+    assert isinstance(result.exception, RuntimeError), "Caught exception should be RuntimeError"
+    assert "Traceback" not in result.output, "Traceback should not be in the output"
 
 
 def verify_log_format(

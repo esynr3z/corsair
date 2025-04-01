@@ -1,0 +1,4 @@
+# doc: This map is empty and should raise validation error
+# exception: ValidationError
+# msg_match: Input should be a valid dictionary or instance of Map
+---

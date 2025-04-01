@@ -2,15 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import pytest
-from pydantic import ValidationError, model_validator
+from pydantic import ValidationError
 
 import corsair as csr
-
-if TYPE_CHECKING:
-    from typing_extensions import Self
 
 # All tests below can be used in smoke testing
 pytestmark = pytest.mark.smoke
@@ -21,12 +18,10 @@ class ItemWrapper(csr.NamedItem):
 
     child: ItemWrapper | None
 
-    @model_validator(mode="after")
-    def _update_backlinks(self) -> Self:
-        """Update backlinks."""
-        if self.child is not None:
-            self.child._assign_parent(self)
-        return self
+    @property
+    def _children(self) -> tuple[csr.NamedItem, ...]:
+        """All subitems within item."""
+        return (self.child,) if self.child else ()
 
 
 def build_item(**kwargs: Any) -> ItemWrapper:
@@ -48,11 +43,7 @@ def test_parent() -> None:
 
     assert child.parent == parent
 
-    # cannot be changed anymore
-    _ = build_item(name="parent2", child=child)
-    assert child.parent == parent
-
-    assert str(child.path) == f"{parent.name}/{child.name}"
+    assert str(child.path) == f"{parent.name}.{child.name}"
 
 
 def test_validation_success() -> None:
@@ -62,8 +53,7 @@ def test_validation_success() -> None:
     assert item.name == "some_name"
     assert item.doc == "Some description."
     assert isinstance(item.metadata, csr.ItemMetadata)
-    with pytest.raises(AttributeError):
-        assert item.parent is None
+    assert item.parent is None
     assert str(item.path) == item.name
 
 

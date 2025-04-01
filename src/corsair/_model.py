@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import enum
+import functools
+import itertools
 import math
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from pathlib import PurePath
-from typing import TYPE_CHECKING, Annotated, Literal
+from typing import TYPE_CHECKING, Annotated, Any, Literal
 
 from pydantic import (
     BaseModel,
@@ -26,6 +27,16 @@ if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator
 
     from typing_extensions import Self
+
+
+class FrozenProperty(functools.cached_property):
+    """Read-only cached property that calculates value on first access and forbids any changes."""
+
+    def __set__(self, instance: object, value: Any) -> None:
+        raise AttributeError(f"Cannot set value of read-only property {self.func.__name__}")
+
+    def __delete__(self, instance: object) -> None:
+        raise AttributeError(f"Cannot delete value of read-only property {self.func.__name__}")
 
 
 class AccessMode(str, enum.Enum):
@@ -414,6 +425,10 @@ class NamedItem(BaseModel, ABC):
         strict=True,
         # Extra values are not permitted
         extra="forbid",
+        # Hide input in errors
+        hide_input_in_errors=True,
+        # Types below are not fields, but properties
+        ignored_types=(FrozenProperty,),
     )
 
     name: IdentifierStr
@@ -429,61 +444,57 @@ class NamedItem(BaseModel, ABC):
     metadata: ItemMetadata = ItemMetadata()
     """Optional user metadata attached to an item."""
 
-    @property
+    # Private fields to store property values
+    _parent: NamedItem | None = None
+
+    @FrozenProperty
     def brief(self) -> SingleLineStr:
         """Brief description for an item, derived from `doc`.
 
         First line of `doc` is used.
         """
-        if not hasattr(self, "_brief"):  # caching is ok - model is frozen
-            self._brief = self.doc.split("\n", 1)[0].strip()
-        return self._brief
+        return self.doc.split("\n", 1)[0].strip()
 
-    @property
+    @FrozenProperty
     def description(self) -> TextStr:
-        """Detailed description for in item, derived from `doc`.
+        """Detailed description for an item, derived from `doc`.
 
         For a single-line `doc` it is the same as `brief`, but for multiline text block following brief is returned.
         """
-        if not hasattr(self, "_description"):
-            parts = self.doc.split("\n", 1)
-            self._description = (parts[1] if len(parts) > 1 else parts[0]).strip()
-        return self._description
+        parts = self.doc.split("\n", 1)
+        return (parts[1] if len(parts) > 1 else parts[0]).strip()
+
+    @FrozenProperty
+    def path(self) -> str:
+        """Full path in object hierarchy."""
+        return self.name if self.parent is None else f"{self.parent.path}.{self.name}"
 
     @property
-    def parent(self) -> NamedItem:
-        """Parent for register model item."""
-        if not hasattr(self, "_parent"):
-            msg = self._err_fmt("Parent is not set")
-            raise AttributeError(msg)
+    def parent(self) -> NamedItem | None:
+        """Parent for the current register model item."""
         return self._parent
 
     @property
-    def path(self) -> PurePath:
-        """Full path in object hierarchy. It is an abstract path very similar to real filesystem paths."""
-        if not hasattr(self, "_path"):
-            self._path = PurePath(self.name)
-        return self._path
-
-    def _err_fmt(self, message: str) -> str:
-        """Format error message properly."""
-        return f"{self.path}: {message}"
-
-    def _assign_parent(self, item: NamedItem) -> None:
-        """Set `parent` property.
-
-        This one-time method has to be used, because model is frozen and parent field is empty after creation.
-        So it is the only way to update `parent` field.
-        This method is typically called inside parent, when child is assigned during validation.
-        """
-        if not hasattr(self, "_parent"):
-            self._parent = item
-            self._path = self._parent.path / self.path
+    @abstractmethod
+    def _children(self) -> tuple[NamedItem, ...]:
+        """All subitems within item."""
 
     @model_validator(mode="after")
-    @abstractmethod
     def _update_backlinks(self) -> Self:
-        """Update backlinks to current parent in all child items."""
+        """Update backlinks to current parent in all child items and clear relevant caches."""
+        for child in self._children:
+            # Set the parent first
+            child._parent = self  # noqa: SLF001
+
+            # Clear all FrozenProperty caches on the child
+            # This ensures that properties recalculated after the parent is set.
+            for attr_name, attr_value in type(child).__dict__.items():
+                if isinstance(attr_value, FrozenProperty):
+                    # The cached value is stored in the instance's dict with the property name.
+                    # Use pop with a default to avoid KeyError if the cache wasn't populated yet.
+                    child.__dict__.pop(attr_name, None)
+
+        return self
 
 
 class MapableItem(NamedItem):
@@ -495,26 +506,23 @@ class MapableItem(NamedItem):
     offset: NonNegativeInt
     """Byte offset from the parent addressable item."""
 
-    @property
+    @FrozenProperty
     def base_address(self) -> NonNegativeInt:
         """Address, which this item is offsetted from."""
-        if not hasattr(self, "_base_address"):
-            if not hasattr(self, "_parent") or not isinstance(self.parent, MapableItem):
-                self._base_address = 0
-            else:
-                self._base_address = self.parent.address
-        return self._base_address
+        if self.parent is None:
+            return 0
+        if not isinstance(self.parent, MapableItem):
+            raise TypeError("Parent has to be a `MapableItem`")
+        return self.parent.address
 
-    @property
+    @FrozenProperty
     def address(self) -> NonNegativeInt:
         """Global address of the item."""
-        if not hasattr(self, "_address"):
-            self._address = self.base_address + self.offset
-        return self._address
+        return self.base_address + self.offset
 
 
 class ArrayItem(NamedItem):
-    """NamedItem that can describe array of items with common properties following some repeatable pattern."""
+    """`NamedItem` that can describe array of items with common properties following some repeatable pattern."""
 
     num: PositiveInt
     """Number of elements within the array."""
@@ -542,12 +550,10 @@ class ArrayItem(NamedItem):
     - `{name}_{index}` -> `irq0`, `irq1`, `irq2`, ...
     """
 
-    @property
+    @FrozenProperty
     def generated_items(self) -> tuple[NamedItem, ...]:
         """Concrete items in array created by following the pattern."""
-        if not hasattr(self, "_generated_items"):
-            self._generated_items = self._generate_items()
-        return self._generated_items
+        return self._generate_items()
 
     @abstractmethod
     def _generate_items(self) -> tuple[NamedItem, ...]:
@@ -566,27 +572,27 @@ class ArrayItem(NamedItem):
         """Validate that array has at least two elements."""
         min_num = 2
         if self.num < min_num:
-            msg = self._err_fmt(
+            raise ValueError(
                 f"At least {min_num} elements are required for the array, but current size is {self.num}. "
                 "Consider using non-array kind instead."
             )
-            raise ValueError(msg)
         return self
 
     @model_validator(mode="after")
     def _validate_indices_unique(self) -> Self:
         """Validate that all indices are unique."""
         if len(set(self.indices)) != len(self.indices):
-            msg = self._err_fmt(f"Indices are not unique: {self.indices}")
-            raise ValueError(msg)
+            raise ValueError(f"Indices are not unique: {self.indices}")
         return self
 
     @model_validator(mode="after")
     def _validate_indices_length(self) -> Self:
         """Validate that number of indices is greater or equal to number of elements."""
         if len(self.indices) < self.num:
-            msg = self._err_fmt(f"Number of indices {len(self.indices)} is less than number of elements {self.num}")
-            raise ValueError(msg)
+            raise ValueError(
+                f"Number of indices {len(self.indices)} is less than number of elements {self.num}. "
+                "Consider using non-array kind instead."
+            )
         return self
 
     @model_validator(mode="after")
@@ -596,17 +602,8 @@ class ArrayItem(NamedItem):
             self.naming.format_map(defaultdict(str, index="0"))
         except KeyError as e:
             if str(e) == "'index'":
-                msg = self._err_fmt(f"Naming pattern {self.naming} is invalid: missing 'index'")
-            else:
-                msg = self._err_fmt(f"Naming pattern {self.naming} is invalid")
-            raise ValueError(msg) from e
-        return self
-
-    @model_validator(mode="after")
-    def _update_backlinks(self) -> Self:
-        """Update references to parent in all child items."""
-        for item in self.generated_items:
-            item._assign_parent(self)  # noqa: SLF001
+                raise ValueError(f"Naming pattern {self.naming} is invalid: missing 'index'") from e
+            raise ValueError(f"Naming pattern {self.naming} is invalid") from e
         return self
 
 
@@ -616,28 +613,27 @@ class EnumMember(NamedItem):
     value: NonNegativeInt
     """Enumeration value."""
 
-    @property
+    @FrozenProperty
     def width(self) -> NonNegativeInt:
         """Minimum number of bits required to represent the value."""
-        if not hasattr(self, "_width"):
-            self._width = self.value.bit_length()
-            if self._width == 0:
-                self._width = 1  # bit_length() returns zero for zero value, so assign minimum value
-        return self._width
+        return max(self.value.bit_length(), 1)
 
     @property
     def parent_enum(self) -> Enum:
-        """Parent enumeration."""
-        if isinstance(self.parent, Enum):
-            return self.parent
-        msg = self._err_fmt("Parent is not an instance of `Enum`")
-        raise TypeError(msg)
+        """Parent enumeration.
 
-    @model_validator(mode="after")
-    def _update_backlinks(self) -> Self:
-        """Update references to parent in all child items."""
-        # has no children, nothing to update
-        return self
+        Requires parent to be set.
+        """
+        if self.parent is None:
+            raise ValueError("Parent has to be set before accessing parent enum")
+        if not isinstance(self.parent, Enum):
+            raise TypeError("Parent is not an instance of `Enum`")
+        return self.parent
+
+    @property
+    def _children(self) -> tuple[NamedItem, ...]:
+        """All subitems within item."""
+        return ()
 
 
 class Enum(NamedItem):
@@ -650,30 +646,37 @@ class Enum(NamedItem):
     Members are sorted by value in ascending order.
     """
 
-    @property
+    @FrozenProperty
     def width(self) -> NonNegativeInt:
         """Minimum number of bits required to represent the largest member of enumeration."""
-        if not hasattr(self, "_width"):
-            self._width = max(m.width for m in self.members)
-        return self._width
+        return max(m.width for m in self.members)
 
-    @property
-    def names(self) -> Iterator[IdentifierStr]:
-        """Iterate over names of members."""
-        return (m.name for m in self.members)
+    @FrozenProperty
+    def names(self) -> tuple[IdentifierStr, ...]:
+        """Names of members."""
+        return tuple(m.name for m in self.members)
 
-    @property
-    def values(self) -> Iterator[NonNegativeInt]:
-        """Iterate over values of members."""
-        return (m.value for m in self.members)
+    @FrozenProperty
+    def values(self) -> tuple[NonNegativeInt, ...]:
+        """Values of members."""
+        return tuple(m.value for m in self.members)
 
     @property
     def parent_field(self) -> Field:
-        """Parent field."""
-        if isinstance(self.parent, Field):
-            return self.parent
-        msg = self._err_fmt("Parent is not an instance of `Field`")
-        raise TypeError(msg)
+        """Parent field.
+
+        Requires parent to be set.
+        """
+        if self.parent is None:
+            raise ValueError("Parent has to be set before accessing parent field")
+        if not isinstance(self.parent, Field):
+            raise TypeError("Parent is not an instance of `Field`")
+        return self.parent
+
+    @property
+    def _children(self) -> tuple[NamedItem, ...]:
+        """All subitems within item."""
+        return self.members
 
     @field_validator("members", mode="after")
     @classmethod
@@ -681,49 +684,42 @@ class Enum(NamedItem):
         """Sort members by value."""
         return tuple(sorted(values, key=lambda v: v.value))
 
-    @model_validator(mode="after")
-    def _validate_members_provided(self) -> Self:
+    @field_validator("members", mode="after")
+    @classmethod
+    def _validate_members_provided(cls, values: tuple[EnumMember, ...]) -> tuple[EnumMember, ...]:
         """Validate that at least one member is provided."""
-        if len(self.members) == 0:
-            msg = self._err_fmt("Empty enumeration is not allowed, at least one member has to be provided")
-            raise ValueError(msg)
-        return self
+        if len(values) == 0:
+            raise ValueError("Empty enumeration is not allowed, at least one member has to be provided")
+        return values
 
-    @model_validator(mode="after")
-    def _validate_members_unique_values(self) -> Self:
+    @field_validator("members", mode="after")
+    @classmethod
+    def _validate_members_unique_values(cls, values: tuple[EnumMember, ...]) -> tuple[EnumMember, ...]:
         """Validate that all values inside enumeration are unique."""
-        if len({member.value for member in self.members}) != len(self.members):
-            msg = self._err_fmt(f"Some enumeration member values are not unique: {self.members}")
-            raise ValueError(msg)
-        return self
+        if len({member.value for member in values}) != len(values):
+            raise ValueError("Some enumeration member values are not unique")
+        return values
 
-    @model_validator(mode="after")
-    def _validate_members_unique_names(self) -> Self:
+    @field_validator("members", mode="after")
+    @classmethod
+    def _validate_members_unique_names(cls, values: tuple[EnumMember, ...]) -> tuple[EnumMember, ...]:
         """Validate that all names inside enumeration are unique."""
-        if len({member.name for member in self.members}) != len(self.members):
-            msg = self._err_fmt(f"Some enumeration member names are not unique: {self.members}")
-            raise ValueError(msg)
-        return self
-
-    @model_validator(mode="after")
-    def _update_backlinks(self) -> Self:
-        """Update references to parent in all child items."""
-        for m in self.members:
-            m._assign_parent(self)  # noqa: SLF001
-        return self
+        if len({member.name for member in values}) != len(values):
+            raise ValueError("Some enumeration member names are not unique")
+        return values
 
 
 class Field(NamedItem):
     """Bit field inside a register."""
-
-    reset: NonNegativeInt | None
-    """Reset value. Can be unknown."""
 
     offset: NonNegativeInt
     """Bit offset within register."""
 
     width: PositiveInt
     """Bit width of the item."""
+
+    reset: NonNegativeInt | None
+    """Reset value. Can be unknown."""
 
     access: AccessMode
     """Access mode."""
@@ -734,43 +730,52 @@ class Field(NamedItem):
     enum: Enum | None
     """Optional enumeration for the field."""
 
-    @property
-    def bit_indices(self) -> Iterator[int]:
-        """Iterate over field bit positions inside register from LSB to MSB."""
-        yield from range(self.offset, self.offset + self.width)
+    @FrozenProperty
+    def bit_indices(self) -> tuple[int, ...]:
+        """Field bit positions inside register from LSB to MSB."""
+        return tuple(range(self.offset, self.offset + self.width))
 
-    @property
-    def byte_indices(self) -> Iterator[int]:
-        """Iterate over field byte indices inside register from lower to higher."""
-        yield from range(self.offset // 8, (self.offset + self.width - 1) // 8 + 1)
+    @FrozenProperty
+    def byte_indices(self) -> tuple[int, ...]:
+        """Field byte indices inside register from lower to higher."""
+        return tuple(range(self.offset // 8, (self.offset + self.width - 1) // 8 + 1))
 
-    @property
+    @FrozenProperty
     def lsb(self) -> int:
         """Position of the least significant bit (LSB) inside register."""
         return self.offset
 
-    @property
+    @FrozenProperty
     def msb(self) -> int:
         """Position of the most significant bit (MSB) inside register."""
         return self.lsb + self.width - 1
 
-    @property
+    @FrozenProperty
     def mask(self) -> int:
         """Bit mask for the bitfield inside register."""
         return (2 ** (self.width) - 1) << self.offset
 
-    @property
+    @FrozenProperty
     def is_multibit(self) -> bool:
         """Bitfield has more than one bit width."""
         return self.width > 1
 
-    @property
+    @FrozenProperty
     def parent_register(self) -> Register:
-        """Parent register."""
-        if isinstance(self.parent, Register):
-            return self.parent
-        msg = self._err_fmt("Parent is not a register")
-        raise TypeError(msg)
+        """Parent register.
+
+        Requires parent to be set.
+        """
+        if self.parent is None:
+            raise ValueError("Parent has to be set before accessing parent register")
+        if not isinstance(self.parent, Register):
+            raise TypeError("Parent is not an instance of `Register`")
+        return self.parent
+
+    @property
+    def _children(self) -> tuple[NamedItem, ...]:
+        """All subitems within item."""
+        return (self.enum,) if self.enum else ()
 
     def byte_select(self, byte_idx: int) -> tuple[int, int]:
         """Return register bit slice infomation (MSB, LSB) for a field projection into Nth byte of a register.
@@ -792,8 +797,7 @@ class Field(NamedItem):
         """
         byte_indices = tuple(self.byte_indices)
         if byte_idx not in byte_indices:
-            msg = self._err_fmt(f"Provided {byte_idx=} has to be one of {byte_indices} for the field.")
-            raise ValueError(msg)
+            raise ValueError(f"Provided {byte_idx=} has to be one of {byte_indices} for the field.")
 
         lsb = self.lsb if byte_idx == byte_indices[0] else byte_idx * 8
         msb = (byte_idx + 1) * 8 - 1 if ((byte_idx + 1) * 8 - 1 - self.msb) < 0 else self.msb
@@ -809,63 +813,54 @@ class Field(NamedItem):
         msb, lsb = self.byte_select(byte_idx)
         return (msb - self.offset, lsb - self.offset)
 
-    @model_validator(mode="after")
-    def _validate_hardware_constraints(self) -> Self:
+    @field_validator("hardware", mode="after")
+    @classmethod
+    def _validate_hardware_constraints(cls, value: HardwareMode, info: ValidationInfo) -> HardwareMode:
         """Validate that `hardware` field follows expected constraints."""
         # Check exclusive hardware flags
         for flag in (HardwareMode.NA, HardwareMode.QUEUE, HardwareMode.FIXED):
-            if flag in self.hardware and len(self.hardware) > 1:
-                msg = self._err_fmt(f"Hardware mode '{flag}' must be exclusive, but current mode is '{self.hardware}'")
-                raise ValueError(msg)
+            if flag in value and len(value) > 1:
+                raise ValueError(f"Hardware mode '{flag}' must be exclusive, but current mode is '{value}'")
 
         # Hardware queue mode can be only combined with specific access values
-        if HardwareMode.QUEUE in self.hardware:
+        if HardwareMode.QUEUE in value:
             q_access_allowed = [AccessMode.RW, AccessMode.RO, AccessMode.WO]
-            if self.access not in q_access_allowed:
-                msg = self._err_fmt(
+            if info.data["access"] not in q_access_allowed:
+                raise ValueError(
                     f"Hardware mode 'q' is allowed to use only with '{q_access_allowed}', "
-                    f"but current access mode is '{self.access}'"
+                    f"but current access mode is '{info.data['access']}'"
                 )
-                raise ValueError(msg)
 
         # Enable must be used with Input
-        if HardwareMode.ENABLE in self.hardware and HardwareMode.INPUT not in self.hardware:
-            msg = self._err_fmt(
-                f"Hardware mode 'e' is allowed to use only with 'i', " f"but current hardware mode is '{self.hardware}'"
+        if HardwareMode.ENABLE in value and HardwareMode.INPUT not in value:
+            raise ValueError(
+                f"Hardware mode 'e' is allowed to use only with 'i', " f"but current hardware mode is '{value}'"
             )
-            raise ValueError(msg)
-        return self
+        return value
 
-    @model_validator(mode="after")
-    def _validate_reset_width(self) -> Self:
+    @field_validator("reset", mode="after")
+    @classmethod
+    def _validate_reset_width(cls, value: NonNegativeInt | None, info: ValidationInfo) -> NonNegativeInt | None:
         """Validate that reset value width less or equal field width."""
-        if self.reset:
-            reset_value_width = self.reset.bit_length()
-            if reset_value_width > self.width:
-                msg = self._err_fmt(
-                    f"Reset value 0x{self.reset:x} requires {reset_value_width} bits to represent,"
-                    f" but field is {self.width} bits wide"
+        if value is not None:
+            reset_value_width = value.bit_length()
+            if reset_value_width > info.data["width"]:
+                raise ValueError(
+                    f"Reset value 0x{value:x} requires {reset_value_width} bits to represent,"
+                    f" but field is {info.data['width']} bits wide"
                 )
-                raise ValueError(msg)
-        return self
+        return value
 
-    @model_validator(mode="after")
-    def _validate_enum_members_width(self) -> Self:
+    @field_validator("enum", mode="after")
+    @classmethod
+    def _validate_enum_members_width(cls, value: Enum | None, info: ValidationInfo) -> Enum | None:
         """Validate that enumeration members has values, which width fit field width."""
-        if self.enum and self.enum.width > self.width:
-            msg = self._err_fmt(
-                f"Enumeration {self.enum} requires {self.enum.width} bits to represent,"
-                f" but field is {self.width} bits wide"
+        if value is not None and value.width > info.data["width"]:
+            raise ValueError(
+                f"Enumeration {value} requires {value.width} bits to represent,"
+                f" but field is {info.data['width']} bits wide"
             )
-            raise ValueError(msg)
-        return self
-
-    @model_validator(mode="after")
-    def _update_backlinks(self) -> Self:
-        """Update references to parent in all child items."""
-        if self.enum:
-            self.enum._assign_parent(self)  # noqa: SLF001
-        return self
+        return value
 
 
 class Register(MapableItem):
@@ -882,77 +877,73 @@ class Register(MapableItem):
 
     @property
     def parent_map(self) -> Map:
-        """Parent map."""
-        if isinstance(self.parent, Map):
-            return self.parent
-        msg = self._err_fmt("Parent is not an instance of `Map`")
-        raise TypeError(msg)
+        """Parent map.
+
+        Requires parent to be set.
+        """
+        if self.parent is None:
+            raise ValueError("Parent has to be set before accessing parent map")
+        if not isinstance(self.parent, Map):
+            raise TypeError("Parent is not an instance of `Map`")
+        return self.parent
 
     @property
+    def _children(self) -> tuple[NamedItem, ...]:
+        """All subitems within item."""
+        return self.fields
+
+    @FrozenProperty
     def width(self) -> NonNegativeInt:
         """Minimum number of bits required to represent the register."""
-        if not hasattr(self, "_width"):
-            self._width = max(f.msb for f in self.fields) + 1
-        return self._width
+        return max(f.msb for f in self.fields) + 1
 
-    @property
+    @FrozenProperty
     def access(self) -> AccessCategory:
         """Access rights based on access modes of the fields."""
-        if not hasattr(self, "_access"):
-            if all(f.access.is_ro for f in self.fields):
-                self._access = AccessCategory.RO
-            elif all(f.access.is_wo for f in self.fields):
-                self._access = AccessCategory.WO
-            else:
-                self._access = AccessCategory.RW
-        return self._access
+        if all(f.access.is_ro for f in self.fields):
+            return AccessCategory.RO
+        if all(f.access.is_wo for f in self.fields):
+            return AccessCategory.WO
+        return AccessCategory.RW
 
-    @property
+    @FrozenProperty
     def reset(self) -> NonNegativeInt:
         """Reset value based on reset values of the fields.
 
         Unknown reset value for a field converted to zero.
         """
-        if not hasattr(self, "_reset"):
-            self._reset = 0
-            for f in self.fields:
-                self._reset |= (f.reset if f.reset else 0) << f.lsb
-        return self._reset
+        return sum(f.reset << f.lsb for f in self.fields if f.reset is not None)
 
-    @property
+    @FrozenProperty
     def reset_binstr(self) -> str:
         """Reset value represented as a binary string where unknown bits masked as 'x'.
 
         No any prefix. Leading zeroes are added to match `width`.
         Examples: 00110, 1x10
         """
-        if not hasattr(self, "_reset_binstr"):
-            bits = ["0"] * self.width
-            for f in self.fields:
-                if f.reset:
-                    bits[f.lsb : f.msb + 1] = list(f"{f.reset:0{f.width}b}")
-                else:
-                    bits[f.lsb : f.msb + 1] = ["x"] * f.width
-            self._reset_binstr = "".join(reversed(bits))
-        return self._reset_binstr
+        bits = ["0"] * self.width
+        for f in self.fields:
+            if f.reset:
+                bits[f.lsb : f.msb + 1] = list(f"{f.reset:0{f.width}b}")
+            else:
+                bits[f.lsb : f.msb + 1] = ["x"] * f.width
+        return "".join(reversed(bits))
 
-    @property
+    @FrozenProperty
     def reset_hexstr(self) -> str:
         """Reset value represented as a hexadecimal string where unknown nibbles masked as 'x'.
 
         No any prefix. Leading zeroes are added to match `width`.
         Examples: 0002bca, x2ax
         """
-        if not hasattr(self, "_reset_hexstr"):
-            nibbles = ["0"] * math.ceil(self.width / 4)
-            for i in range(len(nibbles)):
-                bit_slice = self.reset_binstr[::-1][i * 4 : i * 4 + 4]
-                if "x" in bit_slice:
-                    nibbles[i] = "x"
-                else:
-                    nibbles[i] = f"{int(bit_slice, 2):x}"
-            self._reset_hexstr = "".join(nibbles)
-        return self._reset_hexstr
+        nibbles = ["0"] * math.ceil(self.width / 4)
+        for i in range(len(nibbles)):
+            bit_slice = self.reset_binstr[::-1][i * 4 : i * 4 + 4]
+            if "x" in bit_slice:
+                nibbles[i] = "x"
+            else:
+                nibbles[i] = f"{int(bit_slice, 2):x}"
+        return "".join(nibbles)
 
     @field_validator("fields", mode="after")
     @classmethod
@@ -966,8 +957,7 @@ class Register(MapableItem):
         names = [field.name for field in self.fields]
         duplicates = {name for name in names if names.count(name) > 1}
         if duplicates:
-            msg = self._err_fmt(f"Some field names are not unique and used more than once: {duplicates}")
-            raise ValueError(msg)
+            raise ValueError(f"Some field names are not unique and used more than once: {duplicates}")
         return self
 
     @model_validator(mode="after")
@@ -982,15 +972,7 @@ class Register(MapableItem):
                 if name != field.name
             }
             if any(v for v in overlaps.values()):
-                msg = self._err_fmt(f"Field {field.name} overlaps with other fields: {', '.join(overlaps.keys())}")
-                raise ValueError(msg)
-        return self
-
-    @model_validator(mode="after")
-    def _update_backlinks(self) -> Self:
-        """Update references to parent in all child items."""
-        for field in self.fields:
-            field._assign_parent(self)  # noqa: SLF001
+                raise ValueError(f"Field {field.name} overlaps with other fields: {', '.join(overlaps.keys())}")
         return self
 
 
@@ -1015,46 +997,53 @@ class Memory(MapableItem):
     Each tuple contains memory word index (address within memory) and value.
     """
 
-    @property
+    @FrozenProperty
     def capacity(self) -> Pow2Int:
         """Memory capacity in memory words."""
         return 2**self.address_width
 
-    @property
+    @FrozenProperty
     def size(self) -> Pow2Int:
         """Memory size in bytes."""
         return self.capacity * self.granularity
 
-    @property
+    @FrozenProperty
     def granularity(self) -> PositiveInt:
         """Memory granularity in bytes."""
         return math.ceil(self.data_width / 8)
 
-    @property
+    @FrozenProperty
     def access(self) -> AccessCategory:
         """Memory access rights for CSR map."""
         return self.style.access
+
+    @property
+    def parent_map(self) -> Map:
+        """Parent map.
+
+        Requires parent to be set.
+        """
+        if self.parent is None:
+            raise ValueError("Parent has to be set before accessing parent map")
+        if not isinstance(self.parent, Map):
+            raise TypeError("Parent is not an instance of `Map`")
+        return self.parent
+
+    @property
+    def _children(self) -> tuple[NamedItem, ...]:
+        """All subitems within item."""
+        return ()
 
     @model_validator(mode="after")
     def _validate_initial_values(self) -> Self:
         """Validate that initial values are valid."""
         for i, (addr, value) in enumerate(self.initial_values):
             if addr >= self.capacity:
-                msg = self._err_fmt(
-                    f"Initial value {i} address 0x{addr:x} is out of memory capacity 0x{self.capacity:x}"
-                )
-                raise ValueError(msg)
+                raise ValueError(f"Initial value {i} address 0x{addr:x} is out of memory capacity 0x{self.capacity:x}")
             if value >= 2**self.data_width:
-                msg = self._err_fmt(
+                raise ValueError(
                     f"Initial value {i} data 0x{value:x} is out of memory data width {self.data_width} bits"
                 )
-                raise ValueError(msg)
-        return self
-
-    @model_validator(mode="after")
-    def _update_backlinks(self) -> Self:
-        """Update references to parent in all child items."""
-        # Not needed for Memory
         return self
 
 
@@ -1094,56 +1083,73 @@ class Map(MapableItem):
     Items are sorted by offsets.
     """
 
-    @property
+    @FrozenProperty
     def size(self) -> Pow2Int:
         """Byte size of address space that map covers."""
         return 2**self.address_width
 
-    @property
+    @FrozenProperty
     def granularity(self) -> Pow2Int:
         """Byte size of a single register within map."""
         return math.ceil(self.register_width / 8)
 
-    @property
-    def maps(self) -> Iterator[Map]:
-        """Iterate through all submaps within map. Iterator might be empty."""
-        return (item for item in self.items if isinstance(item, Map))
+    @FrozenProperty
+    def maps(self) -> tuple[Map, ...]:
+        """All submaps within map."""
+        return tuple(item for item in self.items if isinstance(item, Map))
 
-    @property
-    def registers(self) -> Iterator[Register]:
-        """Iterate through all registers within map. Iterator might be empty."""
-        return (item for item in self.items if isinstance(item, Register))
+    @FrozenProperty
+    def registers(self) -> tuple[Register, ...]:
+        """All registers within map."""
+        return tuple(item for item in self.items if isinstance(item, Register))
 
-    @property
-    def memories(self) -> Iterator[Memory]:
-        """Iterate through all memories within map. Iterator might be empty."""
-        return (item for item in self.items if isinstance(item, Memory))
+    @FrozenProperty
+    def memories(self) -> tuple[Memory, ...]:
+        """All memories within map."""
+        return tuple(item for item in self.items if isinstance(item, Memory))
 
-    @property
-    def is_root(self) -> bool:
-        """Check if current map is a root map."""
-        return not hasattr(self, "_parent")
-
-    @property
+    @FrozenProperty
     def has_maps(self) -> bool:
         """Check if current map contains submaps."""
-        return any(isinstance(item, Map) for item in self.items)
+        return any(self.maps)
 
-    @property
+    @FrozenProperty
     def has_registers(self) -> bool:
         """Check if current map contains registers."""
-        return any(isinstance(item, Register) for item in self.items)
+        return any(self.registers)
 
-    @property
+    @FrozenProperty
     def has_memories(self) -> bool:
         """Check if current map contains memory blocks."""
-        return any(isinstance(item, Memory) for item in self.items)
+        return any(self.memories)
 
-    @property
+    @FrozenProperty
     def address(self) -> NonNegativeInt:
         """Global byte address of the item."""
         # root map has no parent, so its address is its offset
         return self.offset if self.is_root else super().address
+
+    @property
+    def is_root(self) -> bool:
+        """Check if current map is a root map."""
+        return self.parent is None
+
+    @property
+    def parent_map(self) -> Map:
+        """Parent map.
+
+        Requires parent to be set.
+        """
+        if self.parent is None:
+            raise ValueError("Parent has to be set before accessing parent map")
+        if not isinstance(self.parent, Map):
+            raise TypeError("Parent is not an instance of `Map`")
+        return self.parent
+
+    @property
+    def _children(self) -> tuple[NamedItem, ...]:
+        """All subitems within item."""
+        return self.items
 
     @field_validator("items", mode="after")
     @classmethod
@@ -1155,8 +1161,7 @@ class Map(MapableItem):
     def _validate_items_provided(self) -> Self:
         """Validate that at least one item is provided."""
         if len(self.items) == 0:
-            msg = self._err_fmt("Empty map is not allowed, at least one item has to be provided")
-            raise ValueError(msg)
+            raise ValueError("Empty map is not allowed, at least one item has to be provided")
         return self
 
     @model_validator(mode="after")
@@ -1164,10 +1169,9 @@ class Map(MapableItem):
         """Validate that register width is at least single byte."""
         min_width = 8
         if self.register_width < min_width:
-            msg = self._err_fmt(
+            raise ValueError(
                 f"Minimal allowed 'register_width' for a map is {min_width}, but {self.register_width} provided"
             )
-            raise ValueError(msg)
         return self
 
     @model_validator(mode="after")
@@ -1176,8 +1180,7 @@ class Map(MapableItem):
         names = [item.name for item in self.items]
         duplicates = {name for name in names if names.count(name) > 1}
         if duplicates:
-            msg = self._err_fmt(f"Some item names are not unique and used more than once: {duplicates}")
-            raise ValueError(msg)
+            raise ValueError(f"Some item names are not unique and used more than once: {duplicates}")
         return self
 
     @model_validator(mode="after")
@@ -1186,8 +1189,7 @@ class Map(MapableItem):
         offsets = [item.offset for item in self.items]
         duplicates = {offset for offset in offsets if offsets.count(offset) > 1}
         if duplicates:
-            msg = self._err_fmt(f"Some item offsets are not unique and used more than once: {duplicates}")
-            raise ValueError(msg)
+            raise ValueError(f"Some item offsets are not unique and used more than once: {duplicates}")
         return self
 
     @model_validator(mode="after")
@@ -1195,22 +1197,20 @@ class Map(MapableItem):
         """Validate that all item offsets are aligned to the map granularity."""
         for item in self.items:
             if item.offset % self.granularity != 0:
-                msg = self._err_fmt(
+                raise ValueError(
                     f"Item {item.name} offset 0x{item.offset:x} is not aligned to map granularity {self.granularity}"
                 )
-                raise ValueError(msg)
         return self
 
     @model_validator(mode="after")
     def _validate_items_address_width(self) -> Self:
-        """Validate that all items have address width less or equal to map address width."""
-        for item in self.items:
-            if isinstance(item, Map | Memory) and item.address_width > self.address_width:
-                msg = self._err_fmt(
+        """Validate that all child maps and memories have address width less or equal to current map address width."""
+        for item in itertools.chain(self.maps, self.memories):
+            if item.address_width > self.address_width:
+                raise ValueError(
                     f"Item {item.name} address width {item.address_width} is "
                     f"greater than map address width {self.address_width}"
                 )
-                raise ValueError(msg)
         return self
 
     @model_validator(mode="after")
@@ -1232,17 +1232,15 @@ class Map(MapableItem):
                 if item is other_item:
                     continue
                 if start <= other_end and end >= other_start:
-                    msg = self._err_fmt(f"Address collision between {item.name} and {other_item.name}")
-                    raise ValueError(msg)
+                    raise ValueError(f"Address collision between {item.name} and {other_item.name}")
 
         # Check that no item is falling out of the root map address space
         for item, (start, end) in item_address_ranges.items():
             if end >= self.size:
-                msg = self._err_fmt(
+                raise ValueError(
                     f"Item {item.name} address range [0x{start:x};0x{end+1:x}) is "
                     f"falling out of the root map address space [0x0;0x{self.size:x})"
                 )
-                raise ValueError(msg)
         return self
 
     @model_validator(mode="after")
@@ -1251,24 +1249,16 @@ class Map(MapableItem):
         for reg in self.registers:
             last_field = reg.fields[-1]
             if last_field.msb >= self.register_width:
-                msg = self._err_fmt(
+                raise ValueError(
                     f"Field {last_field.name} (lsb={last_field.lsb} msb={last_field.msb}) "
                     f"exceeds size {self.register_width} of the register within map"
                 )
-                raise ValueError(msg)
         return self
 
     @model_validator(mode="after")
     def _validate_array_items_increment(self) -> Self:
         """Validate that all array items within map has correct `increment`."""
         # TODO: implement
-        return self
-
-    @model_validator(mode="after")
-    def _update_backlinks(self) -> Self:
-        """Update references to parent in all child items."""
-        for item in self.items:
-            item._assign_parent(self)  # noqa: SLF001
         return self
 
 

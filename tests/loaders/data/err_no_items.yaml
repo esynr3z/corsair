@@ -1,0 +1,5 @@
+# doc: This map is empty and should raise validation error
+# exception: ValidationError
+# msg_match: items\s*Field required
+---
+name: "no_itemsmap"
