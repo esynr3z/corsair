@@ -1,0 +1,34 @@
+# doc: Test that duplicate register offsets within a map raise a validation error.
+# exception: ValidationError
+# msg_match: Some item offsets are not unique
+---
+name: test_map
+doc: Test map with duplicate register offsets
+address_width: 8
+register_width: 32
+offset: 0
+items:
+  - name: reg_a
+    doc: Register A
+    offset: 0 # Duplicate offset
+    fields:
+      - name: field_a
+        doc: Field A
+        offset: 0
+        width: 1
+        access: rw
+        hardware: n
+        reset: null
+        enum: null
+  - name: reg_b
+    doc: Register B
+    offset: 0 # Duplicate offset
+    fields:
+      - name: field_b
+        doc: Field B
+        offset: 0
+        width: 1
+        access: rw
+        hardware: n
+        reset: null
+        enum: null

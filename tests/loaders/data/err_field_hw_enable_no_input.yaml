@@ -1,0 +1,22 @@
+# doc: Test that hardware mode 'e' without 'i' raises a validation error.
+# exception: ValidationError
+# msg_match: Hardware mode 'e' is allowed to use only with 'i'
+---
+name: test_map
+doc: Test map
+address_width: 8
+register_width: 32
+offset: 0
+items:
+  - name: test_reg
+    doc: Test register
+    offset: 0
+    fields:
+      - name: field_hw_e_err
+        doc: Field with invalid hardware mode 'e' without 'i'
+        offset: 0
+        width: 1
+        access: rw
+        hardware: e-o # Missing 'i'
+        reset: null
+        enum: null

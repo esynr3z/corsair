@@ -1,0 +1,34 @@
+# doc: Test that a field with valid reset and enum can be loaded.
+# exception: null
+# msg_match: null
+---
+name: test_map
+doc: Test map
+address_width: 8
+register_width: 32
+offset: 0
+items:
+  - name: test_reg
+    doc: Test register
+    offset: 0
+    fields:
+      - name: field_full
+        doc: Field with reset and enum
+        offset: 4
+        width: 4
+        access: rw
+        hardware: i-o
+        reset: 5
+        enum:
+          name: status_enum
+          doc: Status enumeration
+          members:
+            - name: idle
+              doc: Idle state
+              value: 0
+            - name: busy
+              doc: Busy state
+              value: 1
+            - name: done
+              doc: Done state
+              value: 8

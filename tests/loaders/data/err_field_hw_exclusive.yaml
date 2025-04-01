@@ -1,0 +1,22 @@
+# doc: Test that exclusive hardware mode used with others raises a validation error.
+# exception: ValidationError
+# msg_match: Hardware mode 'n' must be exclusive
+---
+name: test_map
+doc: Test map
+address_width: 8
+register_width: 32
+offset: 0
+items:
+  - name: test_reg
+    doc: Test register
+    offset: 0
+    fields:
+      - name: field_hw_err
+        doc: Field with invalid hardware mode
+        offset: 0
+        width: 1
+        access: rw
+        hardware: n-i # 'n' is exclusive
+        reset: null
+        enum: null

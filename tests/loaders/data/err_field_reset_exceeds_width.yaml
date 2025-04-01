@@ -1,0 +1,22 @@
+# doc: Test that reset value exceeding field width raises a validation error.
+# exception: ValidationError
+# msg_match: Reset value .* requires .* bits to represent, but field is .* bits wide
+---
+name: test_map
+doc: Test map
+address_width: 8
+register_width: 32
+offset: 0
+items:
+  - name: test_reg
+    doc: Test register
+    offset: 0
+    fields:
+      - name: field_reset_err
+        doc: Field with invalid reset
+        offset: 0
+        width: 2 # Max value is 3 (0b11)
+        access: rw
+        hardware: n
+        reset: 5 # Requires 3 bits (0b101)
+        enum: null

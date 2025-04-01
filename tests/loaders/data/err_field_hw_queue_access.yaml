@@ -1,0 +1,22 @@
+# doc: Test that hardware mode 'q' with invalid access mode raises a validation error.
+# exception: ValidationError
+# msg_match: Hardware mode 'q' is allowed to use only with .* but current access mode is
+---
+name: test_map
+doc: Test map
+address_width: 8
+register_width: 32
+offset: 0
+items:
+  - name: test_reg
+    doc: Test register
+    offset: 0
+    fields:
+      - name: field_hw_q_err
+        doc: Field with invalid hardware mode 'q' and access combination
+        offset: 0
+        width: 8
+        access: rw1c # Invalid for 'q'
+        hardware: q
+        reset: null
+        enum: null

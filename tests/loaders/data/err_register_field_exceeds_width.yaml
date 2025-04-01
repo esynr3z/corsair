@@ -1,0 +1,30 @@
+# doc: Test that field exceeding map register width raises a validation error.
+# exception: ValidationError
+# msg_match: Field .* exceeds size .* of the register within map
+---
+name: test_map
+doc: Test map
+address_width: 8
+register_width: 8 # Small width
+offset: 0
+items:
+  - name: test_reg
+    doc: Test register with field exceeding map register width
+    offset: 0
+    fields:
+      - name: field_a
+        doc: Field A
+        offset: 0
+        width: 4
+        access: rw
+        hardware: n
+        reset: null
+        enum: null
+      - name: field_b # Exceeds register_width=8
+        doc: Field B
+        offset: 6
+        width: 4 # Ends at bit 9 (offset 6 + width 4 - 1)
+        access: rw
+        hardware: n
+        reset: null
+        enum: null

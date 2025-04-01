@@ -1,0 +1,34 @@
+# doc: Test that register exceeding map address space raises a validation error.
+# exception: ValidationError
+# msg_match: Item .* address range .* is falling out of the root map address space
+---
+name: test_map
+doc: Test map with register out of bounds
+address_width: 4 # Map size is 16 bytes (0x0 - 0xF)
+offset: 0
+register_width: 32 # Granularity is 4 bytes
+items:
+  - name: reg_a
+    doc: Register A
+    offset: 12 # Occupies bytes 12-15 (0xC - 0xF), still within bounds
+    fields:
+      - name: field_a
+        doc: Field A
+        offset: 0
+        width: 1
+        access: rw
+        hardware: n
+        reset: null
+        enum: null
+  - name: reg_b
+    doc: Register B
+    offset: 16 # Starts at byte 16 (0x10), which is out of bounds
+    fields:
+      - name: field_b
+        doc: Field B
+        offset: 0
+        width: 1
+        access: rw
+        hardware: n
+        reset: null
+        enum: null

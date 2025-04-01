@@ -1,0 +1,30 @@
+# doc: Test that duplicate field names raise a validation error.
+# exception: ValidationError
+# msg_match: Some field names are not unique
+---
+name: test_map
+doc: Test map
+address_width: 8
+register_width: 32
+offset: 0
+items:
+  - name: test_reg
+    doc: Test register with duplicate field names
+    offset: 0
+    fields:
+      - name: field_a # Duplicate name
+        doc: Field A
+        offset: 0
+        width: 1
+        access: rw
+        hardware: n
+        reset: null
+        enum: null
+      - name: field_a # Duplicate name
+        doc: Field B
+        offset: 1
+        width: 1
+        access: rw
+        hardware: n
+        reset: null
+        enum: null

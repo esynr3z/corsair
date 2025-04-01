@@ -1,0 +1,22 @@
+# doc: Test that a minimally valid field can be loaded.
+# exception: null
+# msg_match: null
+---
+name: test_map
+doc: Test map
+address_width: 8
+register_width: 32
+offset: 0
+items:
+  - name: test_reg
+    doc: Test register
+    offset: 0
+    fields:
+      - name: field_min
+        doc: Minimal field
+        offset: 0
+        width: 1
+        access: rw
+        hardware: n
+        reset: null
+        enum: null

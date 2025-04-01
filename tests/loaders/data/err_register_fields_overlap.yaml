@@ -1,0 +1,30 @@
+# doc: Test that overlapping fields raise a validation error.
+# exception: ValidationError
+# msg_match: Field .* overlaps with other fields
+---
+name: test_map
+doc: Test map
+address_width: 8
+register_width: 32
+offset: 0
+items:
+  - name: test_reg
+    doc: Test register with overlapping fields
+    offset: 0
+    fields:
+      - name: field_a
+        doc: Field A
+        offset: 0
+        width: 4 # Bits 0-3
+        access: rw
+        hardware: n
+        reset: null
+        enum: null
+      - name: field_b
+        doc: Field B
+        offset: 2 # Bits 2-5 -> Overlaps with field_a at bits 2, 3
+        width: 4
+        access: rw
+        hardware: n
+        reset: null
+        enum: null

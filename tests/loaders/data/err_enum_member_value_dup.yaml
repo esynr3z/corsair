@@ -1,0 +1,34 @@
+# doc: Test that duplicate enum member values raise a validation error.
+# exception: ValidationError
+# msg_match: Some enumeration member values are not unique
+---
+name: test_map
+doc: Test map
+address_width: 8
+register_width: 32
+offset: 0
+items:
+  - name: test_reg
+    doc: Test register
+    offset: 0
+    fields:
+      - name: field_enum_val_dup
+        doc: Field with enum having duplicate values
+        offset: 0
+        width: 4
+        access: ro
+        hardware: n
+        reset: null
+        enum:
+          name: val_dup_enum
+          doc: Enum with duplicate values
+          members:
+            - name: val_a
+              doc: Value A
+              value: 1 # Duplicate value
+            - name: val_b
+              doc: Value B
+              value: 1 # Duplicate value
+            - name: val_c
+              doc: Value C
+              value: 2
