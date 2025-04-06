@@ -1,6 +1,6 @@
 # doc: Test that unaligned register offset raises a validation error.
 # exception: ValidationError
-# msg_match: Item .* offset .* is not aligned to map granularity
+# msg_match: item .* offset .* is not aligned to map granularity
 ---
 name: test_map
 doc: Test map with unaligned register offset

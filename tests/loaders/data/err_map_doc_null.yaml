@@ -1,6 +1,6 @@
 # doc: This map has null `doc` field and should raise validation error
 # exception: ValidationError
-# msg_match: doc\s*Input should be a valid string
+# msg_match: Input should be a valid string.*schema=doc
 ---
 name: "default_map"
 doc: null

@@ -1,6 +1,6 @@
 # doc: Test that duplicate enum member values raise a validation error.
 # exception: ValidationError
-# msg_match: Some enumeration member values are not unique
+# msg_match: some enumeration member values are not unique
 ---
 name: test_map
 doc: Test map

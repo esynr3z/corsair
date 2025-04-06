@@ -1,6 +1,6 @@
 # doc: This map has wrong `register_width` and should raise validation error
 # exception: ValidationError
-# msg_match: register_width\s*.*for a map is 8, but 1 provided
+# msg_match: minimal allowed 'register_width' for a map is 8, but 1 provided
 ---
 name: "default_map"
 doc: "Default map"

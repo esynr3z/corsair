@@ -1,6 +1,6 @@
 # doc: Test that hardware mode 'q' with invalid access mode raises a validation error.
 # exception: ValidationError
-# msg_match: Hardware mode 'q' is allowed to use only with .* but current access mode is
+# msg_match: hardware mode 'q' is allowed to use only with .* but current access mode is
 ---
 name: test_map
 doc: Test map

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import collections.abc
 import enum
 import functools
 import itertools
@@ -15,6 +16,7 @@ from pydantic import (
     ConfigDict,
     Discriminator,
     Tag,
+    ValidationError,
     ValidationInfo,
     field_validator,
     model_validator,
@@ -24,7 +26,7 @@ from pydantic.types import NonNegativeInt, PositiveInt
 from ._types import IdentifierStr, Pow2Int, SingleLineStr, TextStr
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Iterable, Iterator, Mapping
 
     from typing_extensions import Self
 
@@ -571,7 +573,7 @@ class ArrayItem(NamedItem):
         min_num = 2
         if self.num < min_num:
             raise ValueError(
-                f"At least {min_num} elements are required for the array, but current size is {self.num}. "
+                f"at least {min_num} elements are required for the array, but current size is {self.num}. "
                 "Consider using non-array kind instead."
             )
         return self
@@ -580,7 +582,7 @@ class ArrayItem(NamedItem):
     def _validate_indices_unique(self) -> Self:
         """Validate that all indices are unique."""
         if len(set(self.indices)) != len(self.indices):
-            raise ValueError(f"Indices are not unique: {self.indices}")
+            raise ValueError(f"indices are not unique: {self.indices}")
         return self
 
     @model_validator(mode="after")
@@ -588,7 +590,7 @@ class ArrayItem(NamedItem):
         """Validate that number of indices is greater or equal to number of elements."""
         if len(self.indices) < self.num:
             raise ValueError(
-                f"Number of indices {len(self.indices)} is less than number of elements {self.num}. "
+                f"number of indices {len(self.indices)} is less than number of elements {self.num}. "
                 "Consider using non-array kind instead."
             )
         return self
@@ -600,8 +602,8 @@ class ArrayItem(NamedItem):
             self.naming.format_map(defaultdict(str, index="0"))
         except KeyError as e:
             if str(e) == "'index'":
-                raise ValueError(f"Naming pattern {self.naming} is invalid: missing 'index'") from e
-            raise ValueError(f"Naming pattern {self.naming} is invalid") from e
+                raise ValueError(f"naming pattern {self.naming} is invalid: missing 'index'") from e
+            raise ValueError(f"naming pattern {self.naming} is invalid") from e
         return self
 
 
@@ -687,7 +689,7 @@ class Enum(NamedItem):
     def _validate_members_provided(cls, values: tuple[EnumMember, ...]) -> tuple[EnumMember, ...]:
         """Validate that at least one member is provided."""
         if len(values) == 0:
-            raise ValueError("Empty enumeration is not allowed, at least one member has to be provided")
+            raise ValueError("empty enumeration is not allowed, at least one member has to be provided")
         return values
 
     @field_validator("members", mode="after")
@@ -695,7 +697,7 @@ class Enum(NamedItem):
     def _validate_members_unique_values(cls, values: tuple[EnumMember, ...]) -> tuple[EnumMember, ...]:
         """Validate that all values inside enumeration are unique."""
         if len({member.value for member in values}) != len(values):
-            raise ValueError("Some enumeration member values are not unique")
+            raise ValueError("some enumeration member values are not unique")
         return values
 
     @field_validator("members", mode="after")
@@ -703,7 +705,7 @@ class Enum(NamedItem):
     def _validate_members_unique_names(cls, values: tuple[EnumMember, ...]) -> tuple[EnumMember, ...]:
         """Validate that all names inside enumeration are unique."""
         if len({member.name for member in values}) != len(values):
-            raise ValueError("Some enumeration member names are not unique")
+            raise ValueError("some enumeration member names are not unique")
         return values
 
 
@@ -818,21 +820,21 @@ class Field(NamedItem):
         # Check exclusive hardware flags
         for flag in (HardwareMode.NA, HardwareMode.QUEUE, HardwareMode.FIXED):
             if flag in value and len(value) > 1:
-                raise ValueError(f"Hardware mode '{flag}' must be exclusive, but current mode is '{value}'")
+                raise ValueError(f"hardware mode '{flag}' must be exclusive, but current mode is '{value}'")
 
         # Hardware queue mode can be only combined with specific access values
         if HardwareMode.QUEUE in value:
             q_access_allowed = [AccessMode.RW, AccessMode.RO, AccessMode.WO]
             if info.data["access"] not in q_access_allowed:
                 raise ValueError(
-                    f"Hardware mode 'q' is allowed to use only with '{q_access_allowed}', "
+                    f"hardware mode 'q' is allowed to use only with '{q_access_allowed}', "
                     f"but current access mode is '{info.data['access']}'"
                 )
 
         # Enable must be used with Input
         if HardwareMode.ENABLE in value and HardwareMode.INPUT not in value:
             raise ValueError(
-                f"Hardware mode 'e' is allowed to use only with 'i', " f"but current hardware mode is '{value}'"
+                f"hardware mode 'e' is allowed to use only with 'i', " f"but current hardware mode is '{value}'"
             )
         return value
 
@@ -844,7 +846,7 @@ class Field(NamedItem):
             reset_value_width = value.bit_length()
             if reset_value_width > info.data["width"]:
                 raise ValueError(
-                    f"Reset value 0x{value:x} requires {reset_value_width} bits to represent,"
+                    f"reset value 0x{value:x} requires {reset_value_width} bits to represent,"
                     f" but field is {info.data['width']} bits wide"
                 )
         return value
@@ -855,8 +857,7 @@ class Field(NamedItem):
         """Validate that enumeration members has values, which width fit field width."""
         if value is not None and value.width > info.data["width"]:
             raise ValueError(
-                f"Enumeration {value} requires {value.width} bits to represent,"
-                f" but field is {info.data['width']} bits wide"
+                f"enumeration requires {value.width} bits to represent," f" but field is {info.data['width']} bits wide"
             )
         return value
 
@@ -955,7 +956,7 @@ class Register(MapableItem):
         names = [field.name for field in self.fields]
         duplicates = {name for name in names if names.count(name) > 1}
         if duplicates:
-            raise ValueError(f"Some field names are not unique and used more than once: {duplicates}")
+            raise ValueError(f"some field names are not unique and used more than once: {duplicates}")
         return self
 
     @model_validator(mode="after")
@@ -970,7 +971,7 @@ class Register(MapableItem):
                 if name != field.name
             }
             if any(v for v in overlaps.values()):
-                raise ValueError(f"Field {field.name} overlaps with other fields: {', '.join(overlaps.keys())}")
+                raise ValueError(f"field {field.name} overlaps with other fields: {', '.join(overlaps.keys())}")
         return self
 
 
@@ -1037,10 +1038,10 @@ class Memory(MapableItem):
         """Validate that initial values are valid."""
         for i, (addr, value) in enumerate(self.initial_values):
             if addr >= self.capacity:
-                raise ValueError(f"Initial value {i} address 0x{addr:x} is out of memory capacity 0x{self.capacity:x}")
+                raise ValueError(f"initial value {i} address 0x{addr:x} is out of memory capacity 0x{self.capacity:x}")
             if value >= 2**self.data_width:
                 raise ValueError(
-                    f"Initial value {i} data 0x{value:x} is out of memory data width {self.data_width} bits"
+                    f"initial value {i} data 0x{value:x} is out of memory data width {self.data_width} bits"
                 )
         return self
 
@@ -1159,7 +1160,7 @@ class Map(MapableItem):
     def _validate_items_provided(self) -> Self:
         """Validate that at least one item is provided."""
         if len(self.items) == 0:
-            raise ValueError("Empty map is not allowed, at least one item has to be provided")
+            raise ValueError("empty map is not allowed, at least one item has to be provided")
         return self
 
     @model_validator(mode="after")
@@ -1168,7 +1169,7 @@ class Map(MapableItem):
         min_width = 8
         if self.register_width < min_width:
             raise ValueError(
-                f"Minimal allowed 'register_width' for a map is {min_width}, but {self.register_width} provided"
+                f"minimal allowed 'register_width' for a map is {min_width}, but {self.register_width} provided"
             )
         return self
 
@@ -1178,7 +1179,7 @@ class Map(MapableItem):
         names = [item.name for item in self.items]
         duplicates = {name for name in names if names.count(name) > 1}
         if duplicates:
-            raise ValueError(f"Some item names are not unique and used more than once: {duplicates}")
+            raise ValueError(f"some item names are not unique and used more than once: {duplicates}")
         return self
 
     @model_validator(mode="after")
@@ -1187,7 +1188,7 @@ class Map(MapableItem):
         offsets = [item.offset for item in self.items]
         duplicates = {offset for offset in offsets if offsets.count(offset) > 1}
         if duplicates:
-            raise ValueError(f"Some item offsets are not unique and used more than once: {duplicates}")
+            raise ValueError(f"some item offsets are not unique and used more than once: {duplicates}")
         return self
 
     @model_validator(mode="after")
@@ -1196,7 +1197,7 @@ class Map(MapableItem):
         for item in self.items:
             if item.offset % self.granularity != 0:
                 raise ValueError(
-                    f"Item {item.name} offset 0x{item.offset:x} is not aligned to map granularity {self.granularity}"
+                    f"item {item.name} offset 0x{item.offset:x} is not aligned to map granularity {self.granularity}"
                 )
         return self
 
@@ -1206,7 +1207,7 @@ class Map(MapableItem):
         for item in itertools.chain(self.maps, self.memories):
             if item.address_width > self.address_width:
                 raise ValueError(
-                    f"Item {item.name} address width {item.address_width} is "
+                    f"item {item.name} address width {item.address_width} is "
                     f"greater than map address width {self.address_width}"
                 )
         return self
@@ -1230,13 +1231,13 @@ class Map(MapableItem):
                 if item is other_item:
                     continue
                 if start <= other_end and end >= other_start:
-                    raise ValueError(f"Address collision between {item.name} and {other_item.name}")
+                    raise ValueError(f"address collision between {item.name} and {other_item.name}")
 
         # Check that no item is falling out of the root map address space
         for item, (start, end) in item_address_ranges.items():
             if end >= self.size:
                 raise ValueError(
-                    f"Item {item.name} address range [0x{start:x};0x{end+1:x}) is "
+                    f"item {item.name} address range [0x{start:x};0x{end+1:x}) is "
                     f"falling out of the root map address space [0x0;0x{self.size:x})"
                 )
         return self
@@ -1248,7 +1249,7 @@ class Map(MapableItem):
             last_field = reg.fields[-1]
             if last_field.msb >= self.register_width:
                 raise ValueError(
-                    f"Field {last_field.name} (lsb={last_field.lsb} msb={last_field.msb}) "
+                    f"field {last_field.name} (lsb={last_field.lsb} msb={last_field.msb}) "
                     f"exceeds size {self.register_width} of the register within map"
                 )
         return self
@@ -1326,3 +1327,130 @@ class MapArray(Map, ArrayItem):
     def _generate_items(self) -> tuple[NamedItem, ...]:
         """Generate concrete items in the array."""
         raise NotImplementedError
+
+
+# TODO: function is too heavy, need to refactor later
+def convert_schema_loc_to_path_loc(  # noqa: C901, PLR0912, PLR0915
+    loc: tuple[str | int, ...], data: Mapping[str, Any]
+) -> tuple[str, ...]:
+    """Convert pydantic schema location to path location based on item names in data."""
+
+    def get_name(obj: Any) -> str:
+        """Safely get the 'name' attribute from a mapping."""
+        if isinstance(obj, collections.abc.Mapping):
+            name = obj.get("name")
+            # Ensure name is a non-empty string
+            if isinstance(name, str) and name:
+                return name
+        return "<unknown>"
+
+    path_elements: list[str] = []
+    current_data: Any = data
+    loc_list = list(loc)
+    loc_idx = 0
+    known_containers = {"items", "fields", "members"}
+    # Tags associated with items within containers (e.g., items.0.register)
+    known_tags = {"register", "map", "memory"}
+
+    # Start with the top-level item's name
+    path_elements.append(get_name(current_data))
+
+    while loc_idx < len(loc_list):
+        segment = loc_list[loc_idx]
+
+        try:
+            if isinstance(segment, str) and segment in known_containers:
+                list_key = segment
+                # Expect an integer index next
+                if loc_idx + 1 < len(loc_list) and isinstance(loc_list[loc_idx + 1], int):
+                    item_index = loc_list[loc_idx + 1]
+                    loc_idx += 2  # Consume list_key and item_index
+                    assert isinstance(item_index, int)  # noqa: S101 # Help type checker
+
+                    # --- Access Data ---
+                    if not isinstance(current_data, collections.abc.Mapping):
+                        raise TypeError(  # noqa: TRY301
+                            f"Expected a mapping to access key '{list_key}', got {type(current_data)}"
+                        )
+                    container_list = current_data[list_key]  # Can raise KeyError
+                    # Ensure it's a sequence (list/tuple) but not a string, and index is valid
+                    if not isinstance(container_list, collections.abc.Sequence) or isinstance(container_list, str):
+                        raise TypeError(  # noqa: TRY301
+                            f"Expected a sequence for key '{list_key}', got {type(container_list)}"
+                        )
+                    if not 0 <= item_index < len(container_list):
+                        raise IndexError(  # noqa: TRY301
+                            f"Index {item_index} out of bounds for key '{list_key}'"
+                        )
+                    current_data = container_list[item_index]  # Access the item
+                    # --- End Access ---
+
+                    path_elements.append(get_name(current_data))  # Add item's name
+
+                    # Check for and skip an optional discriminator tag immediately following the index
+                    if (
+                        loc_idx < len(loc_list)
+                        and isinstance(loc_list[loc_idx], str)
+                        and loc_list[loc_idx] in known_tags
+                    ):
+                        loc_idx += 1
+                else:
+                    # Error in loc structure (expected index after container key)
+                    raise ValueError(  # noqa: TRY301 # type: ignore[unreachable]
+                        f"Invalid loc: Expected integer index after '{list_key}', got {loc_list[loc_idx + 1]!r}"
+                    )
+
+            elif isinstance(segment, str) and segment == "enum":
+                # Handle 'enum' as a direct dictionary key access
+                enum_key = segment
+                loc_idx += 1
+
+                # --- Access Data ---
+                if not isinstance(current_data, collections.abc.Mapping):
+                    raise TypeError(  # noqa: TRY301
+                        f"Expected a mapping to access key '{enum_key}', got {type(current_data)}"
+                    )
+                current_data = current_data[enum_key]  # Can raise KeyError
+                # --- End Access ---
+
+                path_elements.append(get_name(current_data))  # Add enum's name
+
+            elif isinstance(segment, str) and segment in known_tags:
+                # Skip discriminator tags if encountered directly (should normally follow an index)
+                loc_idx += 1
+
+            elif isinstance(segment, int):
+                # Error in loc structure (unexpected index without preceding container key)
+                raise ValueError(  # noqa: TRY301
+                    f"Invalid loc: Unexpected integer index '{segment}'"
+                )  # type: ignore[unreachable]
+            else:
+                # Assume it's the final attribute name or an object identifier where validation failed
+                # Append this segment and all subsequent segments as strings, then finish
+                path_elements.extend(map(str, loc_list[loc_idx:]))
+                loc_idx = len(loc_list)  # Ensure loop terminates
+
+        except (KeyError, IndexError, TypeError, ValueError):
+            # Data structure mismatch, invalid loc, or access error encountered.
+            # Append the segment that caused the error (if not already processed by extend above)
+            # and all subsequent segments as strings.
+            # The 'extend' in the 'else' block handles the case where the loop terminates normally
+            # on an attribute. This handles unexpected termination due to errors.
+            path_elements.extend(map(str, loc_list[loc_idx:]))
+            break  # Stop processing
+
+    return tuple(path_elements)
+
+
+def stringify_model_errors(e: ValidationError, data: dict) -> list[str]:
+    """Stringify pydantic validation errors."""
+    errors: list[str] = []
+
+    for error in e.errors():
+        path_loc = ".".join(convert_schema_loc_to_path_loc(error["loc"], data))
+        schema_loc = ".".join(map(str, error["loc"]))
+
+        err_str = f"{error['msg']} [type={error['type']}, path={path_loc}, schema={schema_loc}]"
+        errors.append(err_str)
+
+    return errors

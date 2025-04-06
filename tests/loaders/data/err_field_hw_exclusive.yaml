@@ -1,6 +1,6 @@
 # doc: Test that exclusive hardware mode used with others raises a validation error.
 # exception: ValidationError
-# msg_match: Hardware mode 'n' must be exclusive
+# msg_match: hardware mode 'n' must be exclusive
 ---
 name: test_map
 doc: Test map

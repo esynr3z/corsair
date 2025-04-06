@@ -1,6 +1,6 @@
 # doc: Test that duplicate field names raise a validation error.
 # exception: ValidationError
-# msg_match: Some field names are not unique
+# msg_match: "some field names are not unique and used more than once: {'field_a'}"
 ---
 name: test_map
 doc: Test map

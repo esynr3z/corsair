@@ -21,7 +21,7 @@ def test_map_basic_properties() -> None:
 
 def test_map_empty_items_validation() -> None:
     """Test that map validation fails when no items are provided."""
-    with pytest.raises(ValueError, match="Empty map is not allowed"):
+    with pytest.raises(ValueError, match="empty map is not allowed"):
         build_map(items=())
 
 
@@ -36,7 +36,7 @@ def test_map_unique_item_names() -> None:
     reg1 = build_register(name="reg")
     reg2 = build_register(name="reg")
 
-    with pytest.raises(ValueError, match="Some item names are not unique and used more than once"):
+    with pytest.raises(ValueError, match="some item names are not unique and used more than once"):
         build_map(items=(reg1, reg2))
 
 

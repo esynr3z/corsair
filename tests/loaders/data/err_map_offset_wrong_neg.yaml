@@ -1,6 +1,6 @@
 # doc: This map has wrong `offset` and should raise validation error
 # exception: ValidationError
-# msg_match: offset\s*Input should be greater than or equal to 0
+# msg_match: Input should be greater than or equal to 0.*schema=offset
 ---
 name: "default_map"
 doc: "Default map"

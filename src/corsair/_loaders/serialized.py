@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import sys
-from typing import Literal
+from typing import Any, Literal
 
 import yaml
 
@@ -12,8 +12,6 @@ if sys.version_info >= (3, 11):
     import tomllib as tomlib
 else:
     import tomli as tomlib
-
-from corsair._model import Map
 
 from .base import Loader, LoaderConfig
 
@@ -37,7 +35,7 @@ class SerializedLoader(Loader):
         """Get the configuration class for the loader."""
         return cls.Config
 
-    def _load(self) -> Map:
+    def _load_raw(self) -> dict[str, Any]:
         """Load the register map."""
         if not isinstance(self.config, self.Config):
             raise TypeError("Configuration instance is not of the expected type of SerializedLoader.Config")
@@ -58,22 +56,20 @@ class SerializedLoader(Loader):
 
         return regmap
 
-    def _load_json(self) -> Map:
+    def _load_json(self) -> dict[str, Any]:
         """Load the register map from a JSON file."""
         with self.config.mapfile.open("r", encoding="utf-8") as file:
-            data = json.load(file)
-        return Map.model_validate(data)
+            return json.load(file)
 
-    def _load_yaml(self) -> Map:
+    def _load_yaml(self) -> dict[str, Any]:
         """Load the register map from a YAML file."""
         with self.config.mapfile.open("r", encoding="utf-8") as file:
-            data = yaml.safe_load(file)
-        return Map.model_validate(data)
+            return yaml.safe_load(file)
 
-    def _load_hjson(self) -> Map:
+    def _load_hjson(self) -> dict[str, Any]:
         """Load the register map from a HJSON file."""
         try:
-            import hjson
+            import hjson  # type: ignore reportMissingImports
         except ImportError as e:
             raise ImportError(
                 "hjson is not installed. "
@@ -81,11 +77,9 @@ class SerializedLoader(Loader):
             ) from e
 
         with self.config.mapfile.open("r", encoding="utf-8") as file:
-            data = hjson.load(file)
-        return Map.model_validate(data)
+            return hjson.load(file)
 
-    def _load_toml(self) -> Map:
+    def _load_toml(self) -> dict[str, Any]:
         """Load the register map from a TOML file."""
         with self.config.mapfile.open("rb") as file:
-            data = tomlib.load(file)
-        return Map.model_validate(data)
+            return tomlib.load(file)

@@ -1,6 +1,6 @@
 # doc: Test that duplicate register offsets within a map raise a validation error.
 # exception: ValidationError
-# msg_match: Some item offsets are not unique
+# msg_match: item offsets are not unique
 ---
 name: test_map
 doc: Test map with duplicate register offsets

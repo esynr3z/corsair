@@ -1,6 +1,6 @@
 # doc: This map has no `offset` and should raise validation error
 # exception: ValidationError
-# msg_match: offset\s*Field required
+# msg_match: Field required.*schema=offset
 ---
 name: "default_map"
 doc: "Default map"

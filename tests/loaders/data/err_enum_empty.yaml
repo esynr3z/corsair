@@ -1,6 +1,6 @@
 # doc: Test that an empty enum raises a validation error.
 # exception: ValidationError
-# msg_match: Empty enumeration is not allowed
+# msg_match: empty enumeration is not allowed
 ---
 name: test_map
 doc: Test map

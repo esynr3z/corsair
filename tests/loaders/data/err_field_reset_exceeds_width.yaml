@@ -1,6 +1,6 @@
 # doc: Test that reset value exceeding field width raises a validation error.
 # exception: ValidationError
-# msg_match: Reset value .* requires .* bits to represent, but field is .* bits wide
+# msg_match: reset value .* requires \d+ bits to represent, but field is \d+ bits wide
 ---
 name: test_map
 doc: Test map

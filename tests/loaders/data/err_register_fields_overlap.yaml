@@ -1,6 +1,6 @@
 # doc: Test that overlapping fields raise a validation error.
 # exception: ValidationError
-# msg_match: Field .* overlaps with other fields
+# msg_match: 'field .* overlaps with other fields: .*'
 ---
 name: test_map
 doc: Test map

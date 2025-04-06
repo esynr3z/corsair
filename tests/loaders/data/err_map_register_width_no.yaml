@@ -1,6 +1,6 @@
 # doc: This map has no `register_width` and should raise validation error
 # exception: ValidationError
-# msg_match: register_width\s*Field required
+# msg_match: Field required.*schema=register_width
 ---
 name: "default_map"
 doc: "Default map"

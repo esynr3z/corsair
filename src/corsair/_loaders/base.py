@@ -4,14 +4,22 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
+from corsair._model import Map, stringify_model_errors
 from corsair._types import PyAttrPathStr
 
-if TYPE_CHECKING:
-    from corsair._model import Map
+
+class LoaderValidationError(Exception):
+    """Raised when loader fails during data validation."""
+
+    def __init__(self, pydantic_error: ValidationError, error_messages: list[str]) -> None:
+        """Initialize the exception."""
+        self.pydantic_error = pydantic_error
+        self.error_messages = error_messages  # Store the stringified errors
+        super().__init__("Loader failed during data validation")
 
 
 class LoaderConfig(BaseModel, ABC):
@@ -61,6 +69,7 @@ class Loader(ABC):
     def __init__(self, config: LoaderConfig) -> None:
         """Initialize the loader."""
         self.config = config
+        self.raw_data: dict[str, Any] = {}
 
     def __call__(self) -> Map:
         """Load the register map."""
@@ -70,17 +79,20 @@ class Loader(ABC):
                 f"{self.__class__.__name__}.{self.get_config_cls().__name__}"
             )
 
-        regmap = self._load()
+        self.raw_data = self._load_raw()
         if self.config.overrides:
-            self._apply_overrides(regmap)
+            self._apply_overrides(self.raw_data)
 
-        return regmap
+        try:
+            return Map.model_validate(self.raw_data)
+        except ValidationError as e:
+            raise LoaderValidationError(e, stringify_model_errors(e, self.raw_data)) from e
 
     @abstractmethod
-    def _load(self) -> Map:
-        """Load the register map."""
+    def _load_raw(self) -> dict[str, Any]:
+        """Load the register map into a dictionary, compatible with the `Map` model."""
 
-    def _apply_overrides(self, regmap: Map) -> None:
+    def _apply_overrides(self, raw_data: dict[str, Any]) -> None:
         """Apply overrides to the register map."""
         raise NotImplementedError
 

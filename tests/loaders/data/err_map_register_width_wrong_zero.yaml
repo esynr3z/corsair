@@ -1,6 +1,6 @@
 # doc: This map has wrong `register_width` and should raise validation error
 # exception: ValidationError
-# msg_match: register_width\s*.*is not a power of two
+# msg_match: Value 0 is not a power of two.*schema=register_width
 ---
 name: "default_map"
 doc: "Default map"

@@ -75,15 +75,20 @@ def check(
     log.debug("cmd check args: %s", locals())
 
     if loader_kind == LoaderKind.BUILD:
-        log.info("Loading build specification from TOML file: %s", input_file)
+        log.info("Loading build specification from TOML file: '%s'", input_file)
         csr.BuildSpecification.from_toml_file(input_file)
     else:
-        log.info("Preparing %s loader", loader_kind.value)
+        log.info("Preparing '%s' loader and validating its configuration", loader_kind.value)
         cfg = _prepare_loader_cfg(loader_kind, input_file, loader_cfg)
         loader = cfg.loader_cls(config=cfg)
 
-        log.info("Loading %s file and validating its content", input_file)
-        loader()
+        log.info("Loading '%s' file and validating its content", input_file)
+        try:
+            loader()
+        except csr.LoaderValidationError as e:
+            for msg in e.error_messages:
+                log.error(msg)
+            raise
 
     log.info("No errors found")
 

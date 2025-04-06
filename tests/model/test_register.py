@@ -98,7 +98,7 @@ def test_fields_unique_names() -> None:
     """Test that field names within register are unique."""
     field_dup1 = build_field(name="dup", offset=0, width=8)
     field_dup2 = build_field(name="dup", offset=8, width=8)
-    with pytest.raises(ValueError, match="Some field names are not unique"):
+    with pytest.raises(ValueError, match="some field names are not unique"):
         build_register(fields=(field_dup1, field_dup2))
 
 

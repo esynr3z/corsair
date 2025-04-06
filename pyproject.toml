@@ -34,7 +34,7 @@ classifiers = [
 requires-python = ">=3.10"
 dependencies = [
     "jinja2>=3.1.4",
-    "pydantic>=2.9.2",
+    "pydantic>=2.11.0",
     "pyyaml>=6.0.2",
     "tomli>=2.0.2 ; python_full_version < '3.11'",
     "typer>=0.13.0",
@@ -115,6 +115,7 @@ ignore = [
     "EM102",  # f-string-in-exception
     "FBT",    # flake8-boolean-trap
     "TRY003", # raise-vanilla-args
+    "TRY400", # error-instead-of-exception
     "E741",   # ambiguous-variable-name
     "ANN401", # any-type
     "S607",   # start-process-with-partial-path

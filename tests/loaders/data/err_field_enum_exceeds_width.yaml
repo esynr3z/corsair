@@ -1,6 +1,6 @@
 # doc: Test that enum member value exceeding field width raises a validation error.
 # exception: ValidationError
-# msg_match: Enumeration .* requires .* bits to represent, but field is .* bits wide
+# msg_match: enumeration requires \d+ bits to represent, but field is \d+ bits wide
 ---
 name: test_map
 doc: Test map

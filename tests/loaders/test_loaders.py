@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any
 
@@ -78,10 +79,23 @@ def test_serialized_yaml(yaml_file: Path) -> None:
     loader_cfg = csr.SerializedLoader.Config(kind="yaml", mapfile=yaml_file)
 
     if test_params.exception is None:
+        # If no exception is expected, just run the loader.
+        # Any unexpected exception will fail the test.
         _ = csr.SerializedLoader(config=loader_cfg)()
     else:
-        try:
-            with pytest.raises(test_params.exception, match=test_params.msg_match):
-                _ = csr.SerializedLoader(config=loader_cfg)()
-        except Exception as e:
-            raise AssertionError(f"{test_params.doc}\n{e}") from e
+        # If an exception is expected, we specifically expect LoaderValidationError.
+        # The original expected exception type and message match are now checked
+        # against the stringified details within LoaderValidationError.
+        with pytest.raises(csr.LoaderValidationError) as excinfo:
+            _ = csr.SerializedLoader(config=loader_cfg)()
+
+        # Check if the stringified error list contains the expected message pattern.
+        # This makes the check more flexible than matching the entire exception string.
+        if test_params.msg_match:
+            assert any(
+                re.search(test_params.msg_match, err_str) for err_str in excinfo.value.error_messages
+            ), f"Expected pattern '{test_params.msg_match}' not found in loader errors: {excinfo.value.error_messages}"
+        # else: If msg_match is None, we only check that LoaderValidationError was raised.
+
+        # Optionally, we could also check if the original exception type is mentioned
+        # in the stringified errors, but matching the message is usually sufficient.

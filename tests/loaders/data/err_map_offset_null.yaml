@@ -1,6 +1,6 @@
 # doc: This map has null `offset` and should raise validation error
 # exception: ValidationError
-# msg_match: offset\s*Input should be a valid integer
+# msg_match: Input should be a valid integer.*schema=offset
 ---
 name: "default_map"
 doc: "Default map"

@@ -1,6 +1,6 @@
 # doc: Test that hardware mode 'e' without 'i' raises a validation error.
 # exception: ValidationError
-# msg_match: Hardware mode 'e' is allowed to use only with 'i'
+# msg_match: hardware mode 'e' is allowed to use only with 'i'
 ---
 name: test_map
 doc: Test map

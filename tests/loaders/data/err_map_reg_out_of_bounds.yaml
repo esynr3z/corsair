@@ -1,6 +1,6 @@
 # doc: Test that register exceeding map address space raises a validation error.
 # exception: ValidationError
-# msg_match: Item .* address range .* is falling out of the root map address space
+# msg_match: item .* address range \[.*;.*\) is falling out of the root map address space \[.*;.*\)
 ---
 name: test_map
 doc: Test map with register out of bounds

@@ -64,11 +64,11 @@ def test_memory_with_valid_initial_values() -> None:
 def test_memory_with_invalid_initial_values() -> None:
     """Test that memory creation fails with invalid initial values."""
     # Test with address beyond memory size (2^address_width)
-    with pytest.raises(ValueError, match="Initial value 0 address 0x100 is out of memory capacity"):
+    with pytest.raises(ValueError, match="initial value 0 address 0x100 is out of memory capacity"):
         build_memory(address_width=8, initial_values=((256, 0),))  # 256 >= 2^8
 
     # Test with value beyond memory data width (2^data_width)
-    with pytest.raises(ValueError, match="Initial value 0 data 0x10000 is out of memory data width"):
+    with pytest.raises(ValueError, match="initial value 0 data 0x10000 is out of memory data width"):
         build_memory(data_width=16, initial_values=((0, 0x10000),))  # 0x10000 >= 2^16
 
     # Test with invalid value (negative)

@@ -28,19 +28,19 @@ def test_validation() -> None:
 
 def test_hardware_exclusive_na() -> None:
     """Test that HardwareMode.NA must be exclusive in hardware flags."""
-    with pytest.raises(ValueError, match="Hardware mode 'n' must be exclusive"):
+    with pytest.raises(ValueError, match="hardware mode 'n' must be exclusive"):
         build_field(hardware=csr.HardwareMode.NA | csr.HardwareMode.INPUT)
 
 
 def test_hardware_exclusive_queue() -> None:
     """Test that HardwareMode.QUEUE must be exclusive in hardware flags."""
-    with pytest.raises(ValueError, match="Hardware mode 'q' must be exclusive"):
+    with pytest.raises(ValueError, match="hardware mode 'q' must be exclusive"):
         build_field(hardware=csr.HardwareMode.QUEUE | csr.HardwareMode.INPUT)
 
 
 def test_hardware_exclusive_fixed() -> None:
     """Test that HardwareMode.FIXED must be exclusive in hardware flags."""
-    with pytest.raises(ValueError, match="Hardware mode 'f' must be exclusive"):
+    with pytest.raises(ValueError, match="hardware mode 'f' must be exclusive"):
         build_field(hardware=csr.HardwareMode.FIXED | csr.HardwareMode.INPUT)
 
 
@@ -50,7 +50,7 @@ def test_hardware_queue_access() -> None:
     build_field(hardware=csr.HardwareMode.QUEUE, access=csr.AccessMode.RO)
     build_field(hardware=csr.HardwareMode.QUEUE, access=csr.AccessMode.WO)
 
-    with pytest.raises(ValueError, match="Hardware mode 'q' is allowed to use only with"):
+    with pytest.raises(ValueError, match="hardware mode 'q' is allowed to use only with"):
         build_field(hardware=csr.HardwareMode.QUEUE, access=csr.AccessMode.RW1C)
 
 
@@ -58,7 +58,7 @@ def test_hardware_enable_requires_input() -> None:
     """Test that HardwareMode.ENABLE requires HardwareMode.INPUT in hardware flags."""
     build_field(hardware=csr.HardwareMode.ENABLE | csr.HardwareMode.INPUT)
 
-    with pytest.raises(ValueError, match="Hardware mode 'e' is allowed to use only with 'i'"):
+    with pytest.raises(ValueError, match="hardware mode 'e' is allowed to use only with 'i'"):
         build_field(hardware=csr.HardwareMode.ENABLE)
 
 

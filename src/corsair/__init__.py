@@ -25,6 +25,7 @@ from ._loaders import (
     CustomLoaderConfig,
     Loader,
     LoaderConfig,
+    LoaderValidationError,
     PyModuleLoader,
     SerializedLoader,
 )
@@ -47,6 +48,8 @@ from ._model import (
     NamedItem,
     Register,
     RegisterArray,
+    convert_schema_loc_to_path_loc,
+    stringify_model_errors,
 )
 from ._templates import TemplateEnvironment, TemplateKind
 from ._types import (
@@ -76,6 +79,7 @@ __all__ = (
     "LoaderConfig",
     "CustomLoaderConfig",
     "AnyLoaderConfig",
+    "LoaderValidationError",
     "SerializedLoader",
     "PyModuleLoader",
     # CSR model
@@ -97,6 +101,8 @@ __all__ = (
     "RegisterArray",
     "MemoryArray",
     "MapArray",
+    "stringify_model_errors",
+    "convert_schema_loc_to_path_loc",
     # Generators
     "ResetStyle",
     "Generator",

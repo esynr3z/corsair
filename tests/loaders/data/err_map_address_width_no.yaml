@@ -1,6 +1,6 @@
 # doc: This map has no `address_width` and should raise validation error
 # exception: ValidationError
-# msg_match: address_width\s*Field required
+# msg_match: Field required.*schema=address_width
 ---
 name: "default_map"
 doc: "Default map"

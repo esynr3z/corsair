@@ -1,6 +1,6 @@
 # doc: Test that duplicate register names within a map raise a validation error.
 # exception: ValidationError
-# msg_match: Some item names are not unique
+# msg_match: some item names are not unique
 ---
 name: test_map
 doc: Test map with duplicate register names

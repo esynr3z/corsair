@@ -1,6 +1,6 @@
 # doc: Test that field exceeding map register width raises a validation error.
 # exception: ValidationError
-# msg_match: Field .* exceeds size .* of the register within map
+# msg_match: field .* \(lsb=\d+ msb=\d+\) exceeds size \d+ of the register within map
 ---
 name: test_map
 doc: Test map

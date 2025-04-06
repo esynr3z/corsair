@@ -1,6 +1,6 @@
 # doc: This map has null `register_width` and should raise validation error
 # exception: ValidationError
-# msg_match: register_width\s*Input should be a valid integer
+# msg_match: Input should be a valid integer.*schema=register_width
 ---
 name: "default_map"
 doc: "Default map"
