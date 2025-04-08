@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 from enum import Enum
 from pathlib import Path  # noqa: TCH003
@@ -61,15 +60,6 @@ def check(
             show_choices=True,
         ),
     ],
-    loader_cfg: Annotated[
-        str,
-        typer.Option(
-            "--loader-cfg",
-            metavar="JSON_TEXT",
-            help="Loader configuration parsed from JSON string. Default loader configuration is used if not provided.",
-            show_default=False,
-        ),
-    ] = "",
 ) -> None:
     """Check integrity of user input files."""
     log.debug("cmd check args: %s", locals())
@@ -79,7 +69,7 @@ def check(
         csr.BuildSpecification.from_toml_file(input_file)
     else:
         log.info("Preparing '%s' loader and validating its configuration", loader_kind.value)
-        cfg = _prepare_loader_cfg(loader_kind, input_file, loader_cfg)
+        cfg = _prepare_loader_cfg(loader_kind, input_file)
         loader = cfg.loader_cls(config=cfg)
 
         log.info("Loading '%s' file and validating its content", input_file)
@@ -93,13 +83,9 @@ def check(
     log.info("No errors found")
 
 
-def _prepare_loader_cfg(loader_kind: LoaderKind, input_file: Path, loader_cfg: str) -> csr.LoaderConfig:
+def _prepare_loader_cfg(loader_kind: LoaderKind, input_file: Path) -> csr.LoaderConfig:
     """Prepare loader configuration."""
     cfg_data: dict[str, Any] = {}
-
-    if loader_cfg:
-        log.info("Loading loader configuration from JSON string")
-        cfg_data.update(json.loads(loader_cfg))
 
     cfg_data["mapfile"] = input_file
     cfg_data["kind"] = loader_kind.value
