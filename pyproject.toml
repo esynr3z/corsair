@@ -37,7 +37,7 @@ dependencies = [
     "pydantic>=2.11.0",
     "pyyaml>=6.0.2",
     "tomli>=2.0.2 ; python_full_version < '3.11'",
-    "typer>=0.13.0",
+    "typer>=0.15.0",
 ]
 
 [project.urls]
@@ -120,6 +120,7 @@ ignore = [
     "ANN401", # any-type
     "S607",   # start-process-with-partial-path
     "S603",   # subprocess-without-shell-equals-true
+    "PERF203", # try-except-in-loop
 ]
 
 [tool.ruff.lint.per-file-ignores]

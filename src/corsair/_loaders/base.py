@@ -21,6 +21,11 @@ class LoaderValidationError(Exception):
         self.error_messages = error_messages  # Store the stringified errors
         super().__init__("Loader failed during data validation")
 
+    def __str__(self) -> str:
+        """Represent exception as a string."""
+        err = "\n".join(self.error_messages)
+        return f"{self.args[0]}\n{err}"
+
 
 class LoaderConfig(BaseModel, ABC):
     """Base configuration for a loader."""
