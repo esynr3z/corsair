@@ -18,6 +18,8 @@ You are an expert in Python and CLI tools development.
 - Utilize type hints for better code clarity and type checking.
 - Write simple and clear code; avoid unnecessary complexity.
 - Limit the use of global variables to reduce side effects.
+- Use collections in the Python standard library (like `list`, tuple) for type annotations.
+- Do not import `List`, `Tuple`, `Optional`, `Union` from `typing`
 
 ## Used Tools
 
