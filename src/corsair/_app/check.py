@@ -122,6 +122,7 @@ def _prepare_map_loader_cfg(file_type: _FileType, input_file: Path) -> csr.Loade
     ):
         return csr.SerializedLoader.Config.model_validate(cfg_data)
     if file_type == _FileType.MAP_PY:
+        # FIXME: Implement Python map file checking
         raise NotImplementedError("Python map files are supported for checking yet.")
     # This should not happen if _get_file_type is correct
     raise ValueError(f"Internal error: unsupported file type for loader configuration: {file_type}")
