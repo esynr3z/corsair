@@ -19,10 +19,6 @@ from corsair._app import app
 HJSON_INSTALLED = importlib.util.find_spec("hjson") is not None  # type: ignore reportAttributeAccessIssue
 
 
-# All tests below can be used in smoke testing
-pytestmark = pytest.mark.smoke
-
-
 @pytest.fixture
 def runner(tmp_path: Path) -> Generator[CliRunner, None, None]:
     """Fixture for invoking command-line interfaces."""

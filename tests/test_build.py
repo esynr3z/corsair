@@ -9,9 +9,6 @@ import pytest
 
 import corsair as csr
 
-# All tests below can be used in smoke testing
-pytestmark = pytest.mark.smoke
-
 
 def test_empty_spec() -> None:
     """Test empty build specification."""

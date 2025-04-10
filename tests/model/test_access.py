@@ -7,9 +7,6 @@ from pydantic import BaseModel, ValidationError
 
 from corsair import AccessCategory, AccessMode
 
-# All tests below can be used in smoke testing
-pytestmark = pytest.mark.smoke
-
 
 def test_str() -> None:
     """Test access to string conversion."""

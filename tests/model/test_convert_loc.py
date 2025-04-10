@@ -6,10 +6,6 @@ import pytest
 
 import corsair as csr
 
-# All tests below can be used in smoke testing
-pytestmark = pytest.mark.smoke
-
-
 # Fixture data containing test cases
 # Each tuple: pytest.param(data, schema_loc, golden_path_loc, id=test_id)
 TEST_CASES = [

@@ -10,4 +10,4 @@ if TYPE_CHECKING:
 
 def pytest_configure(config: pytest.Config) -> None:
     """Perform initial configuration."""
-    config.addinivalue_line("markers", "smoke: mark test as smoke to run before commiting code")
+    config.addinivalue_line("markers", "large: test that takes a long time to run")

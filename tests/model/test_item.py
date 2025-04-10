@@ -9,9 +9,6 @@ from pydantic import ValidationError
 
 import corsair as csr
 
-# All tests below can be used in smoke testing
-pytestmark = pytest.mark.smoke
-
 
 class ItemWrapper(csr.NamedItem):
     """Wrapper to be able to construct an object."""

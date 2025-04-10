@@ -9,9 +9,6 @@ import corsair as csr
 
 from .utils import build_enum, build_enum_member
 
-# All tests below can be used in smoke testing
-pytestmark = pytest.mark.smoke
-
 
 def test_validation_success() -> None:
     """Test successful validation."""

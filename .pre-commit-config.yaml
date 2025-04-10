@@ -61,7 +61,7 @@ repos:
       - id: pytest
         name: Pytest smoke testing
         description: Run pytest to execute all smoke tests
-        entry: uv run pytest -m "smoke"
+        entry: uv run pytest -m "not large"
         language: system
         pass_filenames: false
         stages: [pre-commit]

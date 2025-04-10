@@ -14,9 +14,6 @@ from corsair._app.main import app
 if TYPE_CHECKING:
     from pathlib import Path
 
-# All tests below can be used in smoke testing
-pytestmark = pytest.mark.smoke
-
 runner = CliRunner()
 
 

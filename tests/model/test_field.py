@@ -8,9 +8,6 @@ import corsair as csr
 
 from .utils import build_enum, build_enum_member, build_field
 
-# All tests below can be used in smoke testing
-pytestmark = pytest.mark.smoke
-
 
 def test_validation() -> None:
     """Test that a valid Field instance can be created."""

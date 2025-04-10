@@ -7,9 +7,6 @@ import pytest
 import corsair as csr
 from tests.model.utils import build_memory
 
-# All tests below can be used in smoke testing
-pytestmark = pytest.mark.smoke
-
 
 def test_memory_capacity_calculation() -> None:
     """Test that memory capacity is correctly calculated as 2^address_width."""

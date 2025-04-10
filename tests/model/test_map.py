@@ -6,9 +6,6 @@ import pytest
 
 from .utils import build_field, build_map, build_memory, build_register
 
-# All tests below can be used in smoke testing
-pytestmark = pytest.mark.smoke
-
 
 def test_map_basic_properties() -> None:
     """Test basic map properties like size, granularity, and address calculations."""

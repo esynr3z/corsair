@@ -7,9 +7,6 @@ import pytest
 import corsair as csr
 from tests.model.utils import build_field, build_register
 
-# All tests below can be used in smoke testing
-pytestmark = pytest.mark.smoke
-
 
 def test_validation() -> None:
     """Test that a valid Register instance can be created."""
