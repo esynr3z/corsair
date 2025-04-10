@@ -1,0 +1,19 @@
+name: BlockB
+doc: Block B Map
+offset: 0
+address_width: 32
+register_width: 32
+items:
+  - kind: register
+    name: REG2
+    doc: Register 2
+    offset: 4
+    fields:
+      - name: FIELD2
+        doc: Field 2
+        offset: 0
+        width: 16
+        access: ro
+        reset: 1
+        hardware: "n"
+        enum: null

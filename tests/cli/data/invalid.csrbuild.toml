@@ -1,0 +1,4 @@
+[[generators]]
+# kind = "verilog" # Missing required kind field
+label = "invalid_gen"
+

@@ -93,7 +93,7 @@ def _validate_input_paths(input_paths: list[Path]) -> list[Path]:
 def _get_files_to_check(input_paths: list[Path] | None) -> list[Path]:
     """Determine the final list of files to check."""
     if input_paths:
-        log.info("Using provided input paths")
+        log.info("Using provided %d input file(s)", len(input_paths))
         return _validate_input_paths(input_paths)
 
     log.info("No input paths provided. Searching for files in the current directory.")
@@ -122,7 +122,7 @@ def _prepare_map_loader_cfg(file_type: _FileType, input_file: Path) -> csr.Loade
     ):
         return csr.SerializedLoader.Config.model_validate(cfg_data)
     if file_type == _FileType.MAP_PY:
-        return csr.PyModuleLoader.Config.model_validate(cfg_data)
+        raise NotImplementedError("Python map files are supported for checking yet.")
     # This should not happen if _get_file_type is correct
     raise ValueError(f"Internal error: unsupported file type for loader configuration: {file_type}")
 
@@ -164,7 +164,7 @@ def check(
             log.info("%s: OK", file_path)
 
         except Exception as e:  # noqa: BLE001
-            log.error("%s: %s", file_path, e)
+            log.error("%s: FAIL\n%s", file_path, e)
             errors_found = True
 
     if errors_found:

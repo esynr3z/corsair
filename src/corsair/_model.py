@@ -727,7 +727,7 @@ class Field(NamedItem):
     hardware: HardwareMode
     """Hardware interaction options."""
 
-    enum: Enum | None
+    enum: Enum | None = None
     """Optional enumeration for the field."""
 
     @FrozenProperty

@@ -1,0 +1,26 @@
+{
+  name: BlockC
+  doc: Block C Map
+  offset: 0
+  address_width: 32
+  register_width: 32
+  items: [
+    {
+      kind: register
+      name: REG3
+      doc: "Register 3"
+      offset: 8
+      fields: [
+        {
+          name: FIELD3
+          doc: "Field 3"
+          offset: 0
+          width: 8
+          access: wo
+          reset: 255
+          hardware: "n"
+        }
+      ]
+    }
+  ]
+}
