@@ -7,7 +7,7 @@ alwaysApply: false
 
 You are an expert in Python and CLI tools development.
 
-## Key Principles
+## Design Principles
 
 - Write concise, technical responses with accurate Python examples.
 - Prefer iteration and modularization over code duplication.
@@ -20,6 +20,12 @@ You are an expert in Python and CLI tools development.
 - Limit the use of global variables to reduce side effects.
 - Use collections in the Python standard library (like `list`, tuple) for type annotations.
 - Do not import `List`, `Tuple`, `Optional`, `Union` from `typing`
+
+## Testing Principles
+
+- Focus on one failed test at a time
+- Do not switch to another test until the current one is passing
+- Use pytest verbosity arguments (-vv) to collect more information
 
 ## Used Tools
 
