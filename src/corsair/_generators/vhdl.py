@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Literal
 from .base import Generator, GeneratorConfig, ResetStyle
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator as TypeGenerator
     from pathlib import Path
 
 
@@ -33,6 +33,6 @@ class VhdlGenerator(Generator):
         """Get the configuration class for the generator."""
         return cls.Config
 
-    def __call__(self, output_dir: Path, dry_run: bool = False) -> Iterator[Path]:
+    def _generate(self, output_dir: Path) -> TypeGenerator[Path, None, None]:
         """Generate all the outputs."""
         raise NotImplementedError

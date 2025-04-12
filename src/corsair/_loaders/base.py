@@ -33,9 +33,6 @@ class LoaderConfig(BaseModel, ABC):
     mapfile: Path = Path("csrmap.yaml")
     """Path to the register map file."""
 
-    overrides: dict[str, Any] = {}
-    """Overrides to apply to the register map."""
-
     model_config = ConfigDict(
         extra="forbid",
         use_attribute_docstrings=True,
@@ -76,17 +73,18 @@ class Loader(ABC):
         self.config = config
         self.raw_data: dict[str, Any] = {}
 
-    def __call__(self) -> Map:
-        """Load the register map."""
         if not isinstance(self.config, self.get_config_cls()):
             raise TypeError(
                 f"Configuration instance is not of the expected type of "
                 f"{self.__class__.__name__}.{self.get_config_cls().__name__}"
             )
 
+    def __call__(self) -> Map:
+        """Load the register map."""
+        if not self.config.mapfile.exists():
+            raise FileNotFoundError(f"CSR map file not found: {self.config.mapfile}")
+
         self.raw_data = self._load_raw()
-        if self.config.overrides:
-            self._apply_overrides(self.raw_data)
 
         try:
             return Map.model_validate(self.raw_data)
@@ -96,10 +94,6 @@ class Loader(ABC):
     @abstractmethod
     def _load_raw(self) -> dict[str, Any]:
         """Load the register map into a dictionary, compatible with the `Map` model."""
-
-    def _apply_overrides(self, raw_data: dict[str, Any]) -> None:
-        """Apply overrides to the register map."""
-        raise NotImplementedError
 
     @classmethod
     @abstractmethod

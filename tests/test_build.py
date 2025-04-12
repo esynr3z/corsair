@@ -32,8 +32,8 @@ def test_full_spec() -> None:
     data = {
         "loader": {"kind": "json", "mapfile": "map.json"},
         "generators": [
-            {"kind": "verilog", "use_map": "main", "label": "rtl"},
-            {"kind": "vhdl", "use_map": "main"},
+            {"kind": "verilog", "label": "rtl"},
+            {"kind": "vhdl"},
         ],
     }
     spec = csr.BuildSpecification.model_validate(data)
@@ -46,7 +46,7 @@ def test_full_spec() -> None:
 
 def test_forbidden_extra() -> None:
     """Test adding forbidden extra fields to specification."""
-    data = {"extra": "value", "generators": [{"kind": "verilog", "use_map": "main"}]}
+    data = {"extra": "value", "generators": [{"kind": "verilog"}]}
     with pytest.raises(ValueError, match="Extra inputs are not permitted"):
         csr.BuildSpecification.model_validate(data)
 
@@ -110,7 +110,6 @@ def test_from_toml(tmp_path: Path) -> None:
 
     [[generators]]
     kind = "vhdl"
-    use_map = "main"
     """
     toml_file = tmp_path / "build.toml"
     toml_file.write_text(toml_content)

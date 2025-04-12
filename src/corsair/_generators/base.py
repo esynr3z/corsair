@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
-    from collections.abc import Iterator
+    from collections.abc import Generator as TypeGenerator
 
     from typing_extensions import Self
 
@@ -25,9 +25,6 @@ class GeneratorConfig(BaseModel, ABC):
 
     label: IdentifierStr = ""
     """Unique label of the generator."""
-
-    use_map: str | None = None
-    """Name of the map to use for the generation. Root map is used if not specified."""
 
     model_config = ConfigDict(
         extra="forbid",
@@ -98,8 +95,15 @@ class Generator(ABC):
         self.register_map = register_map
         self.config = config
 
+    def __call__(self, output_dir: Path) -> TypeGenerator[Path, None, None]:
+        """Generate all the outputs."""
+        if not output_dir.exists():
+            raise FileNotFoundError(f"Output directory {output_dir} does not exist")
+
+        yield from self._generate(output_dir)
+
     @abstractmethod
-    def __call__(self, output_dir: Path, dry_run: bool = False) -> Iterator[Path]:
+    def _generate(self, output_dir: Path) -> TypeGenerator[Path, None, None]:
         """Generate all the outputs."""
 
     @classmethod

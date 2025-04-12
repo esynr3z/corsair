@@ -40,9 +40,6 @@ class SerializedLoader(Loader):
         if not isinstance(self.config, self.Config):
             raise TypeError("Configuration instance is not of the expected type of SerializedLoader.Config")
 
-        if not self.config.mapfile.exists():
-            raise FileNotFoundError(f"File not found: {self.config.mapfile}")
-
         if self.config.kind == "json":
             regmap = self._load_json()
         elif self.config.kind == "yaml":

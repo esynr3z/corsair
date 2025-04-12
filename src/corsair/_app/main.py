@@ -55,7 +55,7 @@ app = Typer(
 
 # Add commands located in other files
 app.command(no_args_is_help=True)(init)
-app.command(no_args_is_help=True)(build)
+app.command(no_args_is_help=False)(build)
 app.command(no_args_is_help=False)(check)
 app.command(no_args_is_help=True)(schema)
 app.command()(version)
