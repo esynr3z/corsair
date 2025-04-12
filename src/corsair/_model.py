@@ -1058,7 +1058,12 @@ def _get_discriminator_for_mapable_item(v: MapableItem | dict) -> str:
 
 
 AnyMapableItem = Annotated[
-    Annotated["Map", Tag("map")] | Annotated[Register, Tag("register")] | Annotated[Memory, Tag("memory")],
+    Annotated["Map", Tag("map")]
+    | Annotated["Register", Tag("register")]
+    | Annotated["Memory", Tag("memory")]
+    | Annotated["MapArray", Tag("map_array")]
+    | Annotated["RegisterArray", Tag("register_array")]
+    | Annotated["MemoryArray", Tag("memory_array")],
     Discriminator(_get_discriminator_for_mapable_item),
 ]
 """Union of all known mapable items."""
@@ -1098,9 +1103,19 @@ class Map(MapableItem):
         return tuple(item for item in self.items if isinstance(item, Map))
 
     @FrozenProperty
+    def map_arrays(self) -> tuple[MapArray, ...]:
+        """All submap arrays within map."""
+        return tuple(item for item in self.items if isinstance(item, MapArray))
+
+    @FrozenProperty
     def registers(self) -> tuple[Register, ...]:
         """All registers within map."""
         return tuple(item for item in self.items if isinstance(item, Register))
+
+    @FrozenProperty
+    def register_arrays(self) -> tuple[RegisterArray, ...]:
+        """All register arrays within map."""
+        return tuple(item for item in self.items if isinstance(item, RegisterArray))
 
     @FrozenProperty
     def memories(self) -> tuple[Memory, ...]:
@@ -1108,9 +1123,19 @@ class Map(MapableItem):
         return tuple(item for item in self.items if isinstance(item, Memory))
 
     @FrozenProperty
+    def memory_arrays(self) -> tuple[MemoryArray, ...]:
+        """All memory arrays within map."""
+        return tuple(item for item in self.items if isinstance(item, MemoryArray))
+
+    @FrozenProperty
     def has_maps(self) -> bool:
         """Check if current map contains submaps."""
         return any(self.maps)
+
+    @FrozenProperty
+    def has_map_arrays(self) -> bool:
+        """Check if current map contains submap arrays."""
+        return any(self.map_arrays)
 
     @FrozenProperty
     def has_registers(self) -> bool:
@@ -1118,9 +1143,19 @@ class Map(MapableItem):
         return any(self.registers)
 
     @FrozenProperty
+    def has_register_arrays(self) -> bool:
+        """Check if current map contains register arrays."""
+        return any(self.register_arrays)
+
+    @FrozenProperty
     def has_memories(self) -> bool:
         """Check if current map contains memory blocks."""
         return any(self.memories)
+
+    @FrozenProperty
+    def has_memory_arrays(self) -> bool:
+        """Check if current map contains memory arrays."""
+        return any(self.memory_arrays)
 
     @FrozenProperty
     def address(self) -> NonNegativeInt:
@@ -1161,6 +1196,21 @@ class Map(MapableItem):
         """Validate that at least one item is provided."""
         if len(self.items) == 0:
             raise ValueError("empty map is not allowed, at least one item has to be provided")
+        return self
+
+    @model_validator(mode="after")
+    def _validate_not_implemented_features(self) -> Self:
+        """Validate that not implemented features are not used."""
+        if self.has_maps:
+            raise ValueError("submaps are not implemented yet")
+        if self.has_memories:
+            raise ValueError("memories are not implemented yet")
+        if self.has_map_arrays:
+            raise ValueError("submap arrays are not implemented yet")
+        if self.has_register_arrays:
+            raise ValueError("register arrays are not implemented yet")
+        if self.has_memory_arrays:
+            raise ValueError("memory arrays are not implemented yet")
         return self
 
     @model_validator(mode="after")
