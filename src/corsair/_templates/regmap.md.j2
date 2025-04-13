@@ -63,9 +63,9 @@ Reset value: {{ literal(reg.reset, regmap.register_width) }}
 | :---             | :---   | :---            | :---       | :---        |
     {% for bf in reg.fields_with_reserved[::-1] %}
         {% if bf.name.startswith("_reserved") %}
-{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % ("-", range(bf.msb, bf.lsb), "-", literal(bf.reset, bf.width), bf.description) }}
+{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % ("-", range(bf.msb, bf.lsb), "-", literal(bf.reset, bf.width), bf.brief) }}
         {% else %}
-{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % (bf.name.upper(), range(bf.msb, bf.lsb), bf.access, literal(bf.reset, bf.width), bf.description) }}
+{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % (bf.name.upper(), range(bf.msb, bf.lsb), bf.access, literal(bf.reset, bf.width), bf.brief) }}
         {% endif %}
     {% endfor %}
 
@@ -77,7 +77,7 @@ Enumerated values for {{ reg.name.upper() }}.{{ bf.name.upper() }}.
 | Name             | Value   | Description |
 | :---             | :---    | :---        |
             {% for val in bf.enum %}
-{{ "| %-16s | %-6s | %s |" % (val.name, literal(val.value, bf.width), val.description) }}
+{{ "| %-16s | %-6s | %s |" % (val.name.upper(), literal(val.value, bf.width), val.brief) }}
             {% endfor %}
         {% endif %}
     {% endfor %}
