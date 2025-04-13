@@ -44,11 +44,11 @@ Base address: {{ literal(regmap.base_address, regmap.address_width) }}
 | Name                     | Address    | Description |
 | :---                     | :---       | :---        |
 {% for reg in regmap.registers %}
-{{ "| %-24s | %-10s | %s" % ("[%s](#%s)" % (reg.name, reg.name.lower()), literal(reg.address, regmap.address_width), reg.brief) }} |
+{{ "| %-24s | %-10s | %s" % ("[%s](#%s)" % (reg.name.upper(), reg.name.lower()), literal(reg.address, regmap.address_width), reg.brief) }} |
 {% endfor %}
 {% for reg in regmap.registers %}
 
-## {{ reg.name }}
+## {{ reg.name.upper() }}
 
 {{ reg.doc }}
 
@@ -56,8 +56,29 @@ Address offset: {{ literal(reg.address, regmap.address_width) }}
 
 Reset value: {{ literal(reg.reset, regmap.register_width) }}
 
-{% if cfg.print_images %}
+    {% if cfg.print_images %}
 ![{{ reg.name.lower()}}]({{ image_dir }}/{{ reg.name.lower()}}.svg)
-{% endif %}
+    {% endif %}
+| Name             | Bits   | Mode            | Reset      | Description |
+| :---             | :---   | :---            | :---       | :---        |
+    {% for bf in reg.fields_with_reserved[::-1] %}
+        {% if bf.name.startswith("_reserved") %}
+{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % ("-", range(bf.msb, bf.lsb), "-", literal(bf.reset, bf.width), bf.description) }}
+        {% else %}
+{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % (bf.name.upper(), range(bf.msb, bf.lsb), bf.access, literal(bf.reset, bf.width), bf.description) }}
+        {% endif %}
+    {% endfor %}
 
+    {% for bf in reg.fields %}
+        {% if bf.enum %}
+
+Enumerated values for {{ reg.name.upper() }}.{{ bf.name.upper() }}.
+
+| Name             | Value   | Description |
+| :---             | :---    | :---        |
+            {% for val in bf.enum %}
+{{ "| %-16s | %-6s | %s |" % (val.name, literal(val.value, bf.width), val.description) }}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
 {% endfor %}

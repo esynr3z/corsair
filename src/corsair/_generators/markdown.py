@@ -44,6 +44,18 @@ class MarkdownGenerator(Generator):
         """Get the configuration class for the generator."""
         return cls.Config
 
+    def _pre_generate(self) -> None:
+        """Pre-generate hook."""
+        unsupported_items = (
+            self.register_map.has_maps
+            or self.register_map.has_map_arrays
+            or self.register_map.has_memories
+            or self.register_map.has_memory_arrays
+            or self.register_map.has_register_arrays
+        )
+        if unsupported_items:
+            raise ValueError("Only registers are currently supported in the register map")
+
     def _generate(self) -> TypeGenerator[Path, None, None]:
         """Generate all the outputs."""
         if not isinstance(self.config, self.Config):

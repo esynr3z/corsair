@@ -156,6 +156,7 @@ class Generator(ABC):
         # Generation is isolated within the output directory
         with _change_workdir(self.output_dir):
             try:
+                self._pre_generate()
                 yield from self._generate()
             except jinja2.TemplateError as e:
                 raise GeneratorTemplateError(self.config.label, e) from e
@@ -175,6 +176,14 @@ class Generator(ABC):
         with path.open("w") as f:
             f.write(text)
         return path
+
+    @abstractmethod
+    def _pre_generate(self) -> None:
+        """Pre-generate hook.
+
+        Concrete generator can override this method to perform any necessary
+        checking and setup before the generation process begins.
+        """
 
     @abstractmethod
     def _generate(self) -> TypeGenerator[Path, None, None]:

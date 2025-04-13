@@ -106,3 +106,96 @@ def test_fields_no_overlap() -> None:
     field2 = build_field(name="field2", offset=4, width=8, reset=2)
     with pytest.raises(ValueError, match="overlaps with other fields"):
         build_register(fields=(field1, field2))
+
+
+def test_register_fields_with_reserved_full_width() -> None:
+    """Test case: field spans the entire register width (no reserved fields)."""
+    field_full = build_field(name="full_field", offset=0, width=32)
+    reg_full = build_register(name="reg_full", fields=(field_full,))
+    _ = csr.Map(
+        name="test_map",
+        doc="Test map",
+        offset=0,
+        address_width=16,
+        register_width=32,
+        items=(reg_full,),
+    )
+    reserved_fields = reg_full.fields_with_reserved
+    assert len(reserved_fields) == 1
+    assert reserved_fields[0].name == "full_field"
+
+
+def test_register_fields_with_reserved_lsb() -> None:
+    """Test case: field at LSB, reserved bits at MSB."""
+    field_lsb = build_field(name="lsb_field", offset=0, width=8)
+    reg_lsb = build_register(name="reg_lsb", fields=(field_lsb,))
+    _ = csr.Map(
+        name="test_map",
+        doc="Test map",
+        offset=0,
+        address_width=16,
+        register_width=32,
+        items=(reg_lsb,),
+    )
+    reserved_fields = reg_lsb.fields_with_reserved
+    assert len(reserved_fields) == 2
+    assert reserved_fields[0].name == "lsb_field"
+    assert reserved_fields[1].name == "_reserved_31_8"
+    assert reserved_fields[1].offset == 8
+    assert reserved_fields[1].width == 24
+    assert reserved_fields[1].access == csr.AccessMode.RO
+    assert reserved_fields[1].hardware == csr.HardwareMode.NA
+
+
+def test_register_fields_with_reserved_msb() -> None:
+    """Test case: reserved bits at LSB, field at MSB."""
+    field_msb = build_field(name="msb_field", offset=24, width=8)
+    reg_msb = build_register(name="reg_msb", fields=(field_msb,))
+    _ = csr.Map(
+        name="test_map",
+        doc="Test map",
+        offset=0,
+        address_width=16,
+        register_width=32,
+        items=(reg_msb,),
+    )
+    reserved_fields = reg_msb.fields_with_reserved
+    assert len(reserved_fields) == 2
+    assert reserved_fields[0].name == "_reserved_23_0"
+    assert reserved_fields[0].offset == 0
+    assert reserved_fields[0].width == 24
+    assert reserved_fields[1].name == "msb_field"
+
+
+def test_register_fields_with_reserved_middle() -> None:
+    """Test case: two fields in the middle, creating three reserved sections."""
+    field1 = build_field(name="field1", offset=8, width=8)
+    field2 = build_field(name="field2", offset=20, width=4)
+    reg_mid = build_register(name="reg_mid", fields=(field1, field2))
+    _ = csr.Map(
+        name="test_map",
+        doc="Test map",
+        offset=0,
+        address_width=16,
+        register_width=32,
+        items=(reg_mid,),
+    )
+
+    reserved_fields = reg_mid.fields_with_reserved
+    assert len(reserved_fields) == 5
+    assert reserved_fields[0].name == "_reserved_7_0"
+    assert reserved_fields[0].offset == 0
+    assert reserved_fields[0].width == 8
+    assert reserved_fields[1].name == "field1"
+    assert reserved_fields[2].name == "_reserved_19_16"
+    assert reserved_fields[2].offset == 16
+    assert reserved_fields[2].width == 4
+    assert reserved_fields[3].name == "field2"
+    assert reserved_fields[4].name == "_reserved_31_24"
+    assert reserved_fields[4].offset == 24
+    assert reserved_fields[4].width == 8
+
+
+# TODO: Add tests for register arrays
+# TODO: Add tests for hardware signals generation
+# TODO: Add tests for complex access modes interactions

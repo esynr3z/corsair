@@ -944,6 +944,37 @@ class Register(MapableItem):
                 nibbles[i] = f"{int(bit_slice, 2):x}"
         return "".join(nibbles)
 
+    @FrozenProperty
+    def fields_with_reserved(self) -> tuple[Field, ...]:
+        """All fields including virtual fields for reserved bits."""
+
+        def _create_reserved_field(lsb: int, msb: int) -> Field:
+            field = Field(
+                name=f"_reserved_{msb}_{lsb}",
+                reset=0,
+                access=AccessMode.RO,
+                hardware=HardwareMode.NA,
+                doc=f"Reserved bits {msb}:{lsb}",
+                offset=lsb,
+                width=msb - lsb + 1,
+            )
+            field._parent = self  # noqa: SLF001
+            return field
+
+        res = []
+        lsb = 0
+        for f in self.fields:
+            if f.lsb == lsb:
+                res.append(f)
+                lsb = f.msb + 1
+            elif f.lsb > lsb:
+                res.append(_create_reserved_field(lsb=lsb, msb=f.lsb - 1))
+                res.append(f)
+                lsb = f.msb + 1
+        if lsb < self.parent_map.register_width - 1:
+            res.append(_create_reserved_field(lsb=lsb, msb=self.parent_map.register_width - 1))
+        return tuple(res)
+
     @field_validator("fields", mode="after")
     @classmethod
     def _sort_fields(cls, values: tuple[Field, ...]) -> tuple[Field, ...]:
