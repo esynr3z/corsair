@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import contextlib
 import importlib.util
+import os
 from abc import ABC, abstractmethod
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
     from collections.abc import Generator as TypeGenerator
@@ -15,9 +17,53 @@ if TYPE_CHECKING:
 
     from corsair._model import Map
 
+import jinja2
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from corsair._templates import TemplateEnvironment
 from corsair._types import IdentifierStr, PyAttrPathStr
+
+
+@contextlib.contextmanager
+def _change_workdir(path: Path) -> TypeGenerator[None, None, None]:
+    old_cwd = Path.cwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(old_cwd)
+
+
+class GeneratorTemplateError(Exception):
+    """Raised when generator fails to render a template."""
+
+    def __init__(self, label: str, j2_error: jinja2.TemplateError) -> None:
+        """Initialize the exception."""
+        self.label = label
+        self.j2_error = j2_error
+        super().__init__(f"Generator '{label}' failed to render template")
+
+    def __str__(self) -> str:
+        """Represent exception as a string."""
+        err = f"{self.args[0]}\n"
+
+        if isinstance(self.j2_error, jinja2.TemplateSyntaxError):
+            err += "Syntax error within template"
+            if self.j2_error.name:
+                err += f" '{self.j2_error.name}'"
+            if self.j2_error.filename:
+                err += f" {self.j2_error.filename}:{self.j2_error.lineno}"
+            if self.j2_error.message:
+                err += f" {self.j2_error.message}"
+            if self.j2_error.source:
+                err += f"\n{self.j2_error.source.splitlines()[self.j2_error.lineno - 1]}"
+
+        elif isinstance(self.j2_error, jinja2.UndefinedError):
+            err += "Undefined variable within template"
+            if self.j2_error.message:
+                err += f": {self.j2_error.message}"
+
+        return err
 
 
 class GeneratorConfig(BaseModel, ABC):
@@ -90,20 +136,48 @@ class CustomGeneratorConfig(GeneratorConfig):
 class Generator(ABC):
     """Base class for all generators."""
 
-    def __init__(self, register_map: Map, config: GeneratorConfig) -> None:
+    def __init__(
+        self,
+        register_map: Map,
+        config: GeneratorConfig,
+        output_dir: Path,
+        template_searchpaths: list[Path] | None = None,
+    ) -> None:
         """Initialize the generator."""
         self.register_map = register_map
         self.config = config
+        self.output_dir = output_dir
+        self.template_searchpaths = template_searchpaths
 
-    def __call__(self, output_dir: Path) -> TypeGenerator[Path, None, None]:
+    def __call__(self) -> TypeGenerator[Path, None, None]:
         """Generate all the outputs."""
-        if not output_dir.exists():
-            raise FileNotFoundError(f"Output directory {output_dir} does not exist")
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        yield from self._generate(output_dir)
+        # Generation is isolated within the output directory
+        with _change_workdir(self.output_dir):
+            try:
+                yield from self._generate()
+            except jinja2.TemplateError as e:
+                raise GeneratorTemplateError(self.config.label, e) from e
+            except Exception:
+                raise
+
+    def _render_to_text(self, template_name: str, context: dict[str, Any]) -> str:
+        """Render text with Jinja2."""
+        env = TemplateEnvironment(searchpaths=self.template_searchpaths)
+        template = env.get_template(template_name)
+        return template.render(context)
+
+    def _render_to_file(self, template_name: str, context: dict[str, Any], file_name: str) -> Path:
+        """Render text with Jinja2 and save it to the file."""
+        path = self.output_dir / file_name
+        text = self._render_to_text(template_name, context)
+        with path.open("w") as f:
+            f.write(text)
+        return path
 
     @abstractmethod
-    def _generate(self, output_dir: Path) -> TypeGenerator[Path, None, None]:
+    def _generate(self) -> TypeGenerator[Path, None, None]:
         """Generate all the outputs."""
 
     @classmethod

@@ -88,8 +88,12 @@ def build(
 
         for cfg in build_spec.generators:
             log.info("Generate outputs for '%s'", cfg.label)
-            generator = cfg.generator_cls(csr_map, cfg)
-            for out_file in generator(prepared_output_dir / cfg.label):
+            generator = cfg.generator_cls(
+                register_map=csr_map,
+                config=cfg,
+                output_dir=prepared_output_dir / cfg.label,
+            )
+            for out_file in generator():
                 log.info(out_file)
 
         log.info("Build completed successfully")

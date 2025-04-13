@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-from .env import TemplateEnvironment, TemplateKind
+from .env import TemplateEnvironment
 
 __all__ = [
     "TemplateEnvironment",
-    "TemplateKind",
 ]

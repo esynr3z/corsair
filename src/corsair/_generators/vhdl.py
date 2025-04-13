@@ -33,6 +33,6 @@ class VhdlGenerator(Generator):
         """Get the configuration class for the generator."""
         return cls.Config
 
-    def _generate(self, output_dir: Path) -> TypeGenerator[Path, None, None]:
+    def _generate(self) -> TypeGenerator[Path, None, None]:
         """Generate all the outputs."""
         raise NotImplementedError

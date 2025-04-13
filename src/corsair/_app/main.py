@@ -47,6 +47,7 @@ app = Typer(
     invoke_without_command=True,
     help=f"CorSaiR v{VERSION} -- CSR map generator for HDL projects.",
     context_settings={"help_option_names": ["-h", "--help"]},
+    pretty_exceptions_show_locals=False,
     epilog="""
         Pass --help or -h after any COMMAND to get additional help.\n
         Set NO_COLOR=1 environment variable to disable any color in output.\n

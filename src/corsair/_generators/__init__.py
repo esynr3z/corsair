@@ -7,11 +7,12 @@ from typing import Annotated
 from pydantic import Field
 
 from .base import CustomGeneratorConfig, Generator, GeneratorConfig, ResetStyle
+from .markdown import MarkdownGenerator
 from .verilog import VerilogGenerator
 from .vhdl import VhdlGenerator
 
 AnyGeneratorConfig = Annotated[
-    CustomGeneratorConfig | VerilogGenerator.Config | VhdlGenerator.Config,
+    CustomGeneratorConfig | VerilogGenerator.Config | VhdlGenerator.Config | MarkdownGenerator.Config,
     Field(discriminator="kind"),
 ]
 

@@ -1,0 +1,63 @@
+{# MACROS #}
+{#- generic range #}
+{% macro range(msb, lsb) %}
+    {% if msb == lsb %}
+{{ msb }}
+    {%- else %}
+{{ msb }}:{{ lsb }}
+    {%- endif %}
+{%- endmacro %}
+
+{#- value in hex format #}
+{% macro literal(reset, width) %}
+{{ "0x%0{w}x".format(w=width // 4) % reset }}
+{%- endmacro %}
+
+{#- TEMPLATE NAMESPACE #}
+{% set tmp = namespace() %}
+
+{#- TEMPLATE #}
+# {{ cfg.title }}
+
+Created with [Corsair](https://github.com/esynr3z/corsair) v{{ version }}.
+
+{% if cfg.print_conventions %}
+## Conventions
+
+| Access mode | Description               |
+| :---------- | :------------------------ |
+| rw          | Read and Write            |
+| rw1c        | Read and Write 1 to Clear |
+| rw1s        | Read and Write 1 to Set   |
+| ro          | Read Only                 |
+| roc         | Read Only to Clear        |
+| roll        | Read Only / Latch Low     |
+| rolh        | Read Only / Latch High    |
+| wo          | Write only                |
+| wosc        | Write Only / Self Clear   |
+{% endif %}
+
+## Register map summary
+
+Base address: {{ literal(regmap.base_address, regmap.address_width) }}
+
+| Name                     | Address    | Description |
+| :---                     | :---       | :---        |
+{% for reg in regmap.registers %}
+{{ "| %-24s | %-10s | %s" % ("[%s](#%s)" % (reg.name, reg.name.lower()), literal(reg.address, regmap.address_width), reg.brief) }} |
+{% endfor %}
+{% for reg in regmap.registers %}
+
+## {{ reg.name }}
+
+{{ reg.doc }}
+
+Address offset: {{ literal(reg.address, regmap.address_width) }}
+
+Reset value: {{ literal(reg.reset, regmap.register_width) }}
+
+{% if cfg.print_images %}
+![{{ reg.name.lower()}}]({{ image_dir }}/{{ reg.name.lower()}}.svg)
+{% endif %}
+
+{% endfor %}

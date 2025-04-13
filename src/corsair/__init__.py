@@ -51,7 +51,7 @@ from ._model import (
     convert_schema_loc_to_path_loc,
     stringify_model_errors,
 )
-from ._templates import TemplateEnvironment, TemplateKind
+from ._templates import TemplateEnvironment
 from ._types import (
     IdentifierStr,
     Pow2Int,
@@ -113,5 +113,4 @@ __all__ = (
     "VhdlGenerator",
     # Templates
     "TemplateEnvironment",
-    "TemplateKind",
 )
