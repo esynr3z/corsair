@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 from .base import Generator, GeneratorConfig
+from .wavedrom import WaveDromGenerator
 
 if TYPE_CHECKING:
     from collections.abc import Generator as TypeGenerator
-    from pathlib import Path
 
 
 class MarkdownGenerator(Generator):
@@ -31,8 +32,14 @@ class MarkdownGenerator(Generator):
         print_images: bool = False
         """Enable generating images for bit fields of a register."""
 
+        image_dir: Path = Path("img")
+        """Directory for storing images."""
+
         print_conventions: bool = True
         """Enable generating table with register access modes explained."""
+
+        wavedrom: WaveDromGenerator.Config = WaveDromGenerator.Config()
+        """Configuration for the WaveDrom generator."""
 
         @property
         def generator_cls(self) -> type[Generator]:
@@ -71,3 +78,11 @@ class MarkdownGenerator(Generator):
             context=context,
             file_name=self.config.file_name,
         )
+
+        if self.config.print_images:
+            wd_gen = WaveDromGenerator(
+                register_map=self.register_map,
+                config=self.config.wavedrom,
+                output_dir=self.output_dir / self.config.image_dir,
+            )
+            yield from wd_gen()

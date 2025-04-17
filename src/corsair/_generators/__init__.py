@@ -10,9 +10,14 @@ from .base import CustomGeneratorConfig, Generator, GeneratorConfig, ResetStyle
 from .markdown import MarkdownGenerator
 from .verilog import VerilogGenerator
 from .vhdl import VhdlGenerator
+from .wavedrom import WaveDromGenerator
 
 AnyGeneratorConfig = Annotated[
-    CustomGeneratorConfig | VerilogGenerator.Config | VhdlGenerator.Config | MarkdownGenerator.Config,
+    CustomGeneratorConfig
+    | VerilogGenerator.Config
+    | VhdlGenerator.Config
+    | MarkdownGenerator.Config
+    | WaveDromGenerator.Config,
     Field(discriminator="kind"),
 ]
 

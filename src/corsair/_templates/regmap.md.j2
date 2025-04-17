@@ -57,7 +57,8 @@ Address offset: {{ literal(reg.address, regmap.address_width) }}
 Reset value: {{ literal(reg.reset, regmap.register_width) }}
 
     {% if cfg.print_images %}
-![{{ reg.name.lower()}}]({{ image_dir }}/{{ reg.name.lower()}}.svg)
+![{{ reg.name.lower()}}]({{ cfg.image_dir }}/{{regmap.name.lower()}}_{{ reg.name.lower()}}.svg)
+
     {% endif %}
 | Name             | Bits   | Mode            | Reset      | Description |
 | :---             | :---   | :---            | :---       | :---        |

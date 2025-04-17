@@ -72,29 +72,31 @@ def build(
     if targets is None or "all" in targets:
         targets = ["all"]
 
-    log.info("Targets to build: %s", targets)
-
     try:
         # Resolve and prepare output directory
         prepared_output_dir = _prepare_output_root(output=output, clean=clean)
-        log.debug("Output directory: %s", prepared_output_dir)
+        log.info("Output directory: %s", prepared_output_dir)
 
         log.info("Read build specification")
         build_spec = csr.BuildSpecification.from_toml_file(spec)
+
+        log.info("Available targets: %s", [cfg.label for cfg in build_spec.generators])
+        log.info("Targets to build: %s", targets)
 
         log.info("Load CSR map")
         loader = build_spec.loader.loader_cls(build_spec.loader)
         csr_map = loader()
 
         for cfg in build_spec.generators:
-            log.info("Generate outputs for '%s'", cfg.label)
-            generator = cfg.generator_cls(
-                register_map=csr_map,
-                config=cfg,
-                output_dir=prepared_output_dir / cfg.label,
-            )
-            for out_file in generator():
-                log.info(out_file)
+            if cfg.label in targets or "all" in targets:
+                log.info("Generate outputs for '%s'", cfg.label)
+                generator = cfg.generator_cls(
+                    register_map=csr_map,
+                    config=cfg,
+                    output_dir=prepared_output_dir / cfg.label,
+                )
+                for out_file in generator():
+                    log.info(out_file)
 
         log.info("Build completed successfully")
 

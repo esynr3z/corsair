@@ -8,3 +8,5 @@ dist
 site
 .cache
 *.bkp
+temp
+corsair-*

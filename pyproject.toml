@@ -56,7 +56,8 @@ corsair = "corsair.__main__:app"
 
 [project.optional-dependencies]
 hjson = ["hjson>=3.1.0"]
-full = ["hjson"]
+wavedrom = ["wavedrom>=2.0.0"]
+full = ["hjson", "wavedrom"]
 
 [dependency-groups]
 dev = [
@@ -93,33 +94,33 @@ ignore = [
     "D203", # incompatible with D211
     "D213", # incompatible with D212
     # Offical guide recommends disable these to avoid conflicts with formatter
-    "W191",   # tab-indentation
-    "E111",   # indentation-with-invalid-multiple
-    "E114",   # indentation-with-invalid-multiple-comment
-    "E117",   # over-indented
-    "D206",   # indent-with-spaces
-    "D300",   # triple-single-quotes
-    "Q000",   # bad-quotes-inline-string
-    "Q001",   # bad-quotes-multiline-string
-    "Q002",   # bad-quotes-docstring
-    "Q003",   # avoidable-escaped-quote
-    "COM812", # missing-trailing-comma
-    "COM819", # prohibited-trailing-comma
-    "ISC001", # single-line-implicit-string-concatenation
-    "ISC002", # multi-line-implicit-string-concatenation
-    "TD001",  # invalid-todo-tag
-    "TD002",  # missing-todo-author
-    "TD003",  # missing-todo-link
-    "FIX",    # flake8-fixme
-    "EM101",  # raw-string-in-exception
-    "EM102",  # f-string-in-exception
-    "FBT",    # flake8-boolean-trap
-    "TRY003", # raise-vanilla-args
-    "TRY400", # error-instead-of-exception
-    "E741",   # ambiguous-variable-name
-    "ANN401", # any-type
-    "S607",   # start-process-with-partial-path
-    "S603",   # subprocess-without-shell-equals-true
+    "W191",    # tab-indentation
+    "E111",    # indentation-with-invalid-multiple
+    "E114",    # indentation-with-invalid-multiple-comment
+    "E117",    # over-indented
+    "D206",    # indent-with-spaces
+    "D300",    # triple-single-quotes
+    "Q000",    # bad-quotes-inline-string
+    "Q001",    # bad-quotes-multiline-string
+    "Q002",    # bad-quotes-docstring
+    "Q003",    # avoidable-escaped-quote
+    "COM812",  # missing-trailing-comma
+    "COM819",  # prohibited-trailing-comma
+    "ISC001",  # single-line-implicit-string-concatenation
+    "ISC002",  # multi-line-implicit-string-concatenation
+    "TD001",   # invalid-todo-tag
+    "TD002",   # missing-todo-author
+    "TD003",   # missing-todo-link
+    "FIX",     # flake8-fixme
+    "EM101",   # raw-string-in-exception
+    "EM102",   # f-string-in-exception
+    "FBT",     # flake8-boolean-trap
+    "TRY003",  # raise-vanilla-args
+    "TRY400",  # error-instead-of-exception
+    "E741",    # ambiguous-variable-name
+    "ANN401",  # any-type
+    "S607",    # start-process-with-partial-path
+    "S603",    # subprocess-without-shell-equals-true
     "PERF203", # try-except-in-loop
 ]
 
