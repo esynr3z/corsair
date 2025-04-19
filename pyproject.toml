@@ -180,6 +180,10 @@ cmd = "ruff format"
 help = "Lint all the Python code with Ruff"
 cmd = "ruff check"
 
+[tool.poe.tasks.fix-lint]
+help = "Lint all the Python code with Ruff and fix the issues"
+cmd = "ruff check --fix --unsafe-fixes"
+
 [tool.poe.tasks.check-format]
 help = "Check format for all the Python code with Ruff"
 cmd = "ruff format --check"

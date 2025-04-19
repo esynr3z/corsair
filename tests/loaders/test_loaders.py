@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import importlib
+import json
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import pydantic
 import pytest
@@ -12,6 +14,8 @@ import yaml
 from pydantic import ValidationError  # noqa: F401
 
 import corsair as csr
+
+HJSON_INSTALLED = importlib.util.find_spec("hjson") is not None  # type: ignore reportAttributeAccessIssue
 
 
 @pydantic.dataclasses.dataclass
@@ -69,14 +73,57 @@ def get_yaml_files() -> list[Path]:
     return [p for p in directory.glob("*") if p.suffix in (".yaml", ".yml")]
 
 
-@pytest.mark.parametrize("yaml_file", get_yaml_files(), ids=lambda p: p.stem)
-def test_serialized_yaml(yaml_file: Path) -> None:
-    """Test that the `SerializedLoader` can load register map from YAML files."""
-    # Extract expected test parameters from the YAML file header.
+def convert_yaml_to_json(yaml_path: Path, tmp_path: Path) -> Path:
+    """Convert YAML file to JSON and save to a temporary file."""
+    with yaml_path.open("r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    json_path = tmp_path / f"{yaml_path.stem}.json"
+    with json_path.open("w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+    return json_path
+
+
+def convert_yaml_to_hjson(yaml_path: Path, tmp_path: Path) -> Path:
+    """Convert YAML file to HJSON and save to a temporary file."""
+    import hjson
+
+    with yaml_path.open("r", encoding="utf-8") as f:
+        # Use load with comment support if needed, otherwise safe_load
+        data = yaml.safe_load(f)
+    hjson_path = tmp_path / f"{yaml_path.stem}.hjson"
+    with hjson_path.open("w", encoding="utf-8") as f:
+        hjson.dump(data, f)
+    return hjson_path
+
+
+# Combine yaml files and loader kinds for parametrization
+LoaderKind = Literal["yaml", "json", "hjson"]
+test_cases = [
+    (yaml_file, loader_kind)
+    for yaml_file in get_yaml_files()
+    for loader_kind in ["yaml", "json", "hjson"]  # type: ignore[assignment]
+]
+test_ids = [f"{p[0].stem}.{p[1]}" for p in test_cases]
+
+
+@pytest.mark.parametrize(("yaml_file", "loader_kind"), test_cases, ids=test_ids)
+def test_serialized_yaml(yaml_file: Path, loader_kind: LoaderKind, tmp_path: Path) -> None:
+    """Test that the `SerializedLoader` can load register maps from various file formats."""
+    # Extract expected test parameters from the original YAML file header.
     test_params = RegisterMapTestParams.from_file(yaml_file)
 
-    # Load the YAML file using the `SerializedLoader`.
-    loader_cfg = csr.SerializedLoader.Config(kind="yaml", mapfile=yaml_file)
+    # Determine the mapfile path based on the loader kind
+    if loader_kind == "json":
+        mapfile = convert_yaml_to_json(yaml_file, tmp_path)
+    elif loader_kind == "hjson":
+        if not HJSON_INSTALLED:
+            pytest.skip("hjson not installed")
+        mapfile = convert_yaml_to_hjson(yaml_file, tmp_path)
+    else:  # loader_kind == "yaml"
+        mapfile = yaml_file
+
+    # Load the file using the `SerializedLoader` with the specified kind and mapfile.
+    loader_cfg = csr.SerializedLoader.Config(kind=loader_kind, mapfile=mapfile)
 
     if test_params.exception is None:
         # If no exception is expected, just run the loader.
@@ -95,7 +142,3 @@ def test_serialized_yaml(yaml_file: Path) -> None:
             assert any(
                 re.search(test_params.msg_match, err_str) for err_str in excinfo.value.error_messages
             ), f"Expected pattern '{test_params.msg_match}' not found in loader errors: {excinfo.value.error_messages}"
-        # else: If msg_match is None, we only check that LoaderValidationError was raised.
-
-        # Optionally, we could also check if the original exception type is mentioned
-        # in the stringified errors, but matching the message is usually sufficient.
