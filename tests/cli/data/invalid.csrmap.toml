@@ -1,5 +1,0 @@
-name = "InvalidMap"
-doc = "Invalid"
-offset = 0
-address_width = 12
-register_width = 32

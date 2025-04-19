@@ -52,7 +52,7 @@ def invalid_build_file(tmp_path: Path) -> Path:
     return dst
 
 
-@pytest.fixture(params=["json", "toml", "yaml", "hjson"])
+@pytest.fixture(params=["json", "yaml", "hjson"])
 def valid_map_file(tmp_path: Path, request: pytest.FixtureRequest) -> Path:
     """Fixture for a valid map file (parametrized)."""
     ext = request.param
@@ -65,7 +65,7 @@ def valid_map_file(tmp_path: Path, request: pytest.FixtureRequest) -> Path:
     return dst
 
 
-@pytest.fixture(params=["json", "toml", "yaml", "hjson"])
+@pytest.fixture(params=["json", "yaml", "hjson"])
 def invalid_map_file(tmp_path: Path, request: pytest.FixtureRequest) -> Path:
     """Fixture for an invalid map file (parametrized)."""
     ext = request.param
@@ -256,10 +256,10 @@ def test_check_args_mixed(runner: CliRunner, valid_build_file: Path, invalid_bui
 
 def test_check_args_non_existent_file(runner: CliRunner) -> None:
     """Test check with a non-existent file path argument."""
-    result = runner.invoke(app, ["check", "non_existent_file.toml"])
+    result = runner.invoke(app, ["check", "non_existent_file.yaml"])
     assert result.exit_code != 0
     assert isinstance(result.exception, FileNotFoundError)
-    assert "Input file not found: 'non_existent_file.toml'" in str(result.exception)
+    assert "Input file not found: 'non_existent_file.yaml'" in str(result.exception)
 
 
 def test_check_args_directory(runner: CliRunner, tmp_path: Path) -> None:

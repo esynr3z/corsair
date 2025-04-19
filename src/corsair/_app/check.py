@@ -30,9 +30,6 @@ class _FileType(str, Enum):
     MAP_HJSON = "hjson"
     """Register map file in HJSON format (*csrmap.hjson)."""
 
-    MAP_TOML = "toml"
-    """Register map file in TOML format (*csrmap.toml)."""
-
     MAP_PY = "py"
     """Register map file in Python format (*csrmap.py)."""
 
@@ -52,8 +49,6 @@ def _get_file_type(file_path: Path) -> _FileType:
         return _FileType.MAP_JSON
     if name.endswith("csrmap.hjson"):
         return _FileType.MAP_HJSON
-    if name.endswith("csrmap.toml"):
-        return _FileType.MAP_TOML
     if name.endswith("csrmap.py"):
         return _FileType.MAP_PY
     raise ValueError(f"Cannot determine file type for '{file_path}'. Unknown or unsupported extension.")
@@ -118,7 +113,6 @@ def _prepare_map_loader_cfg(file_type: _FileType, input_file: Path) -> csr.Loade
         _FileType.MAP_JSON,
         _FileType.MAP_YAML,
         _FileType.MAP_HJSON,
-        _FileType.MAP_TOML,
     ):
         return csr.SerializedLoader.Config.model_validate(cfg_data)
     if file_type == _FileType.MAP_PY:

@@ -214,8 +214,8 @@ def test_build_non_existent_map(runner: CliRunner, tmp_path: Path) -> None:
     """Test build fails if the map file specified in the build spec does not exist."""
     spec_content = """
 [loader]
-kind = "toml"
-mapfile = "non_existent.csrmap.toml"
+kind = "yaml"
+mapfile = "non_existent.csrmap.yaml"
 
 [[generators]]
 label = "md"
@@ -230,4 +230,4 @@ kind = "markdown"
     assert result.exception is not None
     assert isinstance(result.exception, RuntimeError)  # Wrapper exception
     assert isinstance(result.exception.__cause__, FileNotFoundError)
-    assert "non_existent.csrmap.toml" in str(result.exception.__cause__)
+    assert "non_existent.csrmap.yaml" in str(result.exception.__cause__)
