@@ -40,7 +40,7 @@ def build(
     spec: Annotated[
         Path,
         typer.Option("-s", "--spec", show_default=True, help="Path to a build specification file"),
-    ] = Path("csrbuild.toml"),
+    ] = Path("csrbuild.yaml"),
     targets: Annotated[
         list[str] | None,
         typer.Argument(
@@ -75,9 +75,9 @@ def build(
         log.info("Output directory: %s", prepared_output_dir)
 
         log.info("Read build specification")
-        build_spec = csr.BuildSpecification.from_toml_file(spec)
+        build_spec = csr.BuildSpecification.from_file(spec)
 
-        avail_targets = [cfg.label for cfg in build_spec.generators]
+        avail_targets = list(build_spec.generators.keys())
         if targets is None:
             targets = avail_targets
         log.info("Targets to build: %s", targets)
@@ -89,13 +89,14 @@ def build(
         loader = build_spec.loader.loader_cls(build_spec.loader)
         csr_map = loader()
 
-        for cfg in build_spec.generators:
-            if cfg.label in targets or "all" in targets:
-                log.info("Generate outputs for '%s'", cfg.label)
+        for label, cfg in build_spec.generators.items():
+            if label in targets or "all" in targets:
+                log.info("Generate outputs for '%s'", label)
                 generator = cfg.generator_cls(
+                    label=label,
                     register_map=csr_map,
                     config=cfg,
-                    output_dir=prepared_output_dir / cfg.label,
+                    output_dir=prepared_output_dir / label,
                 )
                 for out_file in generator():
                     log.info(out_file)

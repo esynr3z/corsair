@@ -19,7 +19,7 @@ class _FileType(str, Enum):
     """Input file type based on extension."""
 
     BUILD = "build"
-    """Build specification file (*csrbuild.toml)."""
+    """Build specification file (*csrbuild.yaml)."""
 
     MAP_JSON = "json"
     """Register map file in JSON format (*csrmap.json)."""
@@ -41,7 +41,7 @@ class _FileType(str, Enum):
 def _get_file_type(file_path: Path) -> _FileType:
     """Determine the file type based on the file name."""
     name = file_path.name
-    if name.endswith("csrbuild.toml"):
+    if name.endswith("csrbuild.yaml"):
         return _FileType.BUILD
     if name.endswith("csrmap.yaml"):
         return _FileType.MAP_YAML
@@ -98,7 +98,7 @@ def _get_files_to_check(input_paths: list[Path] | None) -> list[Path]:
 def _check_build_spec(file_path: Path) -> None:
     """Check a build specification file."""
     log.debug("Checking build specification file: '%s'", file_path)
-    csr.BuildSpecification.from_toml_file(file_path)
+    csr.BuildSpecification.from_file(file_path)
 
 
 def _prepare_map_loader_cfg(file_type: _FileType, input_file: Path) -> csr.LoaderConfig:

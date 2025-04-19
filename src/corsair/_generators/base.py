@@ -13,15 +13,13 @@ from typing import TYPE_CHECKING, Any, Literal
 if TYPE_CHECKING:
     from collections.abc import Generator as TypeGenerator
 
-    from typing_extensions import Self
-
     from corsair._model import Map
 
 import jinja2
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 from corsair._templates import TemplateEnvironment
-from corsair._types import IdentifierStr, PyAttrPathStr
+from corsair._types import PyAttrPathStr
 
 
 @contextlib.contextmanager
@@ -69,9 +67,6 @@ class GeneratorTemplateError(Exception):
 class GeneratorConfig(BaseModel, ABC):
     """Base configuration for a generator."""
 
-    label: IdentifierStr = ""
-    """Unique label of the generator."""
-
     model_config = ConfigDict(
         extra="forbid",
         use_attribute_docstrings=True,
@@ -81,14 +76,6 @@ class GeneratorConfig(BaseModel, ABC):
     @abstractmethod
     def generator_cls(self) -> type[Generator]:
         """Related generator class."""
-
-    @model_validator(mode="after")
-    def _derive_label(self) -> Self:
-        """Derive the label from the generator kind."""
-        if self.label == "":
-            # field `kind` is going to present in any child class
-            self.label = self.kind  # type: ignore reportCallIssue
-        return self
 
 
 class CustomGeneratorConfig(GeneratorConfig):
@@ -138,12 +125,14 @@ class Generator(ABC):
 
     def __init__(
         self,
+        label: str,
         register_map: Map,
         config: GeneratorConfig,
         output_dir: Path,
         template_searchpaths: list[Path] | None = None,
     ) -> None:
         """Initialize the generator."""
+        self.label = label
         self.register_map = register_map
         self.config = config
         self.output_dir = output_dir
@@ -159,7 +148,7 @@ class Generator(ABC):
                 self._pre_generate()
                 yield from self._generate()
             except jinja2.TemplateError as e:
-                raise GeneratorTemplateError(self.config.label, e) from e
+                raise GeneratorTemplateError(self.label, e) from e
             except Exception:
                 raise
 

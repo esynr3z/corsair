@@ -254,7 +254,6 @@ dependencies = [
     { name = "jinja2" },
     { name = "pydantic" },
     { name = "pyyaml" },
-    { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "typer" },
 ]
 
@@ -292,7 +291,6 @@ requires-dist = [
     { name = "jinja2", specifier = ">=3.1.4" },
     { name = "pydantic", specifier = ">=2.11.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
-    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0.2" },
     { name = "typer", specifier = ">=0.15.0" },
     { name = "wavedrom", marker = "extra == 'full'" },
     { name = "wavedrom", marker = "extra == 'wavedrom'", specifier = ">=2.0.0" },

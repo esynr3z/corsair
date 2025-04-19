@@ -1,0 +1,4 @@
+generators:
+  gen1:
+    kind: verilog
+

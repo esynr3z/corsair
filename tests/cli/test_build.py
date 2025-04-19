@@ -56,36 +56,32 @@ items:
 def valid_build_spec(tmp_path: Path, valid_map_file: Path) -> Path:
     """Fixture for a valid build spec."""
     spec_content = f"""
-[loader]
-kind = "yaml"
-mapfile = "{valid_map_file.name}"
+loader:
+  kind: yaml
+  mapfile: "{valid_map_file.name}"
 
-[[generators]]
-label = "md0"
-kind = "markdown"
-file_name = "map.md"
-print_images = true
-
-[[generators]]
-label = "md1"
-kind = "markdown"
-file_name = "map1.md"
-print_images = false
-
-[[generators]]
-label = "wd"
-kind = "wavedrom"
-dump_json = true
-render_svg = true
-bits = 32
+generators:
+  md0:
+    kind: markdown
+    file_name: "map.md"
+    print_images: true
+  md1:
+    kind: markdown
+    file_name: "map1.md"
+    print_images: false
+  wd:
+    kind: wavedrom
+    dump_json: true
+    render_svg: true
+    bits: 32
 """
-    spec_file = tmp_path / "csrbuild.toml"
+    spec_file = tmp_path / "csrbuild.yaml"
     spec_file.write_text(spec_content)
     return spec_file
 
 
 def test_build_default_spec(runner: CliRunner, valid_build_spec: Path) -> None:  # noqa: ARG001
-    """Test build uses default 'csrbuild.toml' when --spec is not provided."""
+    """Test build uses default 'csrbuild.yaml' when --spec is not provided."""
     result = runner.invoke(app, ["build"])
     assert result.exit_code == 0
     assert "Read build specification" in result.stderr
@@ -206,22 +202,22 @@ def test_build_output_is_cwd(runner: CliRunner, valid_build_spec: Path) -> None:
 
 def test_build_non_existent_spec(runner: CliRunner) -> None:
     """Test build fails if the specified build spec file does not exist."""
-    result = runner.invoke(app, ["build", "--spec", "non_existent.csrbuild.toml"])
+    result = runner.invoke(app, ["build", "--spec", "non_existent.csrbuild.yaml"])
     assert result.exit_code == 1
 
 
 def test_build_non_existent_map(runner: CliRunner, tmp_path: Path) -> None:
     """Test build fails if the map file specified in the build spec does not exist."""
     spec_content = """
-[loader]
-kind = "yaml"
-mapfile = "non_existent.csrmap.yaml"
+loader:
+  kind: yaml
+  mapfile: "non_existent.csrmap.yaml"
 
-[[generators]]
-label = "md"
-kind = "markdown"
+generators:
+  md:
+    kind: markdown
 """
-    spec_file = tmp_path / "csrbuild.toml"
+    spec_file = tmp_path / "csrbuild.yaml"
     spec_file.write_text(spec_content)
 
     result = runner.invoke(app, ["build"])

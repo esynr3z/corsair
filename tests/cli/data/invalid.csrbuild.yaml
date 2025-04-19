@@ -1,0 +1,3 @@
+generators:
+  invalid_gen: null
+    #kind: "verilog" # Missing required kind field

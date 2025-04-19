@@ -3,23 +3,16 @@
 from __future__ import annotations
 
 import json
-import sys
 from typing import TYPE_CHECKING
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+import yaml
+from pydantic import BaseModel, ConfigDict, Field
 
 from ._generators import AnyGeneratorConfig
 from ._loaders import AnyLoaderConfig, SerializedLoader
 
-if sys.version_info >= (3, 11):
-    import tomllib as tomlib
-else:
-    import tomli as tomlib
-
 if TYPE_CHECKING:
     from pathlib import Path
-
-    from typing_extensions import Self
 
 
 class BuildSpecification(BaseModel):
@@ -28,23 +21,14 @@ class BuildSpecification(BaseModel):
     loader: AnyLoaderConfig = SerializedLoader.Config(kind="yaml")
     """Configuration for the loader."""
 
-    generators: list[AnyGeneratorConfig] = Field(..., min_length=1)
+    generators: dict[str, AnyGeneratorConfig] = Field(..., min_length=1)
     """Configuration for the generators to build all required files."""
 
-    @model_validator(mode="after")
-    def _validate_generators_labels(self) -> Self:
-        """Validate that generators labels are unique."""
-        labels = [g.label for g in self.generators]
-        if len(labels) != len(set(labels)):
-            raise ValueError(f"Generator labels must be unique: {labels}")
-        return self
-
     @classmethod
-    def from_toml_file(cls, path: Path) -> BuildSpecification:
-        """Load specification from TOML file."""
-        with path.open("rb") as f:
-            data = tomlib.load(f)
-            return BuildSpecification(**data)
+    def from_file(cls, path: Path) -> BuildSpecification:
+        """Load specification from YAML file."""
+        with path.open("r", encoding="utf-8") as f:
+            return BuildSpecification(**yaml.safe_load(f))
 
     @classmethod
     def to_json_schema_file(cls, path: Path) -> None:

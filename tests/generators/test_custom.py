@@ -17,13 +17,6 @@ def test_config_init() -> None:
     config = csr.CustomGeneratorConfig(generator="test.py::TestGenerator")
     assert config.kind == "custom"
     assert config.generator == "test.py::TestGenerator"
-    assert config.label == "custom"
-
-
-def test_config_label_override() -> None:
-    """Test that label can be overridden."""
-    config = csr.CustomGeneratorConfig(generator="test.py::TestGenerator", label="custom_label")
-    assert config.label == "custom_label"
 
 
 def test_config_cls_loading(tmp_path: Path) -> None:

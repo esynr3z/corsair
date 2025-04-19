@@ -37,8 +37,8 @@ def runner(tmp_path: Path) -> Generator[CliRunner, None, None]:
 @pytest.fixture
 def valid_build_file(tmp_path: Path) -> Path:
     """Fixture for a valid build file."""
-    src = Path(__file__).parent / "data" / "valid.csrbuild.toml"
-    dst = tmp_path / "valid.csrbuild.toml"
+    src = Path(__file__).parent / "data" / "valid.csrbuild.yaml"
+    dst = tmp_path / "valid.csrbuild.yaml"
     shutil.copy(src, dst)
     return dst
 
@@ -46,8 +46,8 @@ def valid_build_file(tmp_path: Path) -> Path:
 @pytest.fixture
 def invalid_build_file(tmp_path: Path) -> Path:
     """Fixture for an invalid build file."""
-    src = Path(__file__).parent / "data" / "invalid.csrbuild.toml"
-    dst = tmp_path / "invalid.csrbuild.toml"
+    src = Path(__file__).parent / "data" / "invalid.csrbuild.yaml"
+    dst = tmp_path / "invalid.csrbuild.yaml"
     shutil.copy(src, dst)
     return dst
 

@@ -81,6 +81,7 @@ class MarkdownGenerator(Generator):
 
         if self.config.print_images:
             wd_gen = WaveDromGenerator(
+                label=f"{self.label}.wavedrom",
                 register_map=self.register_map,
                 config=self.config.wavedrom,
                 output_dir=self.output_dir / self.config.image_dir,
