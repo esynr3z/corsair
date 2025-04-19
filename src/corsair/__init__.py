@@ -16,9 +16,11 @@ from ._generators import (
     CustomGeneratorConfig,
     Generator,
     GeneratorConfig,
+    MarkdownGenerator,
     ResetStyle,
     VerilogGenerator,
     VhdlGenerator,
+    WaveDromGenerator,
 )
 from ._loaders import (
     AnyLoaderConfig,
@@ -111,6 +113,8 @@ __all__ = (
     "AnyGeneratorConfig",
     "VerilogGenerator",
     "VhdlGenerator",
+    "MarkdownGenerator",
+    "WaveDromGenerator",
     # Templates
     "TemplateEnvironment",
 )

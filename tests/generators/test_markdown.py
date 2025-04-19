@@ -1,0 +1,202 @@
+"""Tests for the Markdown generator."""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+import pytest
+
+import corsair as csr
+
+
+@pytest.fixture
+def simple_regmap() -> csr.Map:
+    """Create a simple register map for testing."""
+    field1 = csr.Field(
+        name="FIELD1",
+        offset=0,
+        width=8,
+        access=csr.AccessMode.RW,
+        hardware=csr.HardwareMode.NA,
+        doc="Field 1",
+        reset=None,
+    )
+    field2 = csr.Field(
+        name="FIELD2",
+        offset=8,
+        width=16,
+        access=csr.AccessMode.RO,
+        hardware=csr.HardwareMode.NA,
+        doc="Field 2",
+        reset=None,
+    )
+    reg1 = csr.Register(name="REG1", offset=0, doc="Register 1", fields=(field1, field2))
+
+    field3 = csr.Field(
+        name="FIELD3",
+        offset=0,
+        width=1,
+        access=csr.AccessMode.WO,
+        hardware=csr.HardwareMode.NA,
+        doc="Field 3",
+        reset=None,
+    )
+    reg2 = csr.Register(name="REG2", offset=4, doc="Register 2", fields=(field3,))
+
+    return csr.Map(
+        name="test_map",
+        offset=0,
+        address_width=32,
+        register_width=32,
+        doc="Test map",
+        items=(reg1, reg2),
+    )
+
+
+def test_default_generation(tmp_path: Path, simple_regmap: csr.Map) -> None:
+    """Test default Markdown generation."""
+    config = csr.MarkdownGenerator.Config()
+    gen = csr.MarkdownGenerator(
+        label="test_md_gen_default", register_map=simple_regmap, config=config, output_dir=tmp_path
+    )
+    generated_files = set(gen())
+
+    expected_file = tmp_path / "regmap.md"
+    expected_files = {expected_file}
+
+    assert generated_files == expected_files
+    assert expected_file.is_file()
+    assert not (tmp_path / "img").exists()
+
+
+def test_custom_file_name(tmp_path: Path, simple_regmap: csr.Map) -> None:
+    """Test that file_name config affects the output file name."""
+    custom_name = "custom_map.md"
+    config = csr.MarkdownGenerator.Config(file_name=custom_name)
+    gen = csr.MarkdownGenerator(
+        label="test_md_gen_fname", register_map=simple_regmap, config=config, output_dir=tmp_path
+    )
+    generated_files = set(gen())
+
+    expected_file = tmp_path / custom_name
+    expected_files = {expected_file}
+
+    assert generated_files == expected_files
+    assert expected_file.is_file()
+
+
+def test_title_in_output(tmp_path: Path, simple_regmap: csr.Map) -> None:
+    """Test that the title config appears in the output file."""
+    custom_title = "My Custom Register Map"
+    config = csr.MarkdownGenerator.Config(title=custom_title)
+    gen = csr.MarkdownGenerator(
+        label="test_md_gen_title", register_map=simple_regmap, config=config, output_dir=tmp_path
+    )
+    generated_files = list(gen())
+
+    assert len(generated_files) == 1
+    output_file = generated_files[0]
+    assert output_file.is_file()
+
+    content = output_file.read_text()
+    assert f"# {custom_title}" in content
+
+
+def test_print_conventions_true(tmp_path: Path, simple_regmap: csr.Map) -> None:
+    """Test that conventions are printed when print_conventions is True."""
+    config = csr.MarkdownGenerator.Config(print_conventions=True)
+    gen = csr.MarkdownGenerator(
+        label="test_md_gen_conv_true", register_map=simple_regmap, config=config, output_dir=tmp_path
+    )
+    generated_files = list(gen())
+    output_file = generated_files[0]
+    content = output_file.read_text()
+    assert "## Conventions" in content
+    assert "| Read and Write 1 to Clear" in content
+
+
+def test_print_conventions_false(tmp_path: Path, simple_regmap: csr.Map) -> None:
+    """Test that conventions are not printed when print_conventions is False."""
+    config = csr.MarkdownGenerator.Config(print_conventions=False)
+    gen = csr.MarkdownGenerator(
+        label="test_md_gen_conv_false", register_map=simple_regmap, config=config, output_dir=tmp_path
+    )
+    generated_files = list(gen())
+    output_file = generated_files[0]
+    content = output_file.read_text()
+    assert "## Conventions" not in content
+    assert "| Read and Write 1 to Clear" not in content
+
+
+def test_print_images_false(tmp_path: Path, simple_regmap: csr.Map) -> None:
+    """Test that no image directory is created when print_images is False."""
+    config = csr.MarkdownGenerator.Config(print_images=False)
+    gen = csr.MarkdownGenerator(
+        label="test_md_gen_img_false", register_map=simple_regmap, config=config, output_dir=tmp_path
+    )
+    generated_files = set(gen())
+
+    expected_file = tmp_path / "regmap.md"
+    expected_files = {expected_file}
+
+    assert generated_files == expected_files
+    assert not (tmp_path / config.image_dir).exists()
+
+
+def test_print_images_true(tmp_path: Path, simple_regmap: csr.Map) -> None:
+    """Test that image directory and SVG files are created when print_images is True."""
+    image_dir_name = "register_images"
+    config = csr.MarkdownGenerator.Config(
+        print_images=True,
+        image_dir=Path(image_dir_name),
+    )
+    gen = csr.MarkdownGenerator(
+        label="test_md_gen_img_true", register_map=simple_regmap, config=config, output_dir=tmp_path
+    )
+    generated_files = set(gen())
+
+    expected_md_file = tmp_path / "regmap.md"
+    expected_img_dir = tmp_path / image_dir_name
+    expected_svg_files = {
+        expected_img_dir / "test_map_reg1.svg",
+        expected_img_dir / "test_map_reg2.svg",
+    }
+    expected_files = {expected_md_file, *expected_svg_files}
+
+    assert generated_files == expected_files
+    assert expected_md_file.is_file()
+    assert expected_img_dir.is_dir()
+    assert {f for f in expected_img_dir.iterdir() if f.suffix == ".svg"} == expected_svg_files
+
+
+def test_wavedrom_dump_json(tmp_path: Path, simple_regmap: csr.Map) -> None:
+    """Test that JSON files are dumped alongside SVGs when wavedrom.dump_json is True."""
+    image_dir_name = "register_data"
+    wavedrom_config = csr.WaveDromGenerator.Config(dump_json=True)
+    config = csr.MarkdownGenerator.Config(
+        print_images=True,
+        image_dir=Path(image_dir_name),
+        wavedrom=wavedrom_config,
+    )
+    gen = csr.MarkdownGenerator(
+        label="test_md_gen_wd_json", register_map=simple_regmap, config=config, output_dir=tmp_path
+    )
+    generated_files = set(gen())
+
+    expected_md_file = tmp_path / "regmap.md"
+    expected_data_dir = tmp_path / image_dir_name
+    expected_svg_files = {
+        expected_data_dir / "test_map_reg1.svg",
+        expected_data_dir / "test_map_reg2.svg",
+    }
+    expected_json_files = {
+        expected_data_dir / "test_map_reg1.json",
+        expected_data_dir / "test_map_reg2.json",
+    }
+    expected_files = {expected_md_file, *expected_svg_files, *expected_json_files}
+
+    assert generated_files == expected_files
+    assert expected_md_file.is_file()
+    assert expected_data_dir.is_dir()
+    assert {f for f in expected_data_dir.iterdir() if f.suffix == ".svg"} == expected_svg_files
+    assert {f for f in expected_data_dir.iterdir() if f.suffix == ".json"} == expected_json_files

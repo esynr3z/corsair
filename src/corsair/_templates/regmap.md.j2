@@ -54,7 +54,7 @@ Base address: {{ literal(regmap.base_address, regmap.address_width) }}
 
 Address offset: {{ literal(reg.address, regmap.address_width) }}
 
-Reset value: {{ literal(reg.reset, regmap.register_width) }}
+Reset value: 0x{{ reg.reset_hexstr }}
 
     {% if cfg.print_images %}
 ![{{ reg.name.lower()}}]({{ cfg.image_dir }}/{{regmap.name.lower()}}_{{ reg.name.lower()}}.svg)
@@ -66,7 +66,7 @@ Reset value: {{ literal(reg.reset, regmap.register_width) }}
         {% if bf.name.startswith("_reserved") %}
 {{ "| %-16s | %-6s | %-15s | %-10s | %s |" % ("-", range(bf.msb, bf.lsb), "-", literal(bf.reset, bf.width), bf.brief) }}
         {% else %}
-{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % (bf.name.upper(), range(bf.msb, bf.lsb), bf.access, literal(bf.reset, bf.width), bf.brief) }}
+{{ "| %-16s | %-6s | %-15s | %-10s | %s |" % (bf.name.upper(), range(bf.msb, bf.lsb), bf.access, "'h" + reg.reset_hexstr, bf.brief) }}
         {% endif %}
     {% endfor %}
 
