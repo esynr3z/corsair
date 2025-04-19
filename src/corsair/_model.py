@@ -1450,19 +1450,13 @@ def convert_schema_loc_to_path_loc(  # noqa: C901, PLR0912, PLR0915
 
                     # --- Access Data ---
                     if not isinstance(current_data, collections.abc.Mapping):
-                        raise TypeError(  # noqa: TRY301
-                            f"Expected a mapping to access key '{list_key}', got {type(current_data)}"
-                        )
+                        raise TypeError(f"Expected a mapping to access key '{list_key}', got {type(current_data)}")
                     container_list = current_data[list_key]  # Can raise KeyError
                     # Ensure it's a sequence (list/tuple) but not a string, and index is valid
                     if not isinstance(container_list, collections.abc.Sequence) or isinstance(container_list, str):
-                        raise TypeError(  # noqa: TRY301
-                            f"Expected a sequence for key '{list_key}', got {type(container_list)}"
-                        )
+                        raise TypeError(f"Expected a sequence for key '{list_key}', got {type(container_list)}")
                     if not 0 <= item_index < len(container_list):
-                        raise IndexError(  # noqa: TRY301
-                            f"Index {item_index} out of bounds for key '{list_key}'"
-                        )
+                        raise IndexError(f"Index {item_index} out of bounds for key '{list_key}'")
                     current_data = container_list[item_index]  # Access the item
                     # --- End Access ---
 
@@ -1477,7 +1471,7 @@ def convert_schema_loc_to_path_loc(  # noqa: C901, PLR0912, PLR0915
                         loc_idx += 1
                 else:
                     # Error in loc structure (expected index after container key)
-                    raise ValueError(  # noqa: TRY301 # type: ignore[unreachable]
+                    raise ValueError(  # type: ignore[unreachable]
                         f"Invalid loc: Expected integer index after '{list_key}', got {loc_list[loc_idx + 1]!r}"
                     )
 
@@ -1488,9 +1482,7 @@ def convert_schema_loc_to_path_loc(  # noqa: C901, PLR0912, PLR0915
 
                 # --- Access Data ---
                 if not isinstance(current_data, collections.abc.Mapping):
-                    raise TypeError(  # noqa: TRY301
-                        f"Expected a mapping to access key '{enum_key}', got {type(current_data)}"
-                    )
+                    raise TypeError(f"Expected a mapping to access key '{enum_key}', got {type(current_data)}")
                 current_data = current_data[enum_key]  # Can raise KeyError
                 # --- End Access ---
 
@@ -1502,9 +1494,7 @@ def convert_schema_loc_to_path_loc(  # noqa: C901, PLR0912, PLR0915
 
             elif isinstance(segment, int):
                 # Error in loc structure (unexpected index without preceding container key)
-                raise ValueError(  # noqa: TRY301
-                    f"Invalid loc: Unexpected integer index '{segment}'"
-                )  # type: ignore[unreachable]
+                raise ValueError(f"Invalid loc: Unexpected integer index '{segment}'")  # type: ignore[unreachable]
             else:
                 # Assume it's the final attribute name or an object identifier where validation failed
                 # Append this segment and all subsequent segments as strings, then finish

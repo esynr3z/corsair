@@ -69,9 +69,6 @@ def build(
     """Build required targets according to the provided specification."""
     log.debug("cmd build args: %s", locals())
 
-    if targets is None or "all" in targets:
-        targets = ["all"]
-
     try:
         # Resolve and prepare output directory
         prepared_output_dir = _prepare_output_root(output=output, clean=clean)
@@ -80,8 +77,13 @@ def build(
         log.info("Read build specification")
         build_spec = csr.BuildSpecification.from_toml_file(spec)
 
-        log.info("Available targets: %s", [cfg.label for cfg in build_spec.generators])
+        avail_targets = [cfg.label for cfg in build_spec.generators]
+        if targets is None:
+            targets = avail_targets
         log.info("Targets to build: %s", targets)
+        for t in targets:
+            if t not in avail_targets:
+                raise ValueError(f"Target '{t}' not found in available targets: {avail_targets}")
 
         log.info("Load CSR map")
         loader = build_spec.loader.loader_cls(build_spec.loader)
