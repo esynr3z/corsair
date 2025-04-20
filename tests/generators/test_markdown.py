@@ -19,7 +19,7 @@ def simple_regmap() -> csr.Map:
         access=csr.AccessMode.RW,
         hardware=csr.HardwareMode.NA,
         doc="Field 1",
-        reset=None,
+        reset=0xAA,
     )
     field2 = csr.Field(
         name="FIELD2",
@@ -30,7 +30,12 @@ def simple_regmap() -> csr.Map:
         doc="Field 2",
         reset=None,
     )
-    reg1 = csr.Register(name="REG1", offset=0, doc="Register 1", fields=(field1, field2))
+    reg1 = csr.Register(
+        name="REG1",
+        offset=0,
+        doc="Register 1\n\nThis is a description of register 1",
+        fields=(field1, field2),
+    )
 
     field3 = csr.Field(
         name="FIELD3",
@@ -39,7 +44,15 @@ def simple_regmap() -> csr.Map:
         access=csr.AccessMode.WO,
         hardware=csr.HardwareMode.NA,
         doc="Field 3",
-        reset=None,
+        reset=0,
+        enum=csr.Enum(
+            name="mode",
+            doc="Mode",
+            members=(
+                csr.EnumMember(name="MODE1", value=0, doc="Mode 1\n\nThis is a description of mode 1"),
+                csr.EnumMember(name="MODE2", value=1, doc="Mode 2\n\nThis is a description of mode 2"),
+            ),
+        ),
     )
     reg2 = csr.Register(name="REG2", offset=4, doc="Register 2", fields=(field3,))
 

@@ -99,7 +99,7 @@ def test_description() -> None:
     assert item.description == "Second line"
 
     item = build_item(doc="First line")
-    assert item.description == "First line"
+    assert item.description == ""
 
     item = build_item(doc="   First line   \n\nSecond line   \n")
     assert item.description == "Second line"

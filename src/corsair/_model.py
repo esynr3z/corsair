@@ -457,12 +457,14 @@ class NamedItem(BaseModel, ABC):
 
     @FrozenProperty
     def description(self) -> TextStr:
-        """Detailed description for an item, derived from `doc`.
-
-        For a single-line `doc` it is the same as `brief`, but for multiline text block following brief is returned.
-        """
+        """Detailed description for an item, derived from `doc`."""
         parts = self.doc.split("\n", 1)
-        return (parts[1] if len(parts) > 1 else parts[0]).strip()
+        return (parts[1] if len(parts) > 1 else "").strip()
+
+    @FrozenProperty
+    def doc_as_single_line(self) -> str:
+        """Docstring converted to a single line string."""
+        return " ".join(self.doc.split())
 
     @FrozenProperty
     def path(self) -> str:
