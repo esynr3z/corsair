@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 from pydantic import Field as PydanticField
@@ -11,7 +12,6 @@ from .base import Generator, GeneratorConfig
 
 if TYPE_CHECKING:
     from collections.abc import Generator as TypeGenerator
-    from pathlib import Path
 
 
 class WaveDromGenerator(Generator):
@@ -69,9 +69,6 @@ class WaveDromGenerator(Generator):
         """Get the configuration class for the generator."""
         return cls.Config
 
-    def _pre_generate(self) -> None:
-        """Pre-generate hook."""
-
     def _generate(self) -> TypeGenerator[Path, None, None]:
         """Generate all the outputs."""
         if not isinstance(self.config, self.Config):
@@ -109,7 +106,7 @@ class WaveDromGenerator(Generator):
 
             # Save the JSON description
             if self.config.dump_json:
-                json_file = self.output_dir / f"{file_name}.json"
+                json_file = Path(f"{file_name}.json")
                 with json_file.open("w") as f:
                     json.dump({"reg": fields, "config": config_dict}, f)
                 yield json_file
@@ -119,7 +116,7 @@ class WaveDromGenerator(Generator):
                 from wavedrom.bitfield import BitField as WaveDromField
                 from wavedrom.bitfield import Options as WaveDromFieldOptions
 
-                svg_file = self.output_dir / f"{file_name}.svg"
+                svg_file = Path(f"{file_name}.svg")
                 WaveDromField().render(fields, WaveDromFieldOptions(**config_dict)).saveas(svg_file)
                 yield svg_file
             except ImportError as e:

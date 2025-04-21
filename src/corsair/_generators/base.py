@@ -24,6 +24,7 @@ from corsair._types import PyAttrPathStr
 
 @contextlib.contextmanager
 def _change_workdir(path: Path) -> TypeGenerator[None, None, None]:
+    """Change the working directory for the duration of the context."""
     old_cwd = Path.cwd()
     os.chdir(path)
     try:
@@ -135,18 +136,18 @@ class Generator(ABC):
         self.label = label
         self.register_map = register_map
         self.config = config
-        self.output_dir = output_dir
+        self.output_dir = output_dir.resolve()
         self.template_searchpaths = template_searchpaths
 
     def __call__(self) -> TypeGenerator[Path, None, None]:
         """Generate all the outputs."""
-        self.output_dir.mkdir(parents=True, exist_ok=True)
+        self._check_register_map()
 
         # Generation is isolated within the output directory
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         with _change_workdir(self.output_dir):
             try:
-                self._pre_generate()
-                yield from self._generate()
+                yield from (p.resolve() for p in self._generate())
             except jinja2.TemplateError as e:
                 raise GeneratorTemplateError(self.label, e) from e
             except Exception:
@@ -160,23 +161,39 @@ class Generator(ABC):
 
     def _render_to_file(self, template_name: str, context: dict[str, Any], file_name: str) -> Path:
         """Render text with Jinja2 and save it to the file."""
-        path = self.output_dir / file_name
+        path = Path(file_name)
         text = self._render_to_text(template_name, context)
         with path.open("w") as f:
             f.write(text)
         return path
 
-    @abstractmethod
-    def _pre_generate(self) -> None:
-        """Pre-generate hook.
+    def _check_register_map(self) -> None:
+        """Check if the register map contains unsupported features.
 
-        Concrete generator can override this method to perform any necessary
-        checking and setup before the generation process begins.
+        Every generator should at least support flatmap with registers.
+        Child generator can override this method to check for more specific features or relax the checks.
+
+        Raises:
+            ValueError: If the register map contains unsupported features.
+
         """
+        unsupported_items = (
+            self.register_map.has_maps
+            or self.register_map.has_map_arrays
+            or self.register_map.has_memories
+            or self.register_map.has_memory_arrays
+            or self.register_map.has_register_arrays
+        )
+        if unsupported_items:
+            raise ValueError(f"Only flat map with registers is currently supported in '{self.label}' generator")
 
     @abstractmethod
     def _generate(self) -> TypeGenerator[Path, None, None]:
-        """Generate all the outputs."""
+        """Generate all the outputs.
+
+        Method should yield paths to the every generated file.
+        Method is called within the output directory, so all the paths are relative to it.
+        """
 
     @classmethod
     @abstractmethod

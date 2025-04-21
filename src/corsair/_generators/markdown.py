@@ -51,18 +51,6 @@ class MarkdownGenerator(Generator):
         """Get the configuration class for the generator."""
         return cls.Config
 
-    def _pre_generate(self) -> None:
-        """Pre-generate hook."""
-        unsupported_items = (
-            self.register_map.has_maps
-            or self.register_map.has_map_arrays
-            or self.register_map.has_memories
-            or self.register_map.has_memory_arrays
-            or self.register_map.has_register_arrays
-        )
-        if unsupported_items:
-            raise ValueError("Only registers are currently supported in the register map")
-
     def _generate(self) -> TypeGenerator[Path, None, None]:
         """Generate all the outputs."""
         if not isinstance(self.config, self.Config):
@@ -84,6 +72,6 @@ class MarkdownGenerator(Generator):
                 label=f"{self.label}.wavedrom",
                 register_map=self.register_map,
                 config=self.config.wavedrom,
-                output_dir=self.output_dir / self.config.image_dir,
+                output_dir=self.config.image_dir,
             )
             yield from wd_gen()
