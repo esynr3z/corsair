@@ -25,7 +25,6 @@ from ._generators import (
 )
 from ._loaders import (
     AnyLoaderConfig,
-    CustomLoaderConfig,
     Loader,
     LoaderConfig,
     LoaderValidationError,
@@ -80,7 +79,6 @@ __all__ = (
     # Loaders
     "Loader",
     "LoaderConfig",
-    "CustomLoaderConfig",
     "AnyLoaderConfig",
     "LoaderValidationError",
     "SerializedLoader",

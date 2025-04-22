@@ -24,6 +24,10 @@ class SerializedLoader(Loader):
             """Related loader class."""
             return SerializedLoader
 
+        def get_kind(self) -> str:
+            """Get the kind of the loader."""
+            return self.kind
+
     @classmethod
     def get_config_cls(cls) -> type[LoaderConfig]:
         """Get the configuration class for the loader."""
@@ -31,8 +35,7 @@ class SerializedLoader(Loader):
 
     def _load_raw(self) -> dict[str, Any]:
         """Load the register map."""
-        if not isinstance(self.config, self.Config):
-            raise TypeError("Configuration instance is not of the expected type of SerializedLoader.Config")
+        assert isinstance(self.config, self.Config)  # noqa: S101, to help type checker
 
         if self.config.kind == "json":
             regmap = self._load_json()

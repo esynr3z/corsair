@@ -6,12 +6,12 @@ from typing import Annotated
 
 from pydantic import Field
 
-from .base import CustomLoaderConfig, Loader, LoaderConfig, LoaderValidationError
+from .base import Loader, LoaderConfig, LoaderValidationError
 from .pymodule import PyModuleLoader
 from .serialized import SerializedLoader
 
 AnyLoaderConfig = Annotated[
-    CustomLoaderConfig | SerializedLoader.Config,
+    SerializedLoader.Config | PyModuleLoader.Config,
     Field(discriminator="kind"),
 ]
 
@@ -20,7 +20,6 @@ __all__ = [
     "Loader",
     "LoaderValidationError",
     "LoaderConfig",
-    "CustomLoaderConfig",
     # Loaders
     "SerializedLoader",
     "PyModuleLoader",

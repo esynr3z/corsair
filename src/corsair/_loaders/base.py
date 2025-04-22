@@ -4,12 +4,11 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, ValidationError
 
 from corsair._model import Map, stringify_model_errors
-from corsair._types import PyAttrPathStr
 
 
 class LoaderValidationError(Exception):
@@ -43,26 +42,9 @@ class LoaderConfig(BaseModel, ABC):
     def loader_cls(self) -> type[Loader]:
         """Related loader class."""
 
-
-class CustomLoaderConfig(LoaderConfig):
-    """Custom configuration that is used by custom loader class."""
-
-    kind: Literal["custom"]
-    """Loader kind discriminator."""
-
-    loader: PyAttrPathStr = Field(..., examples=["bar.py::BarLoader"])
-    """Path to a custom loader class to be used."""
-
-    model_config = ConfigDict(
-        extra="allow",
-        use_attribute_docstrings=True,
-    )
-
-    @property
-    def loader_cls(self) -> type[Loader]:
-        """Loader class to use."""
-        # TODO: implement dynamic loading of loader class
-        raise NotImplementedError
+    @abstractmethod
+    def get_kind(self) -> str:
+        """Get the kind of the loader."""
 
 
 class Loader(ABC):
