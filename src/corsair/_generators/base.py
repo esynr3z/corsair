@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 import contextlib
-import importlib.util
 import os
 from abc import ABC, abstractmethod
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from collections.abc import Generator as TypeGenerator
@@ -16,10 +15,9 @@ if TYPE_CHECKING:
     from corsair._model import Map
 
 import jinja2
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 from corsair._templates import TemplateEnvironment
-from corsair._types import PyAttrPathStr
 
 
 @contextlib.contextmanager
@@ -36,11 +34,11 @@ def _change_workdir(path: Path) -> TypeGenerator[None, None, None]:
 class GeneratorTemplateError(Exception):
     """Raised when generator fails to render a template."""
 
-    def __init__(self, label: str, j2_error: jinja2.TemplateError) -> None:
+    def __init__(self, generator: Generator, j2_error: jinja2.TemplateError) -> None:
         """Initialize the exception."""
-        self.label = label
+        self.generator = generator
         self.j2_error = j2_error
-        super().__init__(f"Generator '{label}' failed to render template")
+        super().__init__(f"Generator '{generator.label}' failed to render template")
 
     def __str__(self) -> str:
         """Represent exception as a string."""
@@ -65,6 +63,21 @@ class GeneratorTemplateError(Exception):
         return err
 
 
+class GeneratorUnsupportedFeatureError(Exception):
+    """Raised when generator encounters unsupported feature in the register map."""
+
+    def __init__(self, generator: Generator, feature: str) -> None:
+        """Initialize the exception."""
+        self.generator = generator
+        self.feature = feature
+
+    def __str__(self) -> str:
+        """Represent exception as a string."""
+        err = f"Generator '{self.generator.label}' ({self.generator.config.get_kind()}) does not support feature: "
+        err += self.feature
+        return err
+
+
 class GeneratorConfig(BaseModel, ABC):
     """Base configuration for a generator."""
 
@@ -78,47 +91,9 @@ class GeneratorConfig(BaseModel, ABC):
     def generator_cls(self) -> type[Generator]:
         """Related generator class."""
 
-
-class CustomGeneratorConfig(GeneratorConfig):
-    """Custom configuration that is used by custom generator class."""
-
-    kind: Literal["custom"] = "custom"
-    """Generator kind discriminator."""
-
-    generator: PyAttrPathStr = Field(..., examples=["bar.py::BarGenerator"])
-    """Path to a custom generator class to be used."""
-
-    model_config = ConfigDict(
-        extra="allow",
-        use_attribute_docstrings=True,
-    )
-
-    @property
-    def generator_cls(self) -> type[Generator]:
-        """Generator class to use."""
-        if hasattr(self, "_generator_cls"):
-            return self._generator_cls
-
-        module_path, class_name = self.generator.split("::")
-
-        full_path = Path(module_path).resolve()
-        spec = importlib.util.spec_from_file_location(full_path.stem, str(full_path))
-        if spec is None or spec.loader is None:
-            raise ImportError(f"Could not load module from {full_path}")
-
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-
-        try:
-            loaded_cls = getattr(module, class_name)
-        except AttributeError as e:
-            raise ImportError(f"Generator class '{class_name}' not found in module '{full_path}'") from e
-
-        if not issubclass(loaded_cls, Generator):
-            raise TypeError(f"Class '{class_name}' must be a subclass of 'Generator'")
-
-        self._generator_cls = loaded_cls
-        return loaded_cls
+    @abstractmethod
+    def get_kind(self) -> str:
+        """Get the kind of the generator."""
 
 
 class Generator(ABC):
@@ -139,6 +114,12 @@ class Generator(ABC):
         self.output_dir = output_dir.resolve()
         self.template_searchpaths = template_searchpaths
 
+        if not isinstance(self.config, self.get_config_cls()):
+            raise TypeError(
+                f"Configuration instance is not of the expected type of "
+                f"{self.__class__.__name__}.{self.get_config_cls().__name__}"
+            )
+
     def __call__(self) -> TypeGenerator[Path, None, None]:
         """Generate all the outputs."""
         self._check_register_map()
@@ -149,7 +130,7 @@ class Generator(ABC):
             try:
                 yield from (p.resolve() for p in self._generate())
             except jinja2.TemplateError as e:
-                raise GeneratorTemplateError(self.label, e) from e
+                raise GeneratorTemplateError(self, e) from e
             except Exception:
                 raise
 
@@ -174,18 +155,23 @@ class Generator(ABC):
         Child generator can override this method to check for more specific features or relax the checks.
 
         Raises:
-            ValueError: If the register map contains unsupported features.
+            GeneratorUnsupportedFeatureError: If the register map contains unsupported features.
 
         """
-        unsupported_items = (
-            self.register_map.has_maps
-            or self.register_map.has_map_arrays
-            or self.register_map.has_memories
-            or self.register_map.has_memory_arrays
-            or self.register_map.has_register_arrays
-        )
-        if unsupported_items:
-            raise ValueError(f"Only flat map with registers is currently supported in '{self.label}' generator")
+        if self.register_map.has_maps:
+            raise GeneratorUnsupportedFeatureError(self, "maps inside register map")
+
+        if self.register_map.has_map_arrays:
+            raise GeneratorUnsupportedFeatureError(self, "map arrays inside register map")
+
+        if self.register_map.has_memories:
+            raise GeneratorUnsupportedFeatureError(self, "memories inside register map")
+
+        if self.register_map.has_memory_arrays:
+            raise GeneratorUnsupportedFeatureError(self, "memory arrays inside register map")
+
+        if self.register_map.has_register_arrays:
+            raise GeneratorUnsupportedFeatureError(self, "register arrays inside register map")
 
     @abstractmethod
     def _generate(self) -> TypeGenerator[Path, None, None]:

@@ -28,6 +28,10 @@ class VerilogGenerator(Generator):
             """Related generator class."""
             return VerilogGenerator
 
+        def get_kind(self) -> str:
+            """Get the kind of the generator."""
+            return self.kind
+
     @classmethod
     def get_config_cls(cls) -> type[GeneratorConfig]:
         """Get the configuration class for the generator."""

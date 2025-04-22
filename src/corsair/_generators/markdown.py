@@ -46,6 +46,10 @@ class MarkdownGenerator(Generator):
             """Related generator class."""
             return MarkdownGenerator
 
+        def get_kind(self) -> str:
+            """Get the kind of the generator."""
+            return self.kind
+
     @classmethod
     def get_config_cls(cls) -> type[GeneratorConfig]:
         """Get the configuration class for the generator."""
@@ -53,8 +57,7 @@ class MarkdownGenerator(Generator):
 
     def _generate(self) -> TypeGenerator[Path, None, None]:
         """Generate all the outputs."""
-        if not isinstance(self.config, self.Config):
-            raise TypeError("Configuration instance is not of the expected type of MarkdownGenerator.Config")
+        assert isinstance(self.config, self.Config)  # noqa: S101, to help type checker
 
         context = {
             "cfg": self.config,

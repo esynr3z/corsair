@@ -6,18 +6,20 @@ from typing import Annotated
 
 from pydantic import Field
 
-from .base import CustomGeneratorConfig, Generator, GeneratorConfig, ResetStyle
+from .base import (
+    Generator,
+    GeneratorConfig,
+    GeneratorTemplateError,
+    GeneratorUnsupportedFeatureError,
+    ResetStyle,
+)
 from .markdown import MarkdownGenerator
 from .verilog import VerilogGenerator
 from .vhdl import VhdlGenerator
 from .wavedrom import WaveDromGenerator
 
 AnyGeneratorConfig = Annotated[
-    CustomGeneratorConfig
-    | VerilogGenerator.Config
-    | VhdlGenerator.Config
-    | MarkdownGenerator.Config
-    | WaveDromGenerator.Config,
+    VerilogGenerator.Config | VhdlGenerator.Config | MarkdownGenerator.Config | WaveDromGenerator.Config,
     Field(discriminator="kind"),
 ]
 
@@ -25,11 +27,15 @@ __all__ = [
     # Base classes
     "Generator",
     "GeneratorConfig",
-    "CustomGeneratorConfig",
     "ResetStyle",
     # Generators
     "VerilogGenerator",
     "VhdlGenerator",
+    "MarkdownGenerator",
+    "WaveDromGenerator",
     # Types
     "AnyGeneratorConfig",
+    # Exceptions
+    "GeneratorUnsupportedFeatureError",
+    "GeneratorTemplateError",
 ]

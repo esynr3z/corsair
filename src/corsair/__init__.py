@@ -13,9 +13,10 @@ __description__ = "Control and status register (CSR) map generator for HDL proje
 from ._build import BuildSpecification
 from ._generators import (
     AnyGeneratorConfig,
-    CustomGeneratorConfig,
     Generator,
     GeneratorConfig,
+    GeneratorTemplateError,
+    GeneratorUnsupportedFeatureError,
     MarkdownGenerator,
     ResetStyle,
     VerilogGenerator,
@@ -109,12 +110,13 @@ __all__ = (
     "ResetStyle",
     "Generator",
     "GeneratorConfig",
-    "CustomGeneratorConfig",
     "AnyGeneratorConfig",
     "VerilogGenerator",
     "VhdlGenerator",
     "MarkdownGenerator",
     "WaveDromGenerator",
+    "GeneratorUnsupportedFeatureError",
+    "GeneratorTemplateError",
     # Templates
     "TemplateEnvironment",
 )
