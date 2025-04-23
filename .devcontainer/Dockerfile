@@ -58,7 +58,7 @@ RUN dpkg --add-architecture i386 && \
     echo "deb http://security.ubuntu.com/ubuntu focal-security main universe" > /etc/apt/sources.list.d/ubuntu-focal-sources.list && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-    ca-certificates curl git nano \
+    ca-certificates curl git nano openssh-client \
     g++ mold ccache perl-doc z3 gtkwave \
     libc6:i386 libxtst6:i386 libncurses5:i386 libxft2:i386 libstdc++6:i386 libc6-dev-i386 lib32z1 libqt5xml5 liblzma-dev \
     && apt-get clean \
