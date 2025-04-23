@@ -10,48 +10,49 @@ on:
 
 env:
   PY_COLORS: "1"
-  DEVCONTAINER_CONFIG_PATH: ".devcontainer"
 
 jobs:
   test:
     # The action itself runs on ubuntu-latest, but the commands execute inside the dev container
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10'] #'3.11', '3.12', '3.13']
+
+    name: Python ${{ matrix.python-version }} Tests
     steps:
     - uses: actions/checkout@v4
 
     # Use the devcontainers/ci action to run steps inside the container
-    - name: Install the project in dev container
+    - name: Install Python ${{ matrix.python-version }} and project dependencies
       uses: devcontainers/ci@v0.3
       with:
-        configPath: ${{ env.DEVCONTAINER_CONFIG_PATH }}
-        run: uv sync --all-extras --dev
+        runCmd: |
+          uv venv -p ${{ matrix.python-version }}
+          uv sync --all-extras --dev
 
-    - name: Check branch commits in dev container
+    - name: Check branch commits
       uses: devcontainers/ci@v0.3
       with:
-        configPath: ${{ env.DEVCONTAINER_CONFIG_PATH }}
-        run: uv run poe check-commits
+        runCmd: uv run poe check-commits
 
-    - name: Check Python code format in dev container
+    - name: Check Python code format
       uses: devcontainers/ci@v0.3
       with:
-        configPath: ${{ env.DEVCONTAINER_CONFIG_PATH }}
-        run: uv run poe check-format
+        runCmd: uv run poe check-format
 
-    - name: Lint Python code in dev container
+    - name: Lint Python code
       uses: devcontainers/ci@v0.3
       with:
-        configPath: ${{ env.DEVCONTAINER_CONFIG_PATH }}
-        run: uv run poe lint
+        runCmd: uv run poe lint
 
-    - name: Do type checking for Python code in dev container
+    - name: Do type checking for Python code
       uses: devcontainers/ci@v0.3
       with:
-        configPath: ${{ env.DEVCONTAINER_CONFIG_PATH }}
-        run: uv run poe check-types
+        runCmd: uv run poe check-types
 
-    - name: Run tests in dev container
+    - name: Run tests
       uses: devcontainers/ci@v0.3
       with:
-        configPath: ${{ env.DEVCONTAINER_CONFIG_PATH }}
-        run: uv run poe test
+        runCmd: uv run poe test
