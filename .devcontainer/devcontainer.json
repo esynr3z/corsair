@@ -1,0 +1,24 @@
+{
+    "name": "corsair-workspace",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "postCreateCommand": "git config --global --add safe.directory /workspaces/corsair && uv sync --all-extras --dev && uv run poe install-hooks",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.debugpy",
+                "anysphere.pyright",
+                "tamasfe.even-better-toml",
+                "laktak.hjson",
+                "yzhang.markdown-all-in-one",
+                "charliermarsh.ruff",
+                "jock.svg",
+                "redhat.vscode-yaml",
+                "github.vscode-github-actions"
+            ]
+        }
+    }
+}
