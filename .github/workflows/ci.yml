@@ -60,7 +60,9 @@ jobs:
           cacheFrom: ghcr.io/esynr3z/corsair-workspace
           push: never
           runCmd: |
-            git config --global --add safe.directory /workspaces/corsair
+            ls -la
+            pwd
+            git branch
             uv run poe check-commits
 
       - name: Check Python code format
