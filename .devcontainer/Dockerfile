@@ -15,7 +15,7 @@ RUN apt-get update && \
     help2man perl python3 make autoconf g++ mold flex bison ccache libfl2 libfl-dev
 
 # Build Verilator
-RUN git clone --branch ${VERILATOR_VERSION} https://github.com/verilator/verilator.git
+RUN git clone --branch ${VERILATOR_VERSION} --depth 1 https://github.com/verilator/verilator.git
 RUN cd verilator && \
     autoconf && \
     ./configure --prefix ${VERILATOR_INSTALL} && \
