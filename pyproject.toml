@@ -71,6 +71,7 @@ dev = [
     "mkdocs-exclude>=1.0.2",
     "mkdocs-git-revision-date-localized-plugin>=1.3.0",
     "mkdocs-material[imaging]>=9.5.44",
+    "pytest-xdist>=3.6.1",
 ]
 
 [tool.ruff]
@@ -193,11 +194,11 @@ cmd = "pyright"
 
 [tool.poe.tasks.test]
 help = "Run all tests via pytest"
-cmd = "pytest -v"
+cmd = "pytest -v -n auto"
 
 [tool.poe.tasks.test-cov]
 help = "Run all tests via pytest with coverage collection"
-cmd = "pytest -v --cov=corsair --no-cov-on-fail --cov-report term-missing --cov-report html"
+cmd = "pytest -v -n auto --cov=corsair --no-cov-on-fail --cov-report term-missing --cov-report html"
 
 [tool.poe.tasks.check-commits]
 help = "Do commit message checking for the current branch"

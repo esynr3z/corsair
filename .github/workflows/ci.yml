@@ -92,4 +92,4 @@ jobs:
         with:
           cacheFrom: ghcr.io/esynr3z/corsair-workspace
           push: never
-          runCmd: uv run poe test
+          runCmd: uv run poe test-cov
