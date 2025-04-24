@@ -56,7 +56,6 @@ jobs:
 
       - name: Check branch commits
         uses: devcontainers/ci@v0.3
-        continue-on-error: true
         with:
           cacheFrom: ghcr.io/esynr3z/corsair-workspace
           push: never
@@ -64,7 +63,7 @@ jobs:
 
       - name: Check Python code format
         uses: devcontainers/ci@v0.3
-        continue-on-error: true
+        if: always()
         with:
           cacheFrom: ghcr.io/esynr3z/corsair-workspace
           push: never
@@ -72,7 +71,7 @@ jobs:
 
       - name: Lint Python code
         uses: devcontainers/ci@v0.3
-        continue-on-error: true
+        if: always()
         with:
           cacheFrom: ghcr.io/esynr3z/corsair-workspace
           push: never
@@ -80,7 +79,7 @@ jobs:
 
       - name: Do type checking for Python code
         uses: devcontainers/ci@v0.3
-        continue-on-error: true
+        if: always()
         with:
           cacheFrom: ghcr.io/esynr3z/corsair-workspace
           push: never
@@ -88,7 +87,7 @@ jobs:
 
       - name: Run all tests
         uses: devcontainers/ci@v0.3
-        continue-on-error: true
+        if: always()
         with:
           cacheFrom: ghcr.io/esynr3z/corsair-workspace
           push: never
