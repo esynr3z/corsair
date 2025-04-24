@@ -201,7 +201,7 @@ cmd = "pytest -v --cov=corsair --no-cov-on-fail --cov-report term-missing --cov-
 
 [tool.poe.tasks.check-commits]
 help = "Do commit message checking for the current branch"
-cmd = "cz check --rev-range master..HEAD"
+cmd = "cz check --rev-range origin/master..HEAD"
 
 [tool.poe.tasks.docs]
 help = "Build the documentation"
