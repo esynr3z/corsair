@@ -1,0 +1,745 @@
+{
+  "$defs": {
+    "AccessMode": {
+      "description": "Access mode for a field.\n\nIt describes how the field can be accessed by bus/software and possible side-effects.",
+      "enum": [
+        "rw",
+        "rw1c",
+        "rw1s",
+        "ro",
+        "roc",
+        "roll",
+        "rolh",
+        "wo",
+        "wosc"
+      ],
+      "title": "AccessMode",
+      "type": "string"
+    },
+    "Enum": {
+      "additionalProperties": false,
+      "description": "Enumeration of a bit field.",
+      "properties": {
+        "name": {
+          "description": "Name of an item.",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Docstring for an item.\n\nFollows Python docstring rules - first line is a brief summary,\nthen optionally, empty line following detailed multiline description.",
+          "title": "Doc",
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "#/$defs/ItemMetadata",
+          "default": {},
+          "description": "Optional user metadata attached to an item."
+        },
+        "members": {
+          "description": "Enumeration members.\n\nThere should be at least one member.\nMembers are sorted by value in ascending order.",
+          "items": {
+            "$ref": "#/$defs/EnumMember"
+          },
+          "title": "Members",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "doc",
+        "members"
+      ],
+      "title": "Enum",
+      "type": "object"
+    },
+    "EnumMember": {
+      "additionalProperties": false,
+      "description": "Member of a bit field enumeration.",
+      "properties": {
+        "name": {
+          "description": "Name of an item.",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Docstring for an item.\n\nFollows Python docstring rules - first line is a brief summary,\nthen optionally, empty line following detailed multiline description.",
+          "title": "Doc",
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "#/$defs/ItemMetadata",
+          "default": {},
+          "description": "Optional user metadata attached to an item."
+        },
+        "value": {
+          "description": "Enumeration value.",
+          "minimum": 0,
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "doc",
+        "value"
+      ],
+      "title": "EnumMember",
+      "type": "object"
+    },
+    "Field": {
+      "additionalProperties": false,
+      "description": "Bit field inside a register.",
+      "properties": {
+        "name": {
+          "description": "Name of an item.",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Docstring for an item.\n\nFollows Python docstring rules - first line is a brief summary,\nthen optionally, empty line following detailed multiline description.",
+          "title": "Doc",
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "#/$defs/ItemMetadata",
+          "default": {},
+          "description": "Optional user metadata attached to an item."
+        },
+        "offset": {
+          "description": "Bit offset within register.",
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "width": {
+          "description": "Bit width of the item.",
+          "exclusiveMinimum": 0,
+          "title": "Width",
+          "type": "integer"
+        },
+        "reset": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Reset value. Can be unknown.",
+          "title": "Reset"
+        },
+        "access": {
+          "$ref": "#/$defs/AccessMode",
+          "description": "Access mode."
+        },
+        "hardware": {
+          "$ref": "#/$defs/HardwareMode",
+          "description": "Hardware interaction options."
+        },
+        "enum": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Enum"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional enumeration for the field."
+        }
+      },
+      "required": [
+        "name",
+        "doc",
+        "offset",
+        "width",
+        "reset",
+        "access",
+        "hardware"
+      ],
+      "title": "Field",
+      "type": "object"
+    },
+    "HardwareMode": {
+      "description": "Hardware mode for a field.\n\nMode reflects hardware possibilities and interfaces to observe and modify bitfield value.",
+      "enum": [
+        "i",
+        "i",
+        "o",
+        "o",
+        "c",
+        "c",
+        "s",
+        "s",
+        "e",
+        "e",
+        "l",
+        "l",
+        "a",
+        "a",
+        "q",
+        "q",
+        "f",
+        "f",
+        "n",
+        "n"
+      ],
+      "title": "HardwareMode",
+      "type": "string"
+    },
+    "ItemMetadata": {
+      "additionalProperties": true,
+      "description": "Metadata for an item.",
+      "properties": {},
+      "title": "ItemMetadata",
+      "type": "object"
+    },
+    "Map": {
+      "additionalProperties": false,
+      "description": "Collection of memory-mapped items.",
+      "properties": {
+        "name": {
+          "description": "Name of an item.",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Docstring for an item.\n\nFollows Python docstring rules - first line is a brief summary,\nthen optionally, empty line following detailed multiline description.",
+          "title": "Doc",
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "#/$defs/ItemMetadata",
+          "default": {},
+          "description": "Optional user metadata attached to an item."
+        },
+        "offset": {
+          "description": "Byte offset from the parent addressable item.",
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "map",
+          "default": "map",
+          "description": "Item kind discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "address_width": {
+          "description": "Map address bit width.",
+          "exclusiveMinimum": 0,
+          "title": "Address Width",
+          "type": "integer"
+        },
+        "register_width": {
+          "description": "Map register bit width.",
+          "title": "Register Width",
+          "type": "integer"
+        },
+        "items": {
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Map"
+              },
+              {
+                "$ref": "#/$defs/Register"
+              },
+              {
+                "$ref": "#/$defs/Memory"
+              },
+              {
+                "$ref": "#/$defs/MapArray"
+              },
+              {
+                "$ref": "#/$defs/RegisterArray"
+              },
+              {
+                "$ref": "#/$defs/MemoryArray"
+              }
+            ]
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "doc",
+        "offset",
+        "address_width",
+        "register_width",
+        "items"
+      ],
+      "title": "Map",
+      "type": "object"
+    },
+    "MapArray": {
+      "additionalProperties": false,
+      "description": "Logical collection of similar maps with common properties.",
+      "properties": {
+        "name": {
+          "description": "Name of an item.",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Docstring for an item.\n\nFollows Python docstring rules - first line is a brief summary,\nthen optionally, empty line following detailed multiline description.",
+          "title": "Doc",
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "#/$defs/ItemMetadata",
+          "default": {},
+          "description": "Optional user metadata attached to an item."
+        },
+        "num": {
+          "description": "Number of elements within the array.",
+          "exclusiveMinimum": 0,
+          "title": "Num",
+          "type": "integer"
+        },
+        "increment": {
+          "description": "Offset increment for each array element.",
+          "exclusiveMinimum": 0,
+          "title": "Increment",
+          "type": "integer"
+        },
+        "indices": {
+          "default": [],
+          "description": "Unique index (label) for each array element.\n\nIndex can be numeric (0, 1, 2, ...), alphabetic (a, b, c, ...), or any string.\nIf indices are not provided (empty tuple), they will be generated as numeric (0, 1, 2, ...) based on `num`.\n\nNumber of indices should be greater or equal to `num`.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Indices",
+          "type": "array"
+        },
+        "naming": {
+          "default": "{name}{index}",
+          "description": "Pattern for element name.\n\nThe pattern can use `{name}` and `{index}` placeholders to insert `name` and concrete index into the name.\n`{name}` can be omitted, but `{index}` is required.\n\nExamples:\n- `{name}{index}` -> `gpioa`, `gpiob`, `gpioc`, ...\n- `{name}_{index}` -> `irq0`, `irq1`, `irq2`, ...",
+          "title": "Naming",
+          "type": "string"
+        },
+        "offset": {
+          "description": "Byte offset from the parent addressable item.",
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "map_array",
+          "default": "map_array",
+          "description": "Item kind discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "address_width": {
+          "description": "Map address bit width.",
+          "exclusiveMinimum": 0,
+          "title": "Address Width",
+          "type": "integer"
+        },
+        "register_width": {
+          "description": "Map register bit width.",
+          "title": "Register Width",
+          "type": "integer"
+        },
+        "items": {
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Map"
+              },
+              {
+                "$ref": "#/$defs/Register"
+              },
+              {
+                "$ref": "#/$defs/Memory"
+              },
+              {
+                "$ref": "#/$defs/MapArray"
+              },
+              {
+                "$ref": "#/$defs/RegisterArray"
+              },
+              {
+                "$ref": "#/$defs/MemoryArray"
+              }
+            ]
+          },
+          "title": "Items",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "doc",
+        "num",
+        "increment",
+        "offset",
+        "address_width",
+        "register_width",
+        "items"
+      ],
+      "title": "MapArray",
+      "type": "object"
+    },
+    "Memory": {
+      "additionalProperties": false,
+      "description": "Memory block.",
+      "properties": {
+        "name": {
+          "description": "Name of an item.",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Docstring for an item.\n\nFollows Python docstring rules - first line is a brief summary,\nthen optionally, empty line following detailed multiline description.",
+          "title": "Doc",
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "#/$defs/ItemMetadata",
+          "default": {},
+          "description": "Optional user metadata attached to an item."
+        },
+        "offset": {
+          "description": "Byte offset from the parent addressable item.",
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "memory",
+          "default": "memory",
+          "description": "Item kind discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "address_width": {
+          "description": "Memory address bit width.",
+          "exclusiveMinimum": 0,
+          "title": "Address Width",
+          "type": "integer"
+        },
+        "data_width": {
+          "description": "Memory data bit width.",
+          "exclusiveMinimum": 0,
+          "title": "Data Width",
+          "type": "integer"
+        },
+        "style": {
+          "$ref": "#/$defs/MemoryStyle",
+          "description": "Memory implementation style."
+        },
+        "initial_values": {
+          "description": "Initial values for selected memory locations.\n\nEach tuple contains memory word index (address within memory) and value.",
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "minimum": 0,
+                "type": "integer"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Initial Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "doc",
+        "offset",
+        "address_width",
+        "data_width",
+        "style",
+        "initial_values"
+      ],
+      "title": "Memory",
+      "type": "object"
+    },
+    "MemoryArray": {
+      "additionalProperties": false,
+      "description": "Logical collection of similar memory blocks with common properties.",
+      "properties": {
+        "name": {
+          "description": "Name of an item.",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Docstring for an item.\n\nFollows Python docstring rules - first line is a brief summary,\nthen optionally, empty line following detailed multiline description.",
+          "title": "Doc",
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "#/$defs/ItemMetadata",
+          "default": {},
+          "description": "Optional user metadata attached to an item."
+        },
+        "num": {
+          "description": "Number of elements within the array.",
+          "exclusiveMinimum": 0,
+          "title": "Num",
+          "type": "integer"
+        },
+        "increment": {
+          "description": "Offset increment for each array element.",
+          "exclusiveMinimum": 0,
+          "title": "Increment",
+          "type": "integer"
+        },
+        "indices": {
+          "default": [],
+          "description": "Unique index (label) for each array element.\n\nIndex can be numeric (0, 1, 2, ...), alphabetic (a, b, c, ...), or any string.\nIf indices are not provided (empty tuple), they will be generated as numeric (0, 1, 2, ...) based on `num`.\n\nNumber of indices should be greater or equal to `num`.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Indices",
+          "type": "array"
+        },
+        "naming": {
+          "default": "{name}{index}",
+          "description": "Pattern for element name.\n\nThe pattern can use `{name}` and `{index}` placeholders to insert `name` and concrete index into the name.\n`{name}` can be omitted, but `{index}` is required.\n\nExamples:\n- `{name}{index}` -> `gpioa`, `gpiob`, `gpioc`, ...\n- `{name}_{index}` -> `irq0`, `irq1`, `irq2`, ...",
+          "title": "Naming",
+          "type": "string"
+        },
+        "offset": {
+          "description": "Byte offset from the parent addressable item.",
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "memory_array",
+          "default": "memory_array",
+          "description": "Item kind discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "address_width": {
+          "description": "Memory address bit width.",
+          "exclusiveMinimum": 0,
+          "title": "Address Width",
+          "type": "integer"
+        },
+        "data_width": {
+          "description": "Memory data bit width.",
+          "exclusiveMinimum": 0,
+          "title": "Data Width",
+          "type": "integer"
+        },
+        "style": {
+          "$ref": "#/$defs/MemoryStyle",
+          "description": "Memory implementation style."
+        },
+        "initial_values": {
+          "description": "Initial values for selected memory locations.\n\nEach tuple contains memory word index (address within memory) and value.",
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "minimum": 0,
+                "type": "integer"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Initial Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "doc",
+        "num",
+        "increment",
+        "offset",
+        "address_width",
+        "data_width",
+        "style",
+        "initial_values"
+      ],
+      "title": "MemoryArray",
+      "type": "object"
+    },
+    "MemoryStyle": {
+      "description": "Memory block implementation style for `Memory`.",
+      "enum": [
+        "internal_ro",
+        "internal_const",
+        "internal_wo",
+        "internal_rw",
+        "external_ro",
+        "external_wo",
+        "external_rw"
+      ],
+      "title": "MemoryStyle",
+      "type": "string"
+    },
+    "Register": {
+      "additionalProperties": false,
+      "description": "Control and Status Register.",
+      "properties": {
+        "name": {
+          "description": "Name of an item.",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Docstring for an item.\n\nFollows Python docstring rules - first line is a brief summary,\nthen optionally, empty line following detailed multiline description.",
+          "title": "Doc",
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "#/$defs/ItemMetadata",
+          "default": {},
+          "description": "Optional user metadata attached to an item."
+        },
+        "offset": {
+          "description": "Byte offset from the parent addressable item.",
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "register",
+          "default": "register",
+          "description": "Item kind discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "fields": {
+          "description": "Bit fields inside a register.\n\nFields are sorted from LSB to MSB.",
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "title": "Fields",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "doc",
+        "offset",
+        "fields"
+      ],
+      "title": "Register",
+      "type": "object"
+    },
+    "RegisterArray": {
+      "additionalProperties": false,
+      "description": "Logical collection of similar registers with common properties.",
+      "properties": {
+        "name": {
+          "description": "Name of an item.",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$",
+          "title": "Name",
+          "type": "string"
+        },
+        "doc": {
+          "description": "Docstring for an item.\n\nFollows Python docstring rules - first line is a brief summary,\nthen optionally, empty line following detailed multiline description.",
+          "title": "Doc",
+          "type": "string"
+        },
+        "metadata": {
+          "$ref": "#/$defs/ItemMetadata",
+          "default": {},
+          "description": "Optional user metadata attached to an item."
+        },
+        "num": {
+          "description": "Number of elements within the array.",
+          "exclusiveMinimum": 0,
+          "title": "Num",
+          "type": "integer"
+        },
+        "increment": {
+          "description": "Offset increment for each array element.",
+          "exclusiveMinimum": 0,
+          "title": "Increment",
+          "type": "integer"
+        },
+        "indices": {
+          "default": [],
+          "description": "Unique index (label) for each array element.\n\nIndex can be numeric (0, 1, 2, ...), alphabetic (a, b, c, ...), or any string.\nIf indices are not provided (empty tuple), they will be generated as numeric (0, 1, 2, ...) based on `num`.\n\nNumber of indices should be greater or equal to `num`.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Indices",
+          "type": "array"
+        },
+        "naming": {
+          "default": "{name}{index}",
+          "description": "Pattern for element name.\n\nThe pattern can use `{name}` and `{index}` placeholders to insert `name` and concrete index into the name.\n`{name}` can be omitted, but `{index}` is required.\n\nExamples:\n- `{name}{index}` -> `gpioa`, `gpiob`, `gpioc`, ...\n- `{name}_{index}` -> `irq0`, `irq1`, `irq2`, ...",
+          "title": "Naming",
+          "type": "string"
+        },
+        "offset": {
+          "description": "Byte offset from the parent addressable item.",
+          "minimum": 0,
+          "title": "Offset",
+          "type": "integer"
+        },
+        "kind": {
+          "const": "register_array",
+          "default": "register_array",
+          "description": "Item kind discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "fields": {
+          "description": "Bit fields inside a register.\n\nFields are sorted from LSB to MSB.",
+          "items": {
+            "$ref": "#/$defs/Field"
+          },
+          "title": "Fields",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "doc",
+        "num",
+        "increment",
+        "offset",
+        "fields"
+      ],
+      "title": "RegisterArray",
+      "type": "object"
+    }
+  },
+  "$ref": "#/$defs/Map"
+}

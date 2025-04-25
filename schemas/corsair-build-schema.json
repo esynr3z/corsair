@@ -1,0 +1,324 @@
+{
+  "$defs": {
+    "ResetStyle": {
+      "description": "Flip-flop reset style.",
+      "enum": [
+        "sync_pos",
+        "sync_neg",
+        "async_pos",
+        "async_neg"
+      ],
+      "title": "ResetStyle",
+      "type": "string"
+    },
+    "corsair___generators__markdown__MarkdownGenerator__Config": {
+      "additionalProperties": false,
+      "description": "Configuration for the Markdown generator.",
+      "properties": {
+        "kind": {
+          "const": "markdown",
+          "default": "markdown",
+          "description": "Generator kind discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "file_name": {
+          "default": "regmap.md",
+          "description": "Name of the output file.",
+          "title": "File Name",
+          "type": "string"
+        },
+        "title": {
+          "default": "Register Map",
+          "description": "Document title.",
+          "title": "Title",
+          "type": "string"
+        },
+        "print_images": {
+          "default": false,
+          "description": "Enable generating images for bit fields of a register.",
+          "title": "Print Images",
+          "type": "boolean"
+        },
+        "image_dir": {
+          "default": "img",
+          "description": "Directory for storing images.",
+          "format": "path",
+          "title": "Image Dir",
+          "type": "string"
+        },
+        "print_conventions": {
+          "default": true,
+          "description": "Enable generating table with register access modes explained.",
+          "title": "Print Conventions",
+          "type": "boolean"
+        },
+        "wavedrom": {
+          "$ref": "#/$defs/corsair___generators__wavedrom__WaveDromGenerator__Config",
+          "default": {
+            "kind": "wavedrom",
+            "vspace": 80,
+            "hspace": 800,
+            "lanes": 1,
+            "bits": 32,
+            "hflip": false,
+            "vflip": false,
+            "fontsize": 14,
+            "fontfamily": "sans-serif",
+            "fontweight": "normal",
+            "use_bits_from_map": true,
+            "dump_json": false,
+            "render_svg": true
+          }
+        }
+      },
+      "title": "Config",
+      "type": "object"
+    },
+    "corsair___generators__verilog__VerilogGenerator__Config": {
+      "additionalProperties": false,
+      "description": "Configuration for the Verilog generator.",
+      "properties": {
+        "kind": {
+          "const": "verilog",
+          "default": "verilog",
+          "description": "Generator kind discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "reset_style": {
+          "$ref": "#/$defs/ResetStyle",
+          "default": "async_neg"
+        }
+      },
+      "title": "Config",
+      "type": "object"
+    },
+    "corsair___generators__vhdl__VhdlGenerator__Config": {
+      "additionalProperties": false,
+      "description": "Configuration for the VHDL generator.",
+      "properties": {
+        "kind": {
+          "const": "vhdl",
+          "default": "vhdl",
+          "description": "Generator kind discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "reset_style": {
+          "$ref": "#/$defs/ResetStyle",
+          "default": "async_neg"
+        }
+      },
+      "title": "Config",
+      "type": "object"
+    },
+    "corsair___generators__wavedrom__WaveDromGenerator__Config": {
+      "additionalProperties": false,
+      "description": "Configuration for the WaveDrom generator.",
+      "properties": {
+        "kind": {
+          "const": "wavedrom",
+          "default": "wavedrom",
+          "description": "Generator kind discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "vspace": {
+          "default": 80,
+          "description": "Vertical space between lanes.",
+          "minimum": 20,
+          "title": "Vspace",
+          "type": "integer"
+        },
+        "hspace": {
+          "default": 800,
+          "description": "Horizontal space between lanes.",
+          "minimum": 40,
+          "title": "Hspace",
+          "type": "integer"
+        },
+        "lanes": {
+          "default": 1,
+          "description": "Number of lanes.",
+          "minimum": 1,
+          "title": "Lanes",
+          "type": "integer"
+        },
+        "bits": {
+          "default": 32,
+          "description": "Overall bit width.",
+          "minimum": 4,
+          "title": "Bits",
+          "type": "integer"
+        },
+        "hflip": {
+          "default": false,
+          "description": "Horizontal flip.",
+          "title": "Hflip",
+          "type": "boolean"
+        },
+        "vflip": {
+          "default": false,
+          "description": "Vertical flip.",
+          "title": "Vflip",
+          "type": "boolean"
+        },
+        "fontsize": {
+          "default": 14,
+          "description": "Font size.",
+          "minimum": 6,
+          "title": "Fontsize",
+          "type": "integer"
+        },
+        "fontfamily": {
+          "default": "sans-serif",
+          "description": "Font family.",
+          "title": "Fontfamily",
+          "type": "string"
+        },
+        "fontweight": {
+          "default": "normal",
+          "description": "Font weight.",
+          "title": "Fontweight",
+          "type": "string"
+        },
+        "use_bits_from_map": {
+          "default": true,
+          "description": "Use the bit width from the register map. When True, `bits` is ignored.",
+          "title": "Use Bits From Map",
+          "type": "boolean"
+        },
+        "dump_json": {
+          "default": false,
+          "description": "Dump the JSON wavedrom descriptions for every register.",
+          "title": "Dump Json",
+          "type": "boolean"
+        },
+        "render_svg": {
+          "default": true,
+          "description": "Render the SVG images.",
+          "title": "Render Svg",
+          "type": "boolean"
+        }
+      },
+      "title": "Config",
+      "type": "object"
+    },
+    "corsair___loaders__pymodule__PyModuleLoader__Config": {
+      "additionalProperties": false,
+      "description": "Configuration for the Python module loader.",
+      "properties": {
+        "mapfile": {
+          "default": "csrmap.yaml",
+          "description": "Path to the register map file.",
+          "format": "path",
+          "title": "Mapfile",
+          "type": "string"
+        },
+        "kind": {
+          "const": "py",
+          "default": "py",
+          "description": "Loader kind discriminator.",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "title": "Config",
+      "type": "object"
+    },
+    "corsair___loaders__serialized__SerializedLoader__Config": {
+      "additionalProperties": false,
+      "description": "Configuration for the serialized loader.",
+      "properties": {
+        "mapfile": {
+          "default": "csrmap.yaml",
+          "description": "Path to the register map file.",
+          "format": "path",
+          "title": "Mapfile",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Loader kind discriminator.",
+          "enum": [
+            "json",
+            "yaml",
+            "hjson"
+          ],
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "Config",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Specification that describes how to build everything.",
+  "properties": {
+    "loader": {
+      "default": {
+        "mapfile": "csrmap.yaml",
+        "kind": "yaml"
+      },
+      "description": "Configuration for the loader.",
+      "discriminator": {
+        "mapping": {
+          "hjson": "#/$defs/corsair___loaders__serialized__SerializedLoader__Config",
+          "json": "#/$defs/corsair___loaders__serialized__SerializedLoader__Config",
+          "py": "#/$defs/corsair___loaders__pymodule__PyModuleLoader__Config",
+          "yaml": "#/$defs/corsair___loaders__serialized__SerializedLoader__Config"
+        },
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/corsair___loaders__serialized__SerializedLoader__Config"
+        },
+        {
+          "$ref": "#/$defs/corsair___loaders__pymodule__PyModuleLoader__Config"
+        }
+      ],
+      "title": "Loader"
+    },
+    "generators": {
+      "additionalProperties": {
+        "discriminator": {
+          "mapping": {
+            "markdown": "#/$defs/corsair___generators__markdown__MarkdownGenerator__Config",
+            "verilog": "#/$defs/corsair___generators__verilog__VerilogGenerator__Config",
+            "vhdl": "#/$defs/corsair___generators__vhdl__VhdlGenerator__Config",
+            "wavedrom": "#/$defs/corsair___generators__wavedrom__WaveDromGenerator__Config"
+          },
+          "propertyName": "kind"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/corsair___generators__verilog__VerilogGenerator__Config"
+          },
+          {
+            "$ref": "#/$defs/corsair___generators__vhdl__VhdlGenerator__Config"
+          },
+          {
+            "$ref": "#/$defs/corsair___generators__markdown__MarkdownGenerator__Config"
+          },
+          {
+            "$ref": "#/$defs/corsair___generators__wavedrom__WaveDromGenerator__Config"
+          }
+        ]
+      },
+      "description": "Configuration for the generators to build all required files.",
+      "minProperties": 1,
+      "title": "Generators",
+      "type": "object"
+    }
+  },
+  "required": [
+    "generators"
+  ],
+  "title": "BuildSpecification",
+  "type": "object"
+}

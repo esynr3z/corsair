@@ -62,6 +62,19 @@ jobs:
           runCmd: |
             uv run poe check-commits
 
+      - name: Check generated files
+        uses: devcontainers/ci@v0.3
+        if: always()
+        with:
+          cacheFrom: ghcr.io/esynr3z/corsair-workspace
+          push: never
+          runCmd: |
+            uv run pre-commit run uv-lock --all-files
+            uv run pre-commit run check-yaml --all-files
+            uv run pre-commit run check-json --all-files
+            uv run pre-commit run check-toml --all-files
+            uv run pre-commit run schemas --all-files
+
       - name: Check Python code format
         uses: devcontainers/ci@v0.3
         if: always()

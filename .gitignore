@@ -9,4 +9,4 @@ site
 .cache
 *.bkp
 temp
-corsair-*
+corsair-build

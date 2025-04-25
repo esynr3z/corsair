@@ -26,6 +26,15 @@ repos:
         types: [file, python]
         stages: [pre-commit]
 
+      - id: check-yaml
+        name: YAML check
+        description: Validate all changed YAML files
+        entry: uv run check-yaml
+        language: python
+        types: [yaml]
+        stages: [pre-commit]
+        exclude: ^mkdocs\.yml$
+
       - id: check-toml
         name: TOML check
         description: Validate all changed TOML files
@@ -40,6 +49,15 @@ repos:
         entry: uv run check-json
         language: python
         types: [json]
+        stages: [pre-commit]
+
+      - id: schemas
+        name: Corsair schemas generation
+        description: Generate all schemas
+        entry: schemas/generate.sh
+        language: system
+        pass_filenames: false
+        always_run: true
         stages: [pre-commit]
 
       - id: commitizen
