@@ -26,7 +26,20 @@ Schemas can be used for autocomplete and validation of data in all main serializ
 
 ### VSCode: JSON files
 
-TBD
+Add the schema under the `json.schemas` key in your user or workspace `settings.json`:
+
+```json
+{
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "*csrmap.json"
+      ],
+      "url": "https://raw.githubusercontent.com/esynr3z/corsair/refs/heads/dev2/schemas/corsair-map-schema.json"
+    }
+  ]
+}
+```
 
 ### Other: YAML files
 
