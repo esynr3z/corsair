@@ -6,6 +6,21 @@
     "postCreateCommand": "git config --global --add safe.directory /workspaces/corsair && uv sync --all-extras --dev && uv run poe install-hooks",
     "customizations": {
         "vscode": {
+            "settings": {
+                "files.trimTrailingWhitespace": true,
+                "yaml.schemas": {
+                    "./schemas/corsair-build-schema.json": "*csrbuild.yaml",
+                    "./schemas/corsair-map-schema.json": "*csrmap.yaml"
+                },
+                "json.schemas": [
+                    {
+                        "fileMatch": [
+                            "*csrmap.json"
+                        ],
+                        "url": "./schemas/corsair-map-schema.json"
+                    }
+                ]
+            },
             "extensions": [
                 "ms-python.python",
                 "ms-python.vscode-pylance",
