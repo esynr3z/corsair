@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from corsair._model import Map
 
 import jinja2
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from corsair._templates import TemplateEnvironment
 
@@ -81,6 +81,9 @@ class GeneratorUnsupportedFeatureError(Exception):
 class GeneratorConfig(BaseModel, ABC):
     """Base configuration for a generator."""
 
+    extra: dict[str, Any] = Field(default_factory=dict)
+    """Extra configuration parameters for the generator."""
+
     model_config = ConfigDict(
         extra="forbid",
         use_attribute_docstrings=True,
@@ -136,7 +139,7 @@ class Generator(ABC):
 
     def _render_to_text(self, template_name: str, context: dict[str, Any]) -> str:
         """Render text with Jinja2."""
-        env = TemplateEnvironment(searchpaths=self.template_searchpaths)
+        env = TemplateEnvironment(searchpath=self.template_searchpaths)
         template = env.get_template(template_name)
         return template.render(context)
 

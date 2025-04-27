@@ -15,6 +15,12 @@
       "additionalProperties": false,
       "description": "Configuration for the Markdown generator.",
       "properties": {
+        "extra": {
+          "additionalProperties": true,
+          "description": "Extra configuration parameters for the generator.",
+          "title": "Extra",
+          "type": "object"
+        },
         "kind": {
           "const": "markdown",
           "default": "markdown",
@@ -32,6 +38,12 @@
           "default": "Register Map",
           "description": "Document title.",
           "title": "Title",
+          "type": "string"
+        },
+        "template_name": {
+          "default": "regmap.md.j2",
+          "description": "Name of the Jinja2 template to use.",
+          "title": "Template Name",
           "type": "string"
         },
         "print_images": {
@@ -56,6 +68,7 @@
         "wavedrom": {
           "$ref": "#/$defs/corsair___generators__wavedrom__WaveDromGenerator__Config",
           "default": {
+            "extra": {},
             "kind": "wavedrom",
             "vspace": 80,
             "hspace": 800,
@@ -79,6 +92,12 @@
       "additionalProperties": false,
       "description": "Configuration for the Verilog generator.",
       "properties": {
+        "extra": {
+          "additionalProperties": true,
+          "description": "Extra configuration parameters for the generator.",
+          "title": "Extra",
+          "type": "object"
+        },
         "kind": {
           "const": "verilog",
           "default": "verilog",
@@ -98,6 +117,12 @@
       "additionalProperties": false,
       "description": "Configuration for the VHDL generator.",
       "properties": {
+        "extra": {
+          "additionalProperties": true,
+          "description": "Extra configuration parameters for the generator.",
+          "title": "Extra",
+          "type": "object"
+        },
         "kind": {
           "const": "vhdl",
           "default": "vhdl",
@@ -117,6 +142,12 @@
       "additionalProperties": false,
       "description": "Configuration for the WaveDrom generator.",
       "properties": {
+        "extra": {
+          "additionalProperties": true,
+          "description": "Extra configuration parameters for the generator.",
+          "title": "Extra",
+          "type": "object"
+        },
         "kind": {
           "const": "wavedrom",
           "default": "wavedrom",

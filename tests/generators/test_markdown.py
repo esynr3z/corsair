@@ -213,3 +213,45 @@ def test_wavedrom_dump_json(tmp_path: Path, simple_regmap: csr.Map) -> None:
     assert expected_data_dir.is_dir()
     assert {f for f in expected_data_dir.iterdir() if f.suffix == ".svg"} == expected_svg_files
     assert {f for f in expected_data_dir.iterdir() if f.suffix == ".json"} == expected_json_files
+
+
+def test_custom_template_and_extra_param(tmp_path: Path, simple_regmap: csr.Map) -> None:
+    """Test generation with a custom template and extra config parameters."""
+    custom_template_name = "custom_template.md.j2"
+    custom_template_content = """
+# Custom Template Test
+
+Registers:
+{% for item in regmap.items %}
+- {{ item.name }}
+{% endfor %}
+
+Custom Param: {{ cfg.extra['my_param'] }}
+"""
+    custom_template_file = tmp_path / custom_template_name
+    custom_template_file.write_text(custom_template_content)
+
+    custom_key = "my_param"
+    custom_value = "hello_world"
+    config = csr.MarkdownGenerator.Config(template_name=str(custom_template_file), extra={custom_key: custom_value})
+
+    gen = csr.MarkdownGenerator(
+        label="test_md_gen_custom_tmpl",
+        register_map=simple_regmap,
+        config=config,
+        output_dir=tmp_path,
+    )
+    generated_files = list(gen())
+
+    # Check that the default file name is used if not specified
+    expected_file = tmp_path / "regmap.md"
+    assert generated_files == [expected_file]
+    assert expected_file.is_file()
+
+    # Check the content of the generated file
+    content = expected_file.read_text()
+    assert "# Custom Template Test" in content
+    assert "Registers:" in content
+    assert "- reg1" in content
+    assert "- reg2" in content
+    assert f"Custom Param: {custom_value}" in content

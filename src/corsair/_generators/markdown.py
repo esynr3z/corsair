@@ -15,8 +15,6 @@ if TYPE_CHECKING:
 class MarkdownGenerator(Generator):
     """Markdown file generator for a register map."""
 
-    template_name: str = "regmap.md.j2"
-
     class Config(GeneratorConfig):
         """Configuration for the Markdown generator."""
 
@@ -28,6 +26,9 @@ class MarkdownGenerator(Generator):
 
         title: str = "Register Map"
         """Document title."""
+
+        template_name: str = "regmap.md.j2"
+        """Name of the Jinja2 template to use."""
 
         print_images: bool = False
         """Enable generating images for bit fields of a register."""
@@ -65,7 +66,7 @@ class MarkdownGenerator(Generator):
         }
 
         yield self._render_to_file(
-            template_name=self.template_name,
+            template_name=self.config.template_name,
             context=context,
             file_name=self.config.file_name,
         )
