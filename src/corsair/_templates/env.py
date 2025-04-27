@@ -61,9 +61,9 @@ class TemplateEnvironment(Environment):
         """Initialize the template environment."""
         if not searchpath:
             searchpath = []
+
         # Always include the directory containing the built-in templates
-        if Path(__file__).parent not in searchpath:
-            searchpath.append(Path(__file__).parent)
+        searchpath.append(Path(__file__).parent)
 
         super().__init__(
             loader=_EnhancedFileSystemLoader(searchpath=searchpath),

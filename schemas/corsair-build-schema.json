@@ -15,6 +15,15 @@
       "additionalProperties": false,
       "description": "Configuration for the Markdown generator.",
       "properties": {
+        "template_searchpaths": {
+          "description": "Additional paths to search for templates.\n\nTemplates will be searched for in the given paths first.",
+          "items": {
+            "format": "path",
+            "type": "string"
+          },
+          "title": "Template Searchpaths",
+          "type": "array"
+        },
         "extra": {
           "additionalProperties": true,
           "description": "Extra configuration parameters for the generator.",
@@ -68,6 +77,7 @@
         "wavedrom": {
           "$ref": "#/$defs/corsair___generators__wavedrom__WaveDromGenerator__Config",
           "default": {
+            "template_searchpaths": [],
             "extra": {},
             "kind": "wavedrom",
             "vspace": 80,
@@ -92,6 +102,15 @@
       "additionalProperties": false,
       "description": "Configuration for the Verilog generator.",
       "properties": {
+        "template_searchpaths": {
+          "description": "Additional paths to search for templates.\n\nTemplates will be searched for in the given paths first.",
+          "items": {
+            "format": "path",
+            "type": "string"
+          },
+          "title": "Template Searchpaths",
+          "type": "array"
+        },
         "extra": {
           "additionalProperties": true,
           "description": "Extra configuration parameters for the generator.",
@@ -117,6 +136,15 @@
       "additionalProperties": false,
       "description": "Configuration for the VHDL generator.",
       "properties": {
+        "template_searchpaths": {
+          "description": "Additional paths to search for templates.\n\nTemplates will be searched for in the given paths first.",
+          "items": {
+            "format": "path",
+            "type": "string"
+          },
+          "title": "Template Searchpaths",
+          "type": "array"
+        },
         "extra": {
           "additionalProperties": true,
           "description": "Extra configuration parameters for the generator.",
@@ -142,6 +170,15 @@
       "additionalProperties": false,
       "description": "Configuration for the WaveDrom generator.",
       "properties": {
+        "template_searchpaths": {
+          "description": "Additional paths to search for templates.\n\nTemplates will be searched for in the given paths first.",
+          "items": {
+            "format": "path",
+            "type": "string"
+          },
+          "title": "Template Searchpaths",
+          "type": "array"
+        },
         "extra": {
           "additionalProperties": true,
           "description": "Extra configuration parameters for the generator.",

@@ -66,6 +66,30 @@ def simple_regmap() -> csr.Map:
     )
 
 
+@pytest.fixture
+def custom_template(tmp_path: Path) -> Path:
+    """Create a custom template file directly in tmp_path and return its absolute path."""
+    template_name = "custom_template_fixture.md.j2"
+    template_content = (
+        """"" \
+# Custom Template Fixture Test
+
+Registers:
+{% for item in regmap.items %}
+- {{ item.name }}
+{% endfor %}
+
+{% if cfg.extra['my_param'] is defined %}
+Custom Param: {{ cfg.extra['my_param'] }}
+{% endif %}
+"""
+        ""
+    )  # Raw string literal to handle backslashes correctly
+    template_file = tmp_path / template_name
+    template_file.write_text(template_content)
+    return template_file.resolve()  # Return absolute path
+
+
 def test_default_generation(tmp_path: Path, simple_regmap: csr.Map) -> None:
     """Test default Markdown generation."""
     config = csr.MarkdownGenerator.Config()
@@ -215,25 +239,13 @@ def test_wavedrom_dump_json(tmp_path: Path, simple_regmap: csr.Map) -> None:
     assert {f for f in expected_data_dir.iterdir() if f.suffix == ".json"} == expected_json_files
 
 
-def test_custom_template_and_extra_param(tmp_path: Path, simple_regmap: csr.Map) -> None:
+def test_custom_template_and_extra_param(tmp_path: Path, simple_regmap: csr.Map, custom_template: Path) -> None:
     """Test generation with a custom template and extra config parameters."""
-    custom_template_name = "custom_template.md.j2"
-    custom_template_content = """
-# Custom Template Test
-
-Registers:
-{% for item in regmap.items %}
-- {{ item.name }}
-{% endfor %}
-
-Custom Param: {{ cfg.extra['my_param'] }}
-"""
-    custom_template_file = tmp_path / custom_template_name
-    custom_template_file.write_text(custom_template_content)
+    template_file = custom_template
 
     custom_key = "my_param"
     custom_value = "hello_world"
-    config = csr.MarkdownGenerator.Config(template_name=str(custom_template_file), extra={custom_key: custom_value})
+    config = csr.MarkdownGenerator.Config(template_name=str(template_file), extra={custom_key: custom_value})
 
     gen = csr.MarkdownGenerator(
         label="test_md_gen_custom_tmpl",
@@ -250,8 +262,34 @@ Custom Param: {{ cfg.extra['my_param'] }}
 
     # Check the content of the generated file
     content = expected_file.read_text()
-    assert "# Custom Template Test" in content
+    assert "# Custom Template Fixture Test" in content
     assert "Registers:" in content
     assert "- reg1" in content
     assert "- reg2" in content
     assert f"Custom Param: {custom_value}" in content
+
+
+def test_custom_template_searchpath(tmp_path: Path, simple_regmap: csr.Map, custom_template: Path) -> None:
+    """Test generation with a custom template specified via search path."""
+    template_file = custom_template  # Fixture now returns the absolute path
+    templates_dir = template_file.parent
+    template_name = template_file.name
+
+    # Configure the generator to use the custom template directory and name
+    config = csr.MarkdownGenerator.Config(
+        template_searchpaths=[templates_dir],
+        template_name=template_name,
+    )
+
+    gen = csr.MarkdownGenerator(
+        label="test_md_gen_searchpath",
+        register_map=simple_regmap,
+        config=config,
+        output_dir=tmp_path,
+    )
+
+    # Running the generator should succeed without TemplateNotFound
+    try:
+        list(gen())
+    except csr.GeneratorTemplateError as e:
+        pytest.fail(f"Template generation failed: {e}")

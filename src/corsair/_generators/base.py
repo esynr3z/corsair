@@ -81,6 +81,12 @@ class GeneratorUnsupportedFeatureError(Exception):
 class GeneratorConfig(BaseModel, ABC):
     """Base configuration for a generator."""
 
+    template_searchpaths: list[Path] = Field(default_factory=list)
+    """Additional paths to search for templates.
+
+    Templates will be searched for in the given paths first.
+    """
+
     extra: dict[str, Any] = Field(default_factory=dict)
     """Extra configuration parameters for the generator."""
 
@@ -108,14 +114,12 @@ class Generator(ABC):
         register_map: Map,
         config: GeneratorConfig,
         output_dir: Path,
-        template_searchpaths: list[Path] | None = None,
     ) -> None:
         """Initialize the generator."""
         self.label = label
         self.register_map = register_map
         self.config = config
         self.output_dir = output_dir.resolve()
-        self.template_searchpaths = template_searchpaths
 
         if not isinstance(self.config, self.get_config_cls()):
             raise TypeError(
@@ -139,7 +143,7 @@ class Generator(ABC):
 
     def _render_to_text(self, template_name: str, context: dict[str, Any]) -> str:
         """Render text with Jinja2."""
-        env = TemplateEnvironment(searchpath=self.template_searchpaths)
+        env = TemplateEnvironment(searchpath=self.config.template_searchpaths)
         template = env.get_template(template_name)
         return template.render(context)
 
