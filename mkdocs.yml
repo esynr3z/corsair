@@ -1,6 +1,6 @@
 site_name: Corsair
-site_url: https://corsair.synrez.xyz/
-site_description: Corsair navigates you through the CSR seas. No more mismatches between hardware, software, and documentation.
+site_url: https://corsair-csr.github.io/
+site_description: CLI tool and Python library designed to manage CSR maps for HDL projects
 repo_url: https://github.com/esynr3z/corsair
 
 plugins:
