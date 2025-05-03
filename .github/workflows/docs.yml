@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # need the entire commit history for mike
+          token: ${{ secrets.CORSAIR_ORG_PAGES_DEPLOY_PAT }}
 
       - name: Install Python and project dependencies
         uses: devcontainers/ci@v0.3
@@ -32,7 +33,7 @@ jobs:
           runCmd: |
             git config --global user.email "github-actions@github.com"
             git config --global user.name  "GitHub Actions"
-            git remote add docs "https://x-access-token:${{ secrets.CORSAIR_ORG_PAGES_DEPLOY_PAT }}@github.com/corsair-csr/corsair-csr.git"
+            git remote add docs git@github.com:corsair-csr/corsair-csr.git
             git fetch docs gh-pages
 
       - name: Deploy dev snapshot
