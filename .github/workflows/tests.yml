@@ -1,9 +1,9 @@
-name: CI
+name: Tests & Checks
 
 on:
   push:
     branches:
-      - dev2
+      - dev2 # FIXME: replace with `master` after merging
   pull_request:
     branches:
       - '**'
@@ -12,30 +12,9 @@ env:
   PY_COLORS: "1"
 
 jobs:
-  build:
-    name: Build devcontainer image
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: esynr3z
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build image
-        uses: devcontainers/ci@v0.3
-        with:
-          imageName: ghcr.io/esynr3z/corsair-workspace
-          cacheFrom: ghcr.io/esynr3z/corsair-workspace
-          push: always
-
   test:
     name: Python ${{ matrix.python-version }} tests & checks
     runs-on: ubuntu-latest
-    needs: build
     strategy:
       fail-fast: false
       matrix:
@@ -43,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # need the entire commit history for checking commits
 
       - name: Install Python ${{ matrix.python-version }} and project dependencies
         uses: devcontainers/ci@v0.3
