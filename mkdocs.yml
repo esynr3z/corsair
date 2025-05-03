@@ -13,6 +13,12 @@ plugins:
       glob:
         - "assets/private/*"
 
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
 extra:
   version:
     provider: mike

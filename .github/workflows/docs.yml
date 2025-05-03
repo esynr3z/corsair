@@ -36,6 +36,14 @@ jobs:
             git remote add docs "https://x-access-token:${{ secrets.CORSAIR_ORG_PAGES_DEPLOY_PAT }}@github.com/corsair-csr/corsair-csr.git"
             git fetch docs gh-pages
 
+      - name: Validate docs
+        uses: devcontainers/ci@v0.3
+        with:
+          cacheFrom: ghcr.io/esynr3z/corsair-workspace
+          push: never
+          runCmd: |
+            uv run mkdocs build --strict --clean
+
       - name: Deploy dev snapshot
         if: github.ref == 'refs/heads/dev2' # FIXME: replace with `master` after merging
         uses: devcontainers/ci@v0.3
