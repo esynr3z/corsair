@@ -1,0 +1,56 @@
+name: Documentation
+
+on:
+  push:
+    branches:
+      - dev2 # FIXME: replace with `master` after merging
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build and deploy documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need the entire commit history for mike
+
+      - name: Install Python and project dependencies
+        uses: devcontainers/ci@v0.3
+        with:
+          cacheFrom: ghcr.io/esynr3z/corsair-workspace
+          push: never
+          runCmd: |
+            uv sync --all-extras --dev
+
+      - name: Add remote with documentation
+        uses: devcontainers/ci@v0.3
+        with:
+          cacheFrom: ghcr.io/esynr3z/corsair-workspace
+          push: never
+          runCmd: |
+            git config --global user.email "github-actions@github.com"
+            git config --global user.name  "GitHub Actions"
+            git remote add docs "https://x-access-token:${{ secrets.CORSAIR_ORG_PAGES_DEPLOY_PAT }}@github.com/corsair-csr/corsair-csr.git"
+            git fetch docs gh-pages
+
+      - name: Deploy dev snapshot
+        if: github.ref == 'refs/heads/dev2' # FIXME: replace with `master` after merging
+        uses: devcontainers/ci@v0.3
+        with:
+          cacheFrom: ghcr.io/esynr3z/corsair-workspace
+          push: never
+          runCmd: |
+            uv run mike deploy dev --remote docs --branch gh-pages --push --force
+            uv run mike set-default --remote docs --branch gh-pages --push dev
+
+      - name: Deploy release from tag
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: devcontainers/ci@v0.3
+        with:
+          cacheFrom: ghcr.io/esynr3z/corsair-workspace
+          push: never
+          runCmd: |
+            uv run mike deploy "${{ github.ref_name }}" --remote docs --branch gh-pages --push --update-aliases latest
+            uv run mike set-default --remote docs --branch gh-pages --push latest
