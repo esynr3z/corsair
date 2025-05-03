@@ -8,5 +8,6 @@ dist
 site
 .cache
 *.bkp
+*.bkp-*
 temp
 corsair-build
