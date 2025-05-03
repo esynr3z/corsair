@@ -3,6 +3,7 @@
     "build": {
         "dockerfile": "Dockerfile"
     },
+    "remoteUser": "ubuntu",
     "postCreateCommand": "git config --global --add safe.directory /workspaces/corsair && uv sync --all-extras --dev && uv run poe install-hooks",
     "customizations": {
         "vscode": {

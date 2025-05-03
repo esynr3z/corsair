@@ -72,9 +72,15 @@ COPY --from=verilator_builder ${VERILATOR_INSTALL} ${VERILATOR_INSTALL}
 ENV MODELSIM_INSTALL=/opt/modelsim
 COPY --from=modelsim_installer ${MODELSIM_INSTALL} ${MODELSIM_INSTALL}
 
+# Add user rights to access the install directories
+RUN chown -R ubuntu:ubuntu /opt
+
+# Switch to non-root user
+USER ubuntu
+
 # Install uv
 ENV UV_VERSION=0.6.16
 RUN curl -LsSf https://astral.sh/uv/${UV_VERSION}/install.sh | sh
 
 # Update PATH
-ENV PATH="/root/.local/bin:${MODELSIM_INSTALL}/modelsim_ase/bin:${VERILATOR_INSTALL}/bin:${PATH}"
+ENV PATH="${HOME}/.local/bin:${MODELSIM_INSTALL}/modelsim_ase/bin:${VERILATOR_INSTALL}/bin:${PATH}"
