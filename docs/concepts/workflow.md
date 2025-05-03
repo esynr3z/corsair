@@ -4,7 +4,7 @@ icon: octicons/workflow-16
 
 # Workflow
 
-<img src="/assets/images/flow.drawio.svg" alt="Corsair flow" class="invert-on-slate">
+<img src="../../assets/images/flow.drawio.svg" alt="Corsair flow" class="invert-on-slate">
 
 :material-numeric-1-circle: TBD
 
