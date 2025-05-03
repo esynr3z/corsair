@@ -42,8 +42,8 @@ jobs:
           cacheFrom: ghcr.io/esynr3z/corsair-workspace
           push: never
           runCmd: |
-            uv run mike deploy dev --remote docs --branch gh-pages --push --force
-            uv run mike set-default --remote docs --branch gh-pages --push dev
+            # FIXME: remove latest alias after first tag is created
+            uv run mike deploy dev latest --remote docs --branch gh-pages --push
 
       - name: Deploy release from tag
         if: startsWith(github.ref, 'refs/tags/')
@@ -52,5 +52,12 @@ jobs:
           cacheFrom: ghcr.io/esynr3z/corsair-workspace
           push: never
           runCmd: |
-            uv run mike deploy "${{ github.ref_name }}" --remote docs --branch gh-pages --push --update-aliases latest
-            uv run mike set-default --remote docs --branch gh-pages --push latest
+            uv run mike deploy "${{ github.ref_name }}" latest --remote docs --branch gh-pages --push --update-aliases
+
+      - name: Update default version
+        uses: devcontainers/ci@v0.3
+        with:
+          cacheFrom: ghcr.io/esynr3z/corsair-workspace
+          push: never
+          runCmd: |
+            uv run mike set-default latest --remote docs --branch gh-pages --push
