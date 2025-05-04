@@ -1,0 +1,8 @@
+---
+description: 
+globs: *.md
+alwaysApply: false
+---
+# Documentation rules
+
+Write technical documentation in English. The documentation should be concise, precise, and easily understandable for non-native speakers. Use simple language and avoid complex academic terms. Adhere to professional technical writing standards and best practices.

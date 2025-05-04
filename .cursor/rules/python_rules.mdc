@@ -1,6 +1,6 @@
 ---
 description: 
-globs: *.py,**/*.py
+globs: *.py
 alwaysApply: false
 ---
 # Python coding rules
@@ -27,39 +27,3 @@ You are an expert in Python and CLI tools development.
 - Do not switch to another test until the current one is passing
 - Use pytest verbosity arguments (-vv) to collect more information
 
-## Used Tools
-
-You use:
-
-- Python 3.10
-- pydantic for data structures management and schemas
-- typer for CLI
-- jinja2 for templates
-- uv for dependency management
-- pytest for unit tests
-- poe for tasks management
-- ruff for code formatting
-- ruff for code linting
-- pyright for type checking
-- pre-commit for git hooks
-- mkdocs for documentation
-- mkdocs-material for documentation theme
-
-Use `uv run` to execute any python code. Example:
-
-```bash
-uv run pytest # run all tests
-uv run corsair --h # run corsair help
-```
-
-Use `uv run poe <task>` to execute any maintenance tasks. Example:
-
-```bash
-uv run poe format # format code with ruff
-uv run poe lint # check code with ruff
-uv run poe lint --fix # fix linting errors with ruff
-uv run poe check-format # check format with ruff
-uv run poe check-types # check types with pyright
-uv run poe test # run tests with pytest
-uv run poe test-cov # run tests with coverage
-```

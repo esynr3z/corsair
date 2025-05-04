@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Git rules
+
+For git commit messages follow the [Conventional Commits](mdc:https:/www.conventionalcommits.org) specification.
+
+For git tags follow [Semantic Versioning (SemVer)](mdc:https:/semver.org).
