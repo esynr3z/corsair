@@ -33,7 +33,8 @@
                 "charliermarsh.ruff",
                 "jock.svg",
                 "redhat.vscode-yaml",
-                "github.vscode-github-actions"
+                "github.vscode-github-actions",
+                "gruntfuggly.todo-tree"
             ]
         }
     }
