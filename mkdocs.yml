@@ -45,6 +45,7 @@ theme:
     - toc.follow
     - toc.integrate
     - content.action.edit
+    - content.code.copy
     - search.suggest
     - search.highlight
     - search.share
@@ -85,7 +86,7 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true
-      linenums: true
+      linenums: false
   - pymdownx.superfences
   - pymdownx.inlinehilite
   - pymdownx.emoji:
