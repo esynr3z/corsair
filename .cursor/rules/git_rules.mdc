@@ -5,6 +5,6 @@ alwaysApply: true
 ---
 # Git rules
 
-For git commit messages follow the [Conventional Commits](mdc:https:/www.conventionalcommits.org) specification.
+For git commit messages follow the [Conventional Commits](mdc:https:/www.conventionalcommits.org) specification. Analyze diffs to create descriptive commit message. DO NOT combine `fix` and `feat` commit types with other known types like `docs` or `test` (e.g. use `docs:` instead of `feat(docs):`)
 
 For git tags follow [Semantic Versioning (SemVer)](mdc:https:/semver.org).

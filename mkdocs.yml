@@ -7,6 +7,7 @@ plugins:
   - search
   - social
   - blog
+  - mkdocs-typer2
   - git-revision-date-localized:
       enable_creation_date: true
   - exclude:
@@ -140,6 +141,7 @@ nav:
       - register-file/custom.md
   - CLI:
       - cli/index.md
+      - cli/commands.md
   - API:
       - api/index.md
   - Hardware:
