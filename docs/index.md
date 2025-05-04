@@ -9,11 +9,21 @@
     <em>No more mismatches between hardware, software, and documentation.</em>
     <br>
     <br>
-    <em>[BADGES HERE]</em>
+    <em>
+      <a href="https://github.com/esynr3z/corsair/actions/workflows/devcontainer.yml" target="_blank">
+        <img src="https://github.com/esynr3z/corsair/actions/workflows/devcontainer.yml/badge.svg?branch=dev2" alt="Devcontainer">
+      </a>
+      <a href="https://github.com/esynr3z/corsair/actions/workflows/docs.yml" target="_blank">
+        <img src="https://github.com/esynr3z/corsair/actions/workflows/docs.yml/badge.svg?branch=dev2" alt="Documentation">
+      </a>
+      <a href="https://github.com/esynr3z/corsair/actions/workflows/tests.yml" target="_blank">
+        <img src="https://github.com/esynr3z/corsair/actions/workflows/tests.yml/badge.svg?branch=dev2" alt="Tests & Checks">
+      </a>
+    </em>
 </p>
 
 <h4 align="center">
-  <a href="https://esynr3z.github.io/corsair">Documentation</a> |
+  <a href="https://corsair-csr.github.io">Documentation</a> |
   <a href="https://github.com/esynr3z/corsair">Repository</a>
 </h4>
 
@@ -21,7 +31,7 @@
 
 ## Features
 
-TBD
+TODO
 
 ## Quick Start
 
@@ -29,4 +39,4 @@ TDB
 
 ## License
 
-TBD
+TODO
