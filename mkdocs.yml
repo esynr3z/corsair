@@ -113,8 +113,8 @@ nav:
       - concepts/philosophy.md
       - concepts/workflow.md
       - concepts/build-specification.md
+      - concepts/loaders.md
       - concepts/register-model.md
-      - concepts/parsers.md
       - concepts/generators.md
       - concepts/customization.md
       - concepts/file-confidence.md
