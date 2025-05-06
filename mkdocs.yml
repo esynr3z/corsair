@@ -140,9 +140,7 @@ nav:
       - register-file/json.md
       - register-file/toml.md
       - register-file/custom.md
-  - CLI:
-      - cli/index.md
-      - cli/commands.md
+  - CLI: cli.md
   - API: api.md
   - Hardware:
       - hardware/index.md

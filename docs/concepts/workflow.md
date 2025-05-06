@@ -40,4 +40,4 @@ For example, if a build file (e.g. `csrbuild.yaml`) is present in the current di
 corsair build
 ```
 
-will generate all output artifacts in the created `corsair-build` directory. For more details on the `build` command, see the [CLI documentation](../cli/commands.md#corsair-build).
+will generate all output artifacts in the created `corsair-build` directory. For more details on the `build` command, see the [CLI documentation](../cli.md#corsair-build).
