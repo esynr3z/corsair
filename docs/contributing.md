@@ -94,7 +94,7 @@ Common tasks include:
 
 ## Project Choices
 
-To ensure consistency and maintainability, the Corsair project relies on a specific seёt of tools and conventions. Understanding these choices is crucial for effective contribution.
+To ensure consistency and maintainability, the Corsair project relies on a specific set of tools and conventions. Understanding these choices is crucial for effective contribution.
 
 ### Main Dependencies
 
