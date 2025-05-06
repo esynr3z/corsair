@@ -73,6 +73,7 @@ dev = [
     "pytest-xdist>=3.6.1",
     "mike>=2.1.3",
     "mkdocs-typer2>=0.1.4",
+    "mkdocstrings[python]>=0.29.1",
 ]
 
 [tool.ruff]
