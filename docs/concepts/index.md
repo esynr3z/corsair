@@ -7,6 +7,6 @@ This section explains what the tool is and is not, outlining its general working
 For detailed technical information, please refer to the following sections:
 
 - [Cookbook](../cookbook/index.md) to get familiar with some practical examples
-- [CLI](../cli/index.md) and [API](../api/index.md) to get information about how to interact with the tool
+- [CLI](../cli.md) and [API](../api.md) to get information about how to interact with the tool
 - [Build File](../build-file/index.md) and [Register File](../register-file/index.md) to get information about format of the input files
 
