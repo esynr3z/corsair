@@ -4,8 +4,6 @@ icon: octicons/workflow-16
 
 # Workflow
 
-
-
 <img src="../../assets/images/flow.drawio.svg" alt="Corsair flow" class="invert-on-slate">
 
 The Corsair transforms register descriptions into various output files like RTL code, software headers, and documentation. This process ensures consistency across different project aspects.
