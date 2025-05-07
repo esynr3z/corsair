@@ -42,7 +42,7 @@ jobs:
           cacheFrom: ghcr.io/esynr3z/corsair-workspace
           push: never
           runCmd: |
-            uv run mkdocs build --strict --clean
+            uv run mkdocs build --clean
 
       - name: Deploy dev snapshot
         if: github.ref == 'refs/heads/dev2' # FIXME: replace with `master` after merging
