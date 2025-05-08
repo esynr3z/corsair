@@ -60,6 +60,15 @@ repos:
         always_run: true
         stages: [pre-commit]
 
+      - id: derived-docs
+        name: Generation of derived documentation
+        description: Generate all derived documentation
+        entry: docs/generate.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
       - id: commitizen
         name: Commit style check
         description: Run commitizen to validate commit message

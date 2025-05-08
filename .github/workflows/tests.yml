@@ -53,6 +53,7 @@ jobs:
             uv run pre-commit run check-json --all-files
             uv run pre-commit run check-toml --all-files
             uv run pre-commit run schemas --all-files
+            uv run pre-commit run derived-docs --all-files
 
       - name: Check Python code format
         uses: devcontainers/ci@v0.3

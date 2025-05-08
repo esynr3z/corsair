@@ -7,13 +7,13 @@ plugins:
   - search
   - social
   - blog
-  - mkdocs-typer2
   - mkdocstrings
   - git-revision-date-localized:
       enable_creation_date: true
   - exclude:
       glob:
         - "assets/private/*"
+        - "*.sh"
 
 validation:
   omitted_files: warn
