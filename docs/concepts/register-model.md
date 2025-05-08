@@ -35,5 +35,5 @@ To handle more intricate and complex hardware designs, Corsair plans to extend t
 
 This chapter serves as an introduction to the concept and structure of the Register Model. For details on how this model is populated from specific input file formats or how it's utilized by different code generators, please refer to their respective documentation sections:
 
-*   [Register File](./register-file/index.md)
-*   [Build File](./build-file/index.md)
+*   [Register File](../register-file/index.md)
+*   [Build File](../build-file/index.md)

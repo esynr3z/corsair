@@ -116,17 +116,19 @@ nav:
       - concepts/file-confidence.md
   - Build File:
       - build-file/index.md
-      - build-file/config.md
-      - Targets:
-          - build-file/targets/sv.md
-          - build-file/targets/sv-package.md
-          - build-file/targets/verilog.md
-          - build-file/targets/verilog-header.md
-          - build-file/targets/vhdl.md
-          - build-file/targets/markdown.md
-          - build-file/targets/asciidoc.md
-          - build-file/targets/c-header.md
-          - build-file/targets/custom.md
+      - Loaders:
+          - build-file/loaders/index.md
+      - Generators:
+          - build-file/generators/index.md
+          - build-file/generators/sv.md
+          - build-file/generators/sv-package.md
+          - build-file/generators/verilog.md
+          - build-file/generators/verilog-header.md
+          - build-file/generators/vhdl.md
+          - build-file/generators/markdown.md
+          - build-file/generators/asciidoc.md
+          - build-file/generators/c-header.md
+          - build-file/generators/custom.md
   - Register File:
       - register-file/index.md
       - register-file/yaml.md
