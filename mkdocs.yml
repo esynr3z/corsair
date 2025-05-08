@@ -45,7 +45,6 @@ theme:
     - navigation.top
     - navigation.footer
     - toc.follow
-    - toc.integrate
     - content.action.edit
     - content.code.copy
     - search.suggest
