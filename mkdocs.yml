@@ -105,12 +105,6 @@ nav:
       - first-steps.md
       - contributing.md
       - changelog.md
-  - Cookbook:
-      - cookbook/index.md
-      - Using CLI:
-          - cookbook/cli/create-project.md
-      - Using API:
-          - cookbook/api/custom-flow.md
   - Concepts:
       - concepts/index.md
       - concepts/philosophy.md
@@ -148,5 +142,11 @@ nav:
           - hardware/fields/index.md
       - Protocols:
           - hardware/protocols/index.md
+  - Cookbook:
+      - cookbook/index.md
+      - Using CLI:
+          - cookbook/cli/create-project.md
+      - Using API:
+          - cookbook/api/custom-flow.md
   - Blog:
       - blog/index.md
