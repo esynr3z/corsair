@@ -1,0 +1,22 @@
+name: Task
+description: You are either one of the maintainers or have been explicitly asked to create an issue here. If not, please check the other available options.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest in Corsair!
+
+        Issues are used solely for task management. If you’d like to report a bug, request a feature, or ask for clarification, please start a conversation in [GitHub Discussions](https://github.com/esynr3z/corsair/discussions/categories/questions) instead.
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: New Task
+      description: Confirm that you are allowed to create an issue here.
+      options:
+        - label: I am one of the maintainers / I have been explicitly asked to create an issue here
+          required: true
+  - type: textarea
+    id: content
+    attributes:
+      label: Task Content
+      description: Add the content of the task here
