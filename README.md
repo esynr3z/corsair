@@ -1,6 +1,6 @@
 # Corsair
 
-⚠️🚨⚠️ **The code for version 1.x is frozen — no new features or bug fixes will be made. More details in [release 2.x roadmap](https://github.com/esynr3z/corsair/issues/95).** ⚠️🚨⚠️
+⚠️🚨⚠️ **The code for version 1.x is frozen — no new features or bug fixes will be made. More details in [release 2.x roadmap](https://github.com/esynr3z/corsair/discussions/97).** ⚠️🚨⚠️
 
 ![corsair_logo](docs/img/logo.png)
 
