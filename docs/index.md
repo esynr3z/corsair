@@ -1,5 +1,7 @@
 # Corsair
 
+⚠️🚨⚠️ **PROJECT'S VERSION 2.X IS UNDER ACTIVE DEVELOPMENT.** ⚠️🚨⚠️
+
 <p align="center">
     <img src="assets/images/logo.svg" alt="logo" width="200"/>
     <br>
