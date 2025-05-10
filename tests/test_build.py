@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
@@ -100,16 +99,3 @@ def test_from_toml(tmp_path: Path) -> None:
     assert spec.loader.kind == "json"
     assert len(spec.generators) == 2
     assert spec.generators["vlog"].kind == "verilog"
-
-
-def test_to_json_schema(tmp_path: Path) -> None:
-    """Test writing JSON schema to file."""
-    schema_file = tmp_path / "schema.json"
-    csr.BuildSpecification.to_json_schema_file(schema_file)
-
-    with schema_file.open() as f:
-        schema = json.load(f)
-
-    assert schema["title"] == "BuildSpecification"
-    assert "loader" in schema["properties"]
-    assert "generators" in schema["properties"]

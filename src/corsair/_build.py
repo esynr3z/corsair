@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from typing import TYPE_CHECKING
 
 import yaml
@@ -29,13 +28,6 @@ class BuildSpecification(BaseModel):
         """Load specification from YAML file."""
         with path.open("r", encoding="utf-8") as f:
             return BuildSpecification(**yaml.safe_load(f))
-
-    @classmethod
-    def to_json_schema_file(cls, path: Path) -> None:
-        """Write JSON schema to file."""
-        with path.open("w") as f:
-            schema = cls.model_json_schema()
-            json.dump(schema, f)
 
     model_config = ConfigDict(
         extra="forbid",
