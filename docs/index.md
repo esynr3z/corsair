@@ -33,12 +33,9 @@
 
 ## Features
 
-TODO
+*   **Single Source of Truth:** Define CSR maps in a single file (e.g., YAML, JSON) and generate various outputs from it.
+*   **Code Generation:** Automatically generate HDL, software sources, and documentation from the CSR map.
+*   **CLI and API:** Offers both a command-line interface for quick operations and a Python API for more complex, custom workflows.
+*   **Customizable Workflows:** Supports user-side extensions for attributes, configurations, templates, and input/output formats.
 
-## Quick Start
-
-TDB
-
-## License
-
-TODO
+Check out the [Concepts](./concepts/index.md) section to understand the core concepts of Corsair.
