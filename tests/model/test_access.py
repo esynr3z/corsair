@@ -68,6 +68,16 @@ def test_access_is_wo() -> None:
     assert AccessMode.RO.is_wo == False
 
 
+def test_access_is_rw() -> None:
+    """Test is_rw property for different access modes."""
+    assert AccessMode.RW.is_rw == True
+    assert AccessMode.RW1C.is_rw == True
+    assert AccessMode.RW1S.is_rw == True
+    assert AccessMode.WO.is_rw == False
+    assert AccessMode.WOSC.is_rw == False
+    assert AccessMode.RO.is_rw == False
+
+
 def test_access_invalid_value() -> None:
     """Test that invalid access mode values raise ValueError."""
     with pytest.raises(ValueError, match="is not a valid AccessMode"):

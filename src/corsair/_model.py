@@ -87,7 +87,7 @@ class AccessMode(str, enum.Enum):
             return AccessCategory.RO
         if self in (AccessMode.WO, AccessMode.WOSC):
             return AccessCategory.WO
-        if self == AccessMode.RW:
+        if self in (AccessMode.RW, AccessMode.RW1C, AccessMode.RW1S):
             return AccessCategory.RW
         raise ValueError(f"Cannot map access mode {self} to any category")
 
