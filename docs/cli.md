@@ -40,11 +40,16 @@ Initialize a simple project.
 **Usage**:
 
 ```console
-$ corsair init [OPTIONS]
+$ corsair init [OPTIONS] [KIND]:[json|hjson|yaml]
 ```
+
+**Arguments**:
+
+* `[KIND]:[json|hjson|yaml]`: Template kind. Defines the format of the generated register map file.  [default: yaml]
 
 **Options**:
 
+* `-o, --output PATH`: Path to an output directory  [default: .]
 * `--help`: Show this message and exit.
 
 ## `corsair build`

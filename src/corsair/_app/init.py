@@ -6,7 +6,7 @@ import importlib.util
 import logging
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 
 import typer  # noqa: TCH002
 
