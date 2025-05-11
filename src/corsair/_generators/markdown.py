@@ -45,6 +45,9 @@ class MarkdownGenerator(Generator):
         show_hardware_mode: bool = False
         """Enable showing hardware mode for each field."""
 
+        use_table_for_fields: bool = False
+        """Use tables to describe fields instead of lists."""
+
         wavedrom: WaveDromGenerator.Config = WaveDromGenerator.Config()
         """Configuration for the WaveDrom generator."""
 

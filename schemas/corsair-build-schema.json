@@ -86,6 +86,12 @@
           "title": "Show Hardware Mode",
           "type": "boolean"
         },
+        "use_table_for_fields": {
+          "default": false,
+          "description": "Use tables to describe fields instead of lists.",
+          "title": "Use Table For Fields",
+          "type": "boolean"
+        },
         "wavedrom": {
           "$ref": "#/$defs/corsair___generators__wavedrom__WaveDromGenerator__Config",
           "default": {
