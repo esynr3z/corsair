@@ -33,7 +33,12 @@
 
 ## Features
 
-TODO
+*   **Single Source of Truth:** Define CSR maps in a single file (e.g., YAML, JSON) and generate various outputs from it.
+*   **Code Generation:** Automatically generate HDL, software sources, and documentation from the CSR map.
+*   **CLI and API:** Offers both a command-line interface for quick operations and a Python API for more complex, custom workflows.
+*   **Customizable Workflows:** Supports user-side extensions for attributes, configurations, templates, and input/output formats.
+
+Check out the [Concepts](https://corsair-csr.github.io/latest/concepts/) section to understand the core concepts of Corsair.
 
 ## Quick Start
 
@@ -51,10 +56,34 @@ pip install corsair[all]
 
 For detailed installation instructions and information about optional features, see the [Installation Guide](https://corsair-csr.github.io/latest/installation/).
 
+Then you can quickly create a new project using the [`corsair init`](https://corsair-csr.github.io/latest/cli/#corsair-init) command:
+
+```bash
+corsair init
+```
+
+This command will create two files in the current directory: `csrmap.yaml` and `csrbuild.yaml`.
+
+The first file, `csrmap.yaml`, describes the source CSR map. It contains the definitions of your registers and their fields. The second file, `csrbuild.yaml`, is the build file. It specifies how to process the `csrmap.yaml` and what output files (like RTL code, software headers, or documentation) should be generated.
+
+Once you have your register map defined and the build file configured, you can generate the output files using the [`corsair build`](https://corsair-csr.github.io/latest/cli#corsair-build) command:
+
+```bash
+corsair build
+```
+
+This command will process your input files according to the `csrbuild.yaml` specification and place all generated artifacts into the `corsair-build` directory by default.
+
+To learn more about the underlying principles of Corsair, refer to the [Workflow](https://corsair-csr.github.io/latest/concepts/workflow) section in our concepts guide.
+
+For detailed information on the formats of the input files, please see the [Build File](https://corsair-csr.github.io/latest/build-file/) and [Register File](https://corsair-csr.github.io/latest/register-file/) documentation.
+
 
 ## Development
 
 Please follow the [Contributing Guide](CONTRIBUTING.md).
+
+All changes are documented in the [Changelog](CHANGELOG.md).
 
 ## License
 
