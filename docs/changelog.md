@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI command `corsair check` to validate input files
 - CLI command `corsair schema`  to generate JSON-schemas of input files for IDE hints, autocompletion and validation
 - CLI command `corsair build`  to render outputs
+- CLI command `corsair init`  to initialize a new project
 - `BuildSpecification` data model to store build targets and configuration
 - Register map data models (`Map`, `Register`, `Field`, `Enum`, `EnumMember`) for internal CSR representation
 - `SetializedParser` to parse register map from JSON/YAML/HJSON files
