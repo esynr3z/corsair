@@ -80,6 +80,12 @@
           "title": "Show Disclaimer",
           "type": "boolean"
         },
+        "show_hardware_mode": {
+          "default": false,
+          "description": "Enable showing hardware mode for each field.",
+          "title": "Show Hardware Mode",
+          "type": "boolean"
+        },
         "wavedrom": {
           "$ref": "#/$defs/corsair___generators__wavedrom__WaveDromGenerator__Config",
           "default": {

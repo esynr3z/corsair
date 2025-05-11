@@ -42,6 +42,9 @@ class MarkdownGenerator(Generator):
         show_disclaimer: bool = True
         """Enable generating disclaimer with version at the beginning of the file."""
 
+        show_hardware_mode: bool = False
+        """Enable showing hardware mode for each field."""
+
         wavedrom: WaveDromGenerator.Config = WaveDromGenerator.Config()
         """Configuration for the WaveDrom generator."""
 
