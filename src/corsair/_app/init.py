@@ -82,7 +82,7 @@ def _create_regmap() -> csr.Map:
     regs.append(
         csr.Register(
             name="DATA",
-            doc="Data register",
+            doc="Data register.\nThis is just the note to test multiple lines.",
             offset=0x4,
             fields=(
                 csr.Field(
@@ -96,7 +96,7 @@ def _create_regmap() -> csr.Map:
                 ),
                 csr.Field(
                     name="FERR",
-                    doc="Frame error flag. Read to clear.",
+                    doc="Frame error flag.\nRead to clear.",
                     width=1,
                     offset=16,
                     access=csr.AccessMode.ROLH,
@@ -105,7 +105,7 @@ def _create_regmap() -> csr.Map:
                 ),
                 csr.Field(
                     name="PERR",
-                    doc="Parity error flag. Read to clear.",
+                    doc="Parity error flag.\nRead to clear.",
                     width=1,
                     offset=17,
                     access=csr.AccessMode.ROLH,
@@ -173,13 +173,17 @@ def _create_regmap() -> csr.Map:
                         members=(
                             csr.EnumMember(name="B9600", value=0, doc="9600 baud"),
                             csr.EnumMember(name="B38400", value=1, doc="38400 baud"),
-                            csr.EnumMember(name="B115200", value=2, doc="115200 baud"),
+                            csr.EnumMember(
+                                name="B115200",
+                                value=2,
+                                doc="115200 baud\nNote: This is just the note to test multiple lines.",
+                            ),
                         ),
                     ),
                 ),
                 csr.Field(
                     name="TXEN",
-                    doc="Transmitter enable. Can be disabled by hardware on error.",
+                    doc="Transmitter enable.\nCan be disabled by hardware on error.",
                     width=1,
                     offset=4,
                     access=csr.AccessMode.RW,
@@ -188,7 +192,7 @@ def _create_regmap() -> csr.Map:
                 ),
                 csr.Field(
                     name="RXEN",
-                    doc="Receiver enable. Can be disabled by hardware on error.",
+                    doc="Receiver enable.\nCan be disabled by hardware on error.",
                     width=1,
                     offset=5,
                     access=csr.AccessMode.RW,
@@ -244,7 +248,7 @@ def _create_regmap() -> csr.Map:
             fields=(
                 csr.Field(
                     name="TX",
-                    doc="Transmitter interrupt flag. Write 1 to clear.",
+                    doc="Transmitter interrupt flag.\nWrite 1 to clear.",
                     width=1,
                     offset=0,
                     access=csr.AccessMode.RW1C,
@@ -253,7 +257,7 @@ def _create_regmap() -> csr.Map:
                 ),
                 csr.Field(
                     name="RX",
-                    doc="Receiver interrupt. Write 1 to clear.",
+                    doc="Receiver interrupt.\nWrite 1 to clear.",
                     width=1,
                     offset=1,
                     access=csr.AccessMode.RW1C,

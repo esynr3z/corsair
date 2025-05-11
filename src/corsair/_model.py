@@ -956,7 +956,7 @@ class Register(MapableItem):
                 reset=0,
                 access=AccessMode.RO,
                 hardware=HardwareMode.NA,
-                doc=f"Reserved bits {msb}:{lsb}",
+                doc="These bits are unused and reserved for future use",
                 offset=lsb,
                 width=msb - lsb + 1,
             )
