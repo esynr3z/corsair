@@ -74,6 +74,12 @@
           "title": "Print Conventions",
           "type": "boolean"
         },
+        "print_disclaimer": {
+          "default": true,
+          "description": "Enable generating disclaimer with version at the beginning of the file.",
+          "title": "Print Disclaimer",
+          "type": "boolean"
+        },
         "wavedrom": {
           "$ref": "#/$defs/corsair___generators__wavedrom__WaveDromGenerator__Config",
           "default": {

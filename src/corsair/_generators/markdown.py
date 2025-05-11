@@ -39,6 +39,9 @@ class MarkdownGenerator(Generator):
         print_conventions: bool = True
         """Enable generating table with register access modes explained."""
 
+        print_disclaimer: bool = True
+        """Enable generating disclaimer with version at the beginning of the file."""
+
         wavedrom: WaveDromGenerator.Config = WaveDromGenerator.Config()
         """Configuration for the WaveDrom generator."""
 
