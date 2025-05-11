@@ -154,7 +154,7 @@ def test_init_no_wavedrom_installed(mock_find_spec: mock.MagicMock, runner: CliR
     # Verify build spec content reflects no wavedrom
     build_spec_data = yaml.safe_load(build_file.read_text())
     assert "doc_wavedrom" not in build_spec_data["generators"]
-    assert build_spec_data["generators"]["doc_markdown"]["print_images"] is False
+    assert build_spec_data["generators"]["doc_markdown"]["show_images"] is False
 
 
 @mock.patch("importlib.util.find_spec")

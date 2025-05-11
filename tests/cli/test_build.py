@@ -64,11 +64,11 @@ generators:
   md0:
     kind: markdown
     file_name: "map.md"
-    print_images: true
+    show_images: true
   md1:
     kind: markdown
     file_name: "map1.md"
-    print_images: false
+    show_images: false
   wd:
     kind: wavedrom
     dump_json: true

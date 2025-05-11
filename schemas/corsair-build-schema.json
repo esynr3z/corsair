@@ -55,10 +55,10 @@
           "title": "Template Name",
           "type": "string"
         },
-        "print_images": {
+        "show_images": {
           "default": false,
           "description": "Enable generating images for bit fields of a register.",
-          "title": "Print Images",
+          "title": "Show Images",
           "type": "boolean"
         },
         "image_dir": {
@@ -68,16 +68,16 @@
           "title": "Image Dir",
           "type": "string"
         },
-        "print_conventions": {
+        "show_conventions": {
           "default": true,
           "description": "Enable generating table with register access modes explained.",
-          "title": "Print Conventions",
+          "title": "Show Conventions",
           "type": "boolean"
         },
-        "print_disclaimer": {
+        "show_disclaimer": {
           "default": true,
           "description": "Enable generating disclaimer with version at the beginning of the file.",
-          "title": "Print Disclaimer",
+          "title": "Show Disclaimer",
           "type": "boolean"
         },
         "wavedrom": {

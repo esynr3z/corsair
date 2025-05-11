@@ -64,7 +64,7 @@ def _create_buildspec(kind: TemplateKind) -> csr.BuildSpecification:
 
     generators = {}
     generators["doc_markdown"] = csr.MarkdownGenerator.Config(
-        print_images=wavedrom_available, wavedrom=csr.WaveDromGenerator.Config(lanes=2)
+        show_images=wavedrom_available, wavedrom=csr.WaveDromGenerator.Config(lanes=2)
     )
     if wavedrom_available:
         generators["doc_wavedrom"] = csr.WaveDromGenerator.Config(dump_json=True, lanes=2)
