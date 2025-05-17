@@ -40,15 +40,15 @@ def _dump(kind: TemplateKind, path: Path, data: dict) -> None:
         if kind == TemplateKind.YAML:
             import yaml
 
-            yaml.dump(data, f)
+            yaml.dump(data, f, sort_keys=False, indent=2)
         elif kind == TemplateKind.HJSON:
             import hjson
 
-            hjson.dump(data, f)
+            hjson.dump(data, f, sort_keys=False, indent=2)
         elif kind == TemplateKind.JSON:
             import json
 
-            json.dump(data, f)
+            json.dump(data, f, sort_keys=False, indent=2)
 
 
 def _create_buildspec(kind: TemplateKind) -> csr.BuildSpecification:
@@ -64,10 +64,16 @@ def _create_buildspec(kind: TemplateKind) -> csr.BuildSpecification:
 
     generators = {}
     generators["doc_markdown"] = csr.MarkdownGenerator.Config(
-        show_images=wavedrom_available, wavedrom=csr.WaveDromGenerator.Config(lanes=2)
+        kind="markdown",
+        show_images=wavedrom_available,
+        wavedrom=csr.WaveDromGenerator.Config(lanes=2),
     )
     if wavedrom_available:
-        generators["doc_wavedrom"] = csr.WaveDromGenerator.Config(dump_json=True, lanes=2)
+        generators["doc_wavedrom"] = csr.WaveDromGenerator.Config(
+            kind="wavedrom",
+            dump_json=True,
+            lanes=2,
+        )
 
     return csr.BuildSpecification(
         loader=loader,
@@ -330,5 +336,13 @@ def init(
     output.mkdir(parents=True, exist_ok=True)
 
     # Dump files
-    _dump(TemplateKind.YAML, output / "csrbuild.yaml", _create_buildspec(kind).model_dump(mode="json"))
-    _dump(kind, output / f"csrmap.{kind.value.lower()}", _create_regmap().model_dump(mode="json"))
+    _dump(
+        TemplateKind.YAML,
+        output / "csrbuild.yaml",
+        _create_buildspec(kind).model_dump(mode="json", exclude_unset=True),
+    )
+    _dump(
+        kind,
+        output / f"csrmap.{kind.value.lower()}",
+        _create_regmap().model_dump(mode="json", exclude_defaults=True, exclude_unset=True),
+    )
