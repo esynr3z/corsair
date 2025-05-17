@@ -33,16 +33,20 @@ The recommended way to develop Corsair is using the provided Devcontainer config
     docker build -t corsair-dev .devcontainer/
     ```
 5.  **Run the container**: Start an interactive container, mounting the project directory.
-    ```bash
-    # For Linux/macOS:
-    docker run -it --rm -v "$(pwd):/workspaces/corsair" -w /workspaces/corsair corsair-dev bash
 
-    # For Windows (Command Prompt):
-    docker run -it --rm -v "%cd%:/workspaces/corsair" -w /workspaces/corsair corsair-dev bash
+    === "Linux/macOS"
+        ```bash
+        docker run -it --rm -v "$(pwd):/workspaces/corsair" -w /workspaces/corsair corsair-dev bash
+        ```
+    === "Windows (Command Prompt)"
+        ```bash
+        docker run -it --rm -v "%cd%:/workspaces/corsair" -w /workspaces/corsair corsair-dev bash
+        ```
+    === "Windows (PowerShell)"
+        ```bash
+        docker run -it --rm -v "${PWD}:/workspaces/corsair" -w /workspaces/corsair corsair-dev bash
+        ```
 
-    # For Windows (PowerShell):
-    docker run -it --rm -v "${PWD}:/workspaces/corsair" -w /workspaces/corsair corsair-dev bash
-    ```
     *   `-it`: Interactive terminal.
     *   `--rm`: Remove the container when it exits.
     *   `-v "...:/workspaces/corsair"`: Mounts your local project directory into the container.
