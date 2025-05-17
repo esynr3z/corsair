@@ -47,6 +47,7 @@ theme:
     - toc.follow
     - content.action.edit
     - content.code.copy
+    - content.code.annotate
     - search.suggest
     - search.highlight
     - search.share
@@ -84,12 +85,22 @@ markdown_extensions:
   - toc:
       permalink: true
   - tables
+  - attr_list
+  - md_in_html
   - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true
       linenums: false
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.superfences
   - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
